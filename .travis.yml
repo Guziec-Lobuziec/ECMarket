@@ -1,0 +1,17 @@
+language: node_js
+
+before_install:
+  - npm install -g truffle
+
+cache:
+  directories:
+    - "node_modules"
+
+install:
+  - truffle install
+
+before_script:
+  - truffle develop
+
+script:
+  - truffle test
