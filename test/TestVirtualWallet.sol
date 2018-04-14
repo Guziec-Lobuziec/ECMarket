@@ -10,7 +10,7 @@ contract TestVirtualWallet {
 
     function testInitialBalanceOfWallet() {
 
-        VirtualWallet testWallet = VirtualWallet(DeployedAddresses.MetaCoin());
+        VirtualWallet testWallet = VirtualWallet(DeployedAddresses.VirtualWallet());
 
         uint expected = 0;
 
