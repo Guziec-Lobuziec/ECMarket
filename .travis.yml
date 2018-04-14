@@ -15,7 +15,8 @@ install:
   - truffle install
 
 before_script:
-  - ganache-cli
+  - nohup ganache-cli &
+  - sleep 1
 
 script:
   - truffle test
