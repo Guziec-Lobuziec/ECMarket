@@ -1,11 +1,10 @@
 language: node_js
+node_js:
+  - "7"
 
 before_install:
+  - npm i -g npm@5.8.0
   - npm install -g truffle
-
-cache:
-  directories:
-    - "node_modules"
 
 install:
   - truffle install
