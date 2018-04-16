@@ -16,4 +16,14 @@ contract TestAgreementManager {
 
     }
 
+    function testAgreementCreation() {
+
+        AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
+
+        address newAgreement = testManager.create();
+
+        Assert.equal(testManager.search(), newAgreement, "New agreement should be added");
+
+    }
+
 }
