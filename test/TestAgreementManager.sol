@@ -12,7 +12,9 @@ contract TestAgreementManager {
 
         AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
 
-        Assert.equal(testManager.search(), 0, "When no agreements are present return 0");
+        address[] memory expected = new address[];
+
+        Assert.equal(testManager.search(), expected, "When no agreements are present return empty array");
 
     }
 
@@ -22,7 +24,7 @@ contract TestAgreementManager {
 
         address newAgreement = testManager.create();
 
-        Assert.equal(testManager.search(), newAgreement, "New agreement should be added");
+        Assert.equal(testManager.search(), [newAgreement], "New agreement should be added");
 
     }
 
