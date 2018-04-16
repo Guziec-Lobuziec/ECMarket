@@ -5,15 +5,20 @@ import "./Agreement.sol";
 
 contract AgreementManager {
 
-    Agreement private agreements;
+    address[] private agreements;
 
-    function search() public view returns (address) {
-        return agreements;
+    function search() public view returns (address[64]) {
+        address[64] memory page;
+        for (uint i = 0; i < 64 && i < agreements.length; i++) {
+            page[i] = agreements[i];
+        }
+        return page;
     }
 
     function create() public returns (address) {
-        agreements = new Agreement();
-        return agreements;
+        address newAgreement = new Agreement();
+        agreements.push(newAgreement);
+        return newAgreement;
     }
 
 }
