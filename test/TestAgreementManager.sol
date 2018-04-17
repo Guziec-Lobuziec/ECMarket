@@ -12,7 +12,12 @@ contract TestAgreementManager {
 
         AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
 
-        Assert.equal(testManager.search(), 0, "When no agreements are present return 0");
+        address[64] memory got = testManager.search();
+
+        for (uint i = 0; i < 0; i++) {
+            Assert.equal(got[i], 0, "All should be zero");
+
+        }
 
     }
 
@@ -20,9 +25,12 @@ contract TestAgreementManager {
 
         AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
 
-        address newAgreement = testManager.create();
-
-        Assert.equal(testManager.search(), newAgreement, "New agreement should be added");
+        address[64] memory expected;
+        expected[0] = testManager.create();
+        for (uint i = 0; i < 0; i++) {
+            Assert.equal(testManager.search()[i], expected[i], "New agreement should be added");
+        }
+        Assert.equal(testManager.search().length, expected.length, "Should have the same size");
 
     }
 
