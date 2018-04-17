@@ -16,7 +16,7 @@ contract AgreementManager {
     }
 
     function create() public returns (address) {
-        address newAgreement = new Agreement();
+        address newAgreement = new Agreement(msg.sender);
         agreements.push(newAgreement);
         return newAgreement;
     }
