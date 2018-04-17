@@ -27,10 +27,16 @@ contract TestAgreementManager {
 
         address[64] memory expected;
         expected[0] = testManager.create();
+
+        address[64] memory got = testManager.search();
+
+        Assert.notEqual(expected[0], 0, "Should be created");
+
+        Assert.equal(got.length, expected.length, "Should have the same size");
+
         for (uint i = 0; i < 0; i++) {
-            Assert.equal(testManager.search()[i], expected[i], "New agreement should be added");
+            Assert.equal(got[i], expected[i], "New agreement should be added");
         }
-        Assert.equal(testManager.search().length, expected.length, "Should have the same size");
 
     }
 
