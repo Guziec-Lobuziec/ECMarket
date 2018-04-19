@@ -18,4 +18,14 @@ contract TestVirtualWallet {
 
     }
 
+    function testPayInBalanceOfWallet(){
+
+        uint public etherBalance = 3 ether;
+        VirtualWallet testWallet = VirtualWallet(DeployedAddresses.VirtualWallet());
+
+        address public _from;
+        testWallet.payIn(_from,testWallet.getAddress,etherBalance)
+        Assert.equal(testWallet.getBalance(tx.origin),3, "Wallet should have 3 units of basic token");
+    }
+
 }
