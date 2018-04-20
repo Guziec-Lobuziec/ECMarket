@@ -1,13 +1,17 @@
 pragma solidity 0.4.21;
 
+import "./AgreementManager.sol";
+
 
 contract Agreement {
     enum Status { New }
     address private creator;
     uint private creationBlock;
     uint private creationTimestamp;
+    AgreementManager private agreementManager;
 
     function Agreement(address _creator) public {
+        agreementManager = AgreementManager(msg.sender);
         creator = _creator;
         creationBlock = block.number;
         creationTimestamp = block.timestamp;
@@ -27,6 +31,10 @@ contract Agreement {
 
     function getStatus() public view returns(Status) {
         return Status.New;
+    }
+
+    function remove() public {
+        agreementManager.remove();
     }
 
 }
