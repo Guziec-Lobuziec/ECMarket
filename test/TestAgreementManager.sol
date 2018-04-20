@@ -14,7 +14,7 @@ contract TestAgreementManager {
 
         address[64] memory got = testManager.search();
 
-        for (uint i = 0; i < 0; i++) {
+        for (uint i = 0; i < got.length; i++) {
             Assert.equal(got[i], 0, "All should be zero");
 
         }
@@ -34,7 +34,7 @@ contract TestAgreementManager {
 
         Assert.equal(got.length, expected.length, "Should have the same size");
 
-        for (uint i = 0; i < 0; i++) {
+        for (uint i = 0; i < got.length; i++) {
             Assert.equal(got[i], expected[i], "New agreement should be added");
         }
 
