@@ -21,4 +21,27 @@ contract TestAgreement {
 
     }
 
+    function testAgreementRemoval() {
+        AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
+
+        address[64] memory before = testManager.search();
+
+        for (uint i = 0; i < before.length; i++) {
+            Assert.equal(before[i], 0, "expected 0");
+        }
+
+        Agreement testAgreement = Agreement(testManager.create());
+
+        Assert.notEqual(testAgreement, 0, "Agreement doesn't exist");
+
+        testAgreement.remove();
+
+        address[64] memory expected = testManager.search();
+
+        for (uint i = 0; i < expected.length; i++) {
+            Assert.equal(expected[i], 0, "expected 0");
+        }
+
+    }
+
 }
