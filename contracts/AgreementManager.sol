@@ -21,4 +21,8 @@ contract AgreementManager {
         return newAgreement;
     }
 
+    function remove() public {
+        delete agreements;
+    }
+
 }
