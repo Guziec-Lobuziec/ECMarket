@@ -35,6 +35,7 @@ contract Agreement {
 
     function remove() public {
         agreementManager.remove();
+        selfdestruct(address(agreementManager));
     }
 
 }
