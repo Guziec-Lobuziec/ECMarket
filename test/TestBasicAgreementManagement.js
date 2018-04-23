@@ -13,23 +13,24 @@ contract("Agreement basic management - removal", async (accounts) => {
     assert.equal(createTransaction.logs.length, 1, "one event generated");
     assert.equal(createTransaction.logs[0].event, "AgreementCreation", "event name");
 
-    let agreement = await Agreement.at(createTransaction.logs[0].args.created);
+    let agreementAddress = createTransaction.logs[0].args.created;
 
-    console.log(agreement);
+    console.log(agreementAddress);
 
-    assert.notEqual(agreement, 0, 'should have valid address');
+    assert.notEqual(agreementAddress, 0, 'should have valid address');
 
-    let codeOfAgreementBefore = await web3.eth.getCode(agreement);
+    let codeOfAgreementBefore = await web3.eth.getCode(agreementAddress);
     assert.notEqual(codeOfAgreementBefore, "0x0", "should have some code");
 
     let agreements = await testManager.search();
     let one = agreements.filter((e) => {return e != 0;});
     assert.lengthOf(one, 1,'exactly one non zero');
-    assert.include(one, [agreement], "manager should return the same address");
+    assert.equal(one[0], agreementAddress, "manager should return the same address");
 
+    let agreement = await Agreement.at(agreementAddress);
     await agreement.remove({from: accounts[0]});
 
-    let codeOfAgreementAfter = await web3.eth.getCode(agreement);
+    let codeOfAgreementAfter = await web3.eth.getCode(agreementAddress);
     assert.equal(codeOfAgreementAfter, "0x0", "should have none");
 
     let after = await testManager.search();
