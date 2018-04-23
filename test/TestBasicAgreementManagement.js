@@ -32,7 +32,7 @@ contract("Agreement basic management - removal", async (accounts) => {
     assert.equal(codeOfAgreementAfter, "0x0", "should have none");
 
     let after = await testManager.search();
-    assert.isTrue(after.every((e) => {return e === 0;}),'expected to be zeros after');
+    assert.isTrue(after.every((e) => {return e == 0;}),'expected to be zeros after');
 
   })
 
