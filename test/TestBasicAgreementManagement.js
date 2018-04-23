@@ -39,3 +39,49 @@ contract("Agreement basic management - removal", async (accounts) => {
   })
 
 })
+
+contract("Agreement basic management - remove selected", async (accounts) => {
+
+  it("Test if only selected agreement is removed", async () => {
+    let testManager = await AgreementManager.deployed();
+
+    let before = await testManager.search();
+    assert.isTrue(before.every((e) => {return e == 0;}),'expected to be zeros before');
+
+    let createTransaction1 = await testManager.create({from: accounts[0]});
+    let createTransaction2 = await testManager.create({from: accounts[0]});
+
+    let agreements = await testManager.search();
+    assert.equal(agreements.filter((e) => {return e != 0;}).length, 2, "Should be two non zero records");
+
+    let creationLogs = await (new Promise(function(resolve,reject) {
+      testManager.AgreementCreation({},{fromBlock: 0, toBlock: 'latest'})
+                                          .get((error, eventResult) => {
+                                            if(error)
+                                              return reject(error);
+                                            else
+                                              return resolve(eventResult);
+                                          });
+    }));
+
+    console.log(creationLogs.map((l) => {return l.args.created}));
+    assert.equal(creationLogs.length, 2, "Should be two events");
+    assert.include(
+      agreements.toString(),
+      creationLogs.map((l) => {return l.args.created}),
+      "Search and logs should match"
+    );
+
+    let createdAgreements = agreements.filter((e) => {return e != 0;});
+    let agreementToBeRemoved = await Agreement.at(createdAgreements[0]);
+    await agreementToBeRemoved.remove({from: accounts[0]});
+
+    let after = await testManager.search();
+    assert.notInclude(after, createdAgreements[0],'no longer exists');
+    assert.include(after, createdAgreements[1], 'second agreement still tracked');
+    assert.equal(await web3.eth.getCode(createdAgreements[0]), '0x0', "destroyed");
+    assert.notEqual(await web3.eth.getCode(createdAgreements[1]), '0x0', "untouched");
+
+  })
+
+})
