@@ -1,4 +1,5 @@
 var AgreementManager = artifacts.require("AgreementManager");
+var Agreement = artifacts.require("Agreement");
 
 contract("Agreement basic management - removal", async (accounts) => {
 
@@ -12,7 +13,7 @@ contract("Agreement basic management - removal", async (accounts) => {
     assert.equal(createTransaction.logs.length, 1, "one event generated");
     assert.equal(createTransaction.logs[0].event, "AgreementCreation", "event name");
 
-    let agreement = createTransaction.logs[0].args.created;
+    let agreement = await Agreement.at(createTransaction.logs[0].args.created);
 
     console.log(agreement);
 
