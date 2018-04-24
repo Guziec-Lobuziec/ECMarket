@@ -10,12 +10,13 @@ contract TestVirtualWallet {
 
     function testInitialBalanceOfWallet() {
 
-        VirtualWallet testWallet = VirtualWallet(DeployedAddresses.VirtualWallet());
+        VirtualWallet testWallet = new VirtualWallet();
 
         uint expected = 0;
 
-        Assert.equal(testWallet.getBalance(tx.origin), expected, "Waller should have 0 units of basic token");
+        Assert.equal(testWallet.getBalance(this), expected, "Waller should have 0 units of basic token");
 
     }
+
 
 }
