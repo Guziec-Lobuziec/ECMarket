@@ -6,11 +6,13 @@ contract("VirtualWallet payin and payout test", async (accounts) => {
         let testWallet = await VirtualWallet.deployed();
         let testValue = 1000;
 
-        assert.equal(await testWallet.getBalance(accounts[0]), 0, "Should be zero");
+        let before = await testWallet.getBalance(accounts[0]);
+        assert.equal(before, 0, "Should be zero");
 
         await testWallet.payIn({from: accounts[0], value: testValue});
 
-        assert.equal(await testWallet.getBalance(accounts[0]), testValue, "Should be equal");
+        let after = await testWallet.getBalance(accounts[0]);
+        assert.equal(after, testValue, "Should be equal");
 
     })
 })
