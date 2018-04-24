@@ -4,7 +4,7 @@ function assertError(error, s, message) {
 
 async function assertThrows(callback, message, errorCode) {
     try {
-        await callback()
+        await callback
     } catch (e) {
         return assertError(e, errorCode, message)
     }
