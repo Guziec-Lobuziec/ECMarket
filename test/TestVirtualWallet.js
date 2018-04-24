@@ -26,6 +26,12 @@ contract("VirtualWallet payin and payout test", async (accounts) => {
         await testWallet.payOut(testValue,{from: accounts[0]});
         let after = await testWallet.getBalance(accounts[0]);
 
-        assert.equal(after.toNumber(),500, "Should be 500");
+        assert.equal(after.toNumber(),testValue, "Should be 500");
+        let actualWalletBalance = await web3.eth.getBalance(testWallet.address);
+        assert.equal(
+            actualWalletBalance.toNumber(),
+            testValue,
+            "Contract balance should be equal to 500"
+        );
     })
 })
