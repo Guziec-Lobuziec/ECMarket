@@ -1,5 +1,4 @@
 const {assertRevert} = require('./helpers/assertThrow');
-const BigNumber = require('bignumber.js');
 const AgreementManager = artifacts.require("AgreementManager");
 const Agreement = artifacts.require("Agreement");
 
