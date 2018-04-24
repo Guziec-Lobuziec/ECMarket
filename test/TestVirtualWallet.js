@@ -7,12 +7,25 @@ contract("VirtualWallet payin and payout test", async (accounts) => {
         let testValue = 1000;
 
         let before = await testWallet.getBalance(accounts[0]);
-        assert.equal(before, 0, "Should be zero");
+        assert.equal(before.toNumber(), "0", "Should be zero");
 
         await testWallet.payIn({from: accounts[0], value: testValue});
 
         let after = await testWallet.getBalance(accounts[0]);
-        assert.equal(after, testValue, "Should be equal");
+        assert.equal(after.toNumber(), testValue, "Should be equal");
 
+    })
+    it("test payout", async () => {
+        let testWallet = await VirtualWallet.deployed();
+        let testValue = 500;
+
+        let before = await testWallet.getBalance(accounts[0]);
+        assert.equal(before.toNumber(),1000, "Should be 1000");
+
+
+        await testWallet.payOut(testValue,{from: accounts[0]});
+        let after = await testWallet.getBalance(accounts[0]);
+
+        assert.equal(after.toNumber(),500, "Should be 500");
     })
 })
