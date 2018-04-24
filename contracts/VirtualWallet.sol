@@ -15,4 +15,9 @@ contract VirtualWallet {
     {
         value = msg.value;    
     }
+
+    function payOut(uint amount) public
+    {
+        value -= amount;
+    }
 }
