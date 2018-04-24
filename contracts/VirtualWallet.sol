@@ -6,7 +6,7 @@ contract VirtualWallet {
     uint private value;
 
     function getBalance(address externalWallet) public view returns (uint balance) {
-        return value;
+        return this.balance;
     }
 
 
@@ -16,8 +16,8 @@ contract VirtualWallet {
         value = msg.value;    
     }
 
-    function payOut(uint amount) public
+    function payOut(uint amount) public payable
     {
-        value -= amount;
+        msg.sender.send(amount);
     }
 }
