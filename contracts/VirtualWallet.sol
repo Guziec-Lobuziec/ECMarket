@@ -5,15 +5,17 @@ contract VirtualWallet {
 
     uint private value;
 
+    mapping (address=>uint) walletValue;
+
     function getBalance(address externalWallet) public view returns (uint balance) {
-        return this.balance;
+        return walletValue[this.balance];
     }
 
 
 
     function payIn() public payable
     {
-        value = msg.value;    
+        walletValue[this.balance] = msg.value;    
     }
 
     function payOut(uint amount) public payable
