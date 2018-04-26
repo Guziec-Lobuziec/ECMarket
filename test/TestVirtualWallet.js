@@ -1,3 +1,4 @@
+const {assertRevert} = require('./helpers/assertThrow');
 var VirtualWallet = artifacts.require("VirtualWallet");
 
 contract("VirtualWallet payin and payout test", async (accounts) => {
@@ -89,4 +90,16 @@ contract("VirtualWallet multiple users test", async (accounts) => {
             "Should be "+(testValue2-payout2)
         );
     })
+})
+
+contract("VirtualWallet with invalid input", async (accounts) => {
+  it("throw if trying withdraw more than curently in wallet", async () => {
+    let testWallet = await VirtualWallet.deployed();
+    let valueIn = 1000;
+    let valueOut = 2000;
+
+    await testWallet.payIn({from: accounts[0], value: valueIn});
+
+    await assertRevert(testWallet.payOut(valueOut,{from: accounts[0]}));
+  })
 })

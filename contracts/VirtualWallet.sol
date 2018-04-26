@@ -14,10 +14,9 @@ contract VirtualWallet {
     }
 
     function payOut(uint amount) public payable {
-        if (walletValue[msg.sender] >= amount) {
-            walletValue[msg.sender] -= amount;
-            msg.sender.transfer(amount);
-        }
+        require(walletValue[msg.sender] >= amount);
+        walletValue[msg.sender] -= amount;
+        msg.sender.transfer(amount);
 
     }
 }
