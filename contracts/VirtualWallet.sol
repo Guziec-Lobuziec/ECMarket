@@ -10,7 +10,7 @@ contract VirtualWallet {
     mapping (address => uint) walletValue;
 
     function getBalance(address externalWallet) public view returns (uint balance) {
-        value = walletValue[path];
+        value = walletValue[externalWallet];
         return value;
     }
 
@@ -18,15 +18,14 @@ contract VirtualWallet {
 
     function payIn() public payable
     {
-        path = msg.sender;
-        walletValue[path] += msg.value;    
+        walletValue[msg.sender] += msg.value;    
     }
 
     function payOut(uint amount) public payable
     {
-        path = msg.sender;
-        if(walletValue[path] >= amount) {
-            walletValue[path] -= amount;
+
+        if(walletValue[msg.sender] >= amount) {
+            walletValue[msg.sender] -= amount;
             msg.sender.transfer(amount);
          }
         
