@@ -34,6 +34,7 @@ contract Agreement {
     }
 
     function remove() public {
+        require(msg.sender == creator);
         agreementManager.remove();
         selfdestruct(address(agreementManager));
     }
