@@ -61,7 +61,7 @@ contract("VirtualWallet multiple users test", async (accounts) => {
 
     it("multiple payouts", async () => {
         let testWallet = await VirtualWallet.deployed();
-        let testValue1 = 1000;
+        let testValue1 = 2000;
         let testValue2 = 2000;
         let payout1 = 400;
         let payout2 = 1200;

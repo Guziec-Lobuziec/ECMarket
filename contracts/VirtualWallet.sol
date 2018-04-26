@@ -4,7 +4,7 @@ pragma solidity 0.4.21;
 contract VirtualWallet {
 
     
-    address private path = msg.sender;
+    address private path;
     uint private value;
 
     mapping (address => uint) walletValue;
@@ -18,13 +18,15 @@ contract VirtualWallet {
 
     function payIn() public payable
     {
+        path = msg.sender;
         walletValue[path] += msg.value;    
     }
 
     function payOut(uint amount) public payable
     {
-           if(walletValue[msg.sender] >= amount) {
-             walletValue[msg.sender] -= amount;
+        path = msg.sender;
+        if(walletValue[path] >= amount) {
+            walletValue[path] -= amount;
             msg.sender.transfer(amount);
          }
         
