@@ -39,7 +39,7 @@ contract("VirtualWallet payin and payout test", async (accounts) => {
 contract("VirtualWallet multiple users test", async (accounts) => {
     it("multiple payins", async () => {
         let testWallet = await VirtualWallet.deployed();
-        let testValue1 = 1000;
+        let testValue1 = 2000;
         let testValue2 = 2000;
 
         let before1 = await testWallet.getBalance.call(accounts[0]);

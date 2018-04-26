@@ -3,28 +3,30 @@ pragma solidity 0.4.21;
 
 contract VirtualWallet {
 
+    
+    address private path = msg.sender;
     uint private value;
 
     mapping (address => uint) walletValue;
 
     function getBalance(address externalWallet) public view returns (uint balance) {
-        return walletValue[this];
+        value = walletValue[path];
+        return value;
     }
 
 
 
     function payIn() public payable
     {
-        walletValue[this] += msg.value;    
+        walletValue[path] += msg.value;    
     }
 
     function payOut(uint amount) public payable
     {
-        
-        //   if(walletValue[msg.sender] >= amount) {
-        //     walletValue[msg.sender] -= amount;
+           if(walletValue[msg.sender] >= amount) {
+             walletValue[msg.sender] -= amount;
             msg.sender.transfer(amount);
-        // }
+         }
         
     }
 }
