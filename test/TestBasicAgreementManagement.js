@@ -1,18 +1,7 @@
 const {assertRevert} = require('./helpers/assertThrow');
+const {createManyAgreements} = require('./helpers/agreementFactory');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
-
-async function createManyAgreements(manager, setupData) {
-
-        var transactions = [];
-        var i;
-        setupData.forEach((accountData) => {
-          for(i = 0; i < accountData.count; i++) {
-            transactions.push(manager.create({from: accountData.address}));
-          }
-        });
-        return Promise.all(transactions);
-}
 
 contract('Agreement basic management - creation, removal', async (accounts) => {
 
