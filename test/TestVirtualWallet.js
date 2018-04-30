@@ -2,30 +2,33 @@ const {assertRevert} = require('./helpers/assertThrow');
 var VirtualWallet = artifacts.require("VirtualWallet");
 
 contract("VirtualWallet payin and payout test", async (accounts) => {
-    it("test payin", async () => {
+    let testWallet;
 
-        let testWallet = await VirtualWallet.deployed();
+    before(async () => {
+      testWallet = await VirtualWallet.deployed();
+    })
+
+    it("test payin", async () => {
         let testValue = 1000;
 
-        let before = await testWallet.getBalance(accounts[0]);
+        let before = await testWallet.getBalance.call(accounts[0]);
         assert.equal(before.toNumber(), "0", "Should be zero");
 
         await testWallet.payIn({from: accounts[0], value: testValue});
 
-        let after = await testWallet.getBalance(accounts[0]);
+        let after = await testWallet.getBalance.call(accounts[0]);
         assert.equal(after.toNumber(), testValue, "Should be equal");
 
     })
     it("test payout", async () => {
-        let testWallet = await VirtualWallet.deployed();
         let testValue = 500;
 
-        let before = await testWallet.getBalance(accounts[0]);
+        let before = await testWallet.getBalance.call(accounts[0]);
         assert.equal(before.toNumber(),1000, "Should be 1000");
 
 
         await testWallet.payOut(testValue,{from: accounts[0]});
-        let after = await testWallet.getBalance(accounts[0]);
+        let after = await testWallet.getBalance.call(accounts[0]);
 
         assert.equal(after.toNumber(),testValue, "Should be 500");
         let actualWalletBalance = await web3.eth.getBalance(testWallet.address);
@@ -38,8 +41,13 @@ contract("VirtualWallet payin and payout test", async (accounts) => {
 })
 
 contract("VirtualWallet multiple users test", async (accounts) => {
+  let testWallet;
+
+  before(async () => {
+    testWallet = await VirtualWallet.deployed();
+  })
+
     it("multiple payins", async () => {
-        let testWallet = await VirtualWallet.deployed();
         let testValue1 = 2000;
         let testValue2 = 2000;
 
@@ -61,7 +69,6 @@ contract("VirtualWallet multiple users test", async (accounts) => {
     })
 
     it("multiple payouts", async () => {
-        let testWallet = await VirtualWallet.deployed();
         let testValue1 = 2000;
         let testValue2 = 2000;
         let payout1 = 400;
@@ -93,8 +100,14 @@ contract("VirtualWallet multiple users test", async (accounts) => {
 })
 
 contract("VirtualWallet with invalid input", async (accounts) => {
+
+  let testWallet;
+
+  before(async () => {
+    testWallet = await VirtualWallet.deployed();
+  })
+
   it("throw if trying withdraw more than curently in wallet", async () => {
-    let testWallet = await VirtualWallet.deployed();
     let valueIn = 1000;
     let valueOut = 2000;
 
