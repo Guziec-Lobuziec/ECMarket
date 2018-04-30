@@ -26,17 +26,20 @@ contract TestVirtualWallet {
 
     uint public initialBalance = 5000;
 
+    VirtualWallet testWallet;
+
+    function beforeAll() {
+        testWallet = VirtualWallet(DeployedAddresses.VirtualWallet());
+    }
+
     function testInitialBalanceOfWallet() {
-
-        VirtualWallet testWallet = VirtualWallet(DeployedAddresses.VirtualWallet());
-
         uint expected = 0;
 
         Assert.equal(testWallet.getBalance(this), expected, "Wallet should have 0 units of basic token");
     }
 
     function testBalanceChangeOfTest() {
-        VirtualWallet testWallet = VirtualWallet(DeployedAddresses.VirtualWallet());
+
         uint expected = 1000;
 
         testWallet.payIn.value(expected)();
@@ -47,7 +50,6 @@ contract TestVirtualWallet {
 
     function testSelfdestructionTransferEffects() {
 
-        VirtualWallet testWallet = VirtualWallet(DeployedAddresses.VirtualWallet());
         uint expected = 1000;
         uint sentToDummy = 1000;
         DummyMortal dummy = (new DummyMortal).value(sentToDummy)(address(testWallet));
