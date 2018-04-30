@@ -40,8 +40,6 @@ contract('Agreement basic management - creation, removal', async (accounts) => {
 
     agreementAddress = createTransactions[0].logs[0].args.created;
 
-    console.log(agreementAddress);
-
     assert.notEqual(agreementAddress, 0, 'should have valid address');
 
     let codeOfAgreementBefore = await web3.eth.getCode(agreementAddress);
@@ -106,7 +104,6 @@ contract('Agreement basic management - remove selected', async (accounts) => {
                                           });
     }));
 
-    console.log(creationLogs.map((l) => {return l.args.created}));
     assert.equal(creationLogs.length, 2, 'Should be two events');
     assert.include(
       agreements.toString(),
@@ -125,8 +122,8 @@ contract('Agreement basic management - remove selected', async (accounts) => {
     let after = await testManager.search.call();
     assert.notInclude(after, createdAgreements[0],'no longer exists');
     assert.include(after, createdAgreements[1], 'second agreement still tracked');
-    assert.equal(await web3.eth.getCode(createdAgreements[0]), '0x0', 'destroyed');
-    assert.notEqual(await web3.eth.getCode(createdAgreements[1]), '0x0', 'untouched');
+    assert.equal(await web3.eth.getCode(createdAgreements[0]), '0x0', 'should be destroyed');
+    assert.notEqual(await web3.eth.getCode(createdAgreements[1]), '0x0', 'should be untouched');
 
   })
 })
@@ -134,7 +131,7 @@ contract('Agreement basic management - remove selected', async (accounts) => {
 contract('Agreement basic management - permissions to remove', async (accounts) => {
 
   let testManager;
-  let agreementsAddresses;
+  let agreementsAddresses = [];
 
   before(async () => {
     testManager = await AgreementManager.deployed();
@@ -167,5 +164,12 @@ contract('Agreement basic management - permissions to remove', async (accounts) 
       3,
       'Should be three non zero records'
     );
+  })
+
+  it('Test if contracts still exists', async () => {
+    var i;
+    for(i = 0; i < agreementsAddresses.length; i++ ) {
+      assert.notEqual(await web3.eth.getCode(agreementsAddresses[i]), '0x0', 'should be untouched');
+    }
   })
 })
