@@ -5,21 +5,27 @@ import "./AgreementManager.sol";
 
 contract Agreement {
     enum Status { New }
-    address private creator;
+    address[] private participants;
     uint private creationBlock;
     uint private creationTimestamp;
     AgreementManager private agreementManager;
 
-    function Agreement(address _creator) public {
+    function Agreement(address creator) public {
         agreementManager = AgreementManager(msg.sender);
-        creator = _creator;
+        participants.push(creator);
         creationBlock = block.number;
         creationTimestamp = block.timestamp;
     }
 
+    function join() public {
+        participants.push(msg.sender);
+    }
+
     function getParticipants() public view returns(address[64]) {
         address[64] memory page;
-        page[0] = creator;
+        for (uint i = 0; i < participants.length && i < 64; i++) {
+            page[i] = participants[i];
+        }
         return page;
     }
 
@@ -36,7 +42,7 @@ contract Agreement {
     }
 
     function remove() public {
-        require(msg.sender == creator);
+        require(msg.sender == participants[0]);
         agreementManager.remove();
         selfdestruct(address(agreementManager));
     }
