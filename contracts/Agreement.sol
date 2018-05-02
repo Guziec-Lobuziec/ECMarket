@@ -17,8 +17,10 @@ contract Agreement {
         creationTimestamp = block.timestamp;
     }
 
-    function getParticipants() public view returns(address) {
-        return creator;
+    function getParticipants() public view returns(address[64]) {
+        address[64] memory page;
+        page[0] = creator;
+        return page;
     }
 
     function getCreationBlock() public view returns(uint) {
