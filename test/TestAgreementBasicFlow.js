@@ -1,5 +1,4 @@
 const {createManyAgreements} = require('./helpers/agreementFactory');
-const BigNumber = require('bignumber.js');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 
@@ -43,5 +42,31 @@ contract('Agreement flow', async (accounts) => {
       [creator, accounts[1], accounts[2]],
       "Creator or suplicant missing"
     );
+  })
+
+  it('Test if suplicant or creator cannot double-join', async () => {
+    let before = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
+
+    await agreement.join({from: creator});
+
+    let afterCreatorJoin = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
+    assert.lengthOf(afterCreatorJoin, 3, "should have three participants");
+    assert.include(
+      afterCreatorJoin.toString(),
+      [creator, accounts[1], accounts[2]],
+      "Creator or suplicant missing"
+    );
+    assert.equal(afterCreatorJoin, before, "Should be equal after creator join");
+
+    await agreement.join({from: accounts[2]});
+
+    let afterSuplicantJoin = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
+    assert.lengthOf(afterSuplicantJoin, 3, "should have three participants");
+    assert.include(
+      afterSuplicantJoin.toString(),
+      [creator, accounts[1], accounts[2]],
+      "Creator or suplicant missing"
+    );
+    assert.equal(afterSuplicantJoin, before, "Should be equal after suplicant join");
   })
 })
