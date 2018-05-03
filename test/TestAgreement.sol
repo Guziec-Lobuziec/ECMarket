@@ -14,7 +14,10 @@ contract TestAgreement {
 
         Agreement testAgreement = Agreement(testManager.create());
 
-        Assert.equal(testAgreement.getParticipants(), this, "Test should be creator and only participan");
+        address[64] memory participants;
+        participants = testAgreement.getParticipants();
+
+        Assert.equal(participants[0], this, "Should have agreement creator");
         Assert.equal(testAgreement.getCreationBlock(), block.number, "Should be created in same block as test tx");
         Assert.equal(testAgreement.getCreationTimestamp(), block.timestamp, "Same timestamp as in test");
         Assert.equal(uint(testAgreement.getStatus()), uint(Agreement.Status.New), "Should have \"New\" Status");
