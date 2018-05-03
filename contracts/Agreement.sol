@@ -4,10 +4,12 @@ import "./AgreementManager.sol";
 
 
 contract Agreement {
-    enum Status { New }
+    enum Status { New, Running }
 
     address[] private participants;
     mapping(address => bool) private participantsSet;
+
+    Status private currentStatus;
 
     uint private creationBlock;
     uint private creationTimestamp;
@@ -21,6 +23,7 @@ contract Agreement {
 
         creationBlock = block.number;
         creationTimestamp = block.timestamp;
+        currentStatus = Status.New;
     }
 
     function join() public {
@@ -28,6 +31,10 @@ contract Agreement {
             participantsSet[msg.sender] = true;
             participants.push(msg.sender);
         }
+    }
+
+    function accept(address suplicant) public {
+        currentStatus = Status.Running;
     }
 
     function getParticipants() public view returns(address[64]) {
