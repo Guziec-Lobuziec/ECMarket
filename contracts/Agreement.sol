@@ -54,7 +54,7 @@ contract Agreement {
     }
 
     function getStatus() public view returns(Status) {
-        return Status.New;
+        return currentStatus;
     }
 
     function remove() public {
