@@ -56,7 +56,12 @@ contract('Agreement flow', async (accounts) => {
       [creator, accounts[1], accounts[2]],
       "Creator or suplicant missing"
     );
-    assert.equal(afterCreatorJoin, before, "Should be equal after creator join");
+
+    let i;
+
+    for(i = 0; i < afterCreatorJoin.length; i++) {
+      assert.equal(afterCreatorJoin[i], before[i], "Should be in same order");
+    }
 
     await agreement.join({from: accounts[2]});
 
@@ -67,6 +72,9 @@ contract('Agreement flow', async (accounts) => {
       [creator, accounts[1], accounts[2]],
       "Creator or suplicant missing"
     );
-    assert.equal(afterSuplicantJoin, before, "Should be equal after suplicant join");
+
+    for(i = 0; i < afterSuplicantJoin.length; i++) {
+      assert.equal(afterSuplicantJoin[i], before[i], "Should be in same order");
+    }
   })
 })
