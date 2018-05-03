@@ -77,4 +77,12 @@ contract('Agreement flow', async (accounts) => {
       assert.equal(afterSuplicantJoin[i], before[i], "Should be in same order");
     }
   })
+
+  it('Test accepting participants', async () => {
+
+    await agreement.accept(accounts[1], {from: creator});
+
+    assert.equal((await agreement.getStatus.call()), Agreement.Status.Running, 'Should be "Running"');
+
+  })
 })
