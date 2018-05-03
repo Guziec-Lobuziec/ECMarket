@@ -3,7 +3,7 @@ const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 
 
-contract('Agreement flow', async (accounts) => {
+contract('Agreement flow - joining', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
@@ -76,13 +76,5 @@ contract('Agreement flow', async (accounts) => {
     for(i = 0; i < afterSuplicantJoin.length; i++) {
       assert.equal(afterSuplicantJoin[i], before[i], "Should be in same order");
     }
-  })
-
-  it('Test accepting participants', async () => {
-
-    await agreement.accept(accounts[1], {from: creator});
-
-    assert.equal((await agreement.getStatus.call()), Agreement.Status.Running, 'Should be "Running"');
-
   })
 })
