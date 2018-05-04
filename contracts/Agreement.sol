@@ -34,6 +34,9 @@ contract Agreement {
     }
 
     function accept(address suplicant) public {
+        require(msg.sender == participants[0]);
+        require(participantsSet[suplicant]);
+        require(suplicant != participants[0]);
         currentStatus = Status.Running;
     }
 
