@@ -4,29 +4,7 @@ import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 
 import "../contracts/AgreementManager.sol";
-
-
-contract DummyParticipant {
-
-    AgreementManager private manager;
-
-    function setManager(address _manager) public {
-        manager = AgreementManager(_manager);
-    }
-
-    function createAgreement() public returns(address) {
-        return manager.create();
-    }
-
-    function joinAgreement(address agreement) public {
-        Agreement(agreement).join();
-    }
-
-    function acceptParticipant(address participant, address agreement) public {
-        Agreement(agreement).accept(participant);
-    }
-
-}
+import "./helpers/DummyParticipant.sol";
 
 
 contract TestAgreementBasicAccept {

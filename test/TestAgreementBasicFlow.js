@@ -1,4 +1,5 @@
 const {createManyAgreements} = require('./helpers/agreementFactory');
+const {assertRevert} = require('./helpers/assertThrow');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 
@@ -76,5 +77,39 @@ contract('Agreement flow - joining', async (accounts) => {
     for(i = 0; i < afterSuplicantJoin.length; i++) {
       assert.equal(afterSuplicantJoin[i], before[i], "Should be in same order");
     }
+  })
+})
+
+contract('Agreement flow - accept properties', async (accounts) => {
+  const creator = accounts[0];
+  let testManager;
+  let agreement;
+
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1}]);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+  })
+
+  it('Test if creator fails to accept himself', async () => {
+
+    await assertRevert(agreement.accept(creator, {from: creator}));
+
+  })
+
+  it('Test if creator fails to accept party, who didn\'t join', async () => {
+
+    await assertRevert(agreement.accept(accounts[1], {from: creator}));
+
+  })
+
+  it('Only creator can accept others', async () => {
+
+    await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (1)');
+    await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (2)');
+
+    await agreement.join({from: accounts[2]});
+    await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (3)');
+    await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (4)');
   })
 })
