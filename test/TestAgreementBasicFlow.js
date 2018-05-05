@@ -77,4 +77,16 @@ contract('Agreement flow', async (accounts) => {
       assert.equal(afterSuplicantJoin[i], before[i], "Should be in same order");
     }
   })
+
+  it('Test if agreement is set to Done', async () => 
+  {
+    let beforeChangingStatusToDone = (await agreement.getStatus.call());
+    assert.equal(afterChangingStatusToDone,'Done', "Status should be set to New");
+    
+    await agreement.conclude({from: accounts[1]});
+
+    let afterChangingStatusToDone = (await agreement.getStatus.call());
+    assert.equal(afterChangingStatusToDone,'Done', "Status should be set to Done ");
+  })
 })
+
