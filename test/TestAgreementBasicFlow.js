@@ -80,13 +80,14 @@ contract('Agreement flow', async (accounts) => {
 
   it('Test if agreement is set to Done', async () => 
   {
+    const Status = {New: 0,Done: 1};
     let beforeChangingStatusToDone = (await agreement.getStatus.call());
-    assert.equal(afterChangingStatusToDone,'Done', "Status should be set to New");
+    assert.equal(beforeChangingStatusToDone,Status.New, "Status should be set to New");
     
-    await agreement.conclude({from: accounts[1]});
+     await agreement.conclude({from: accounts[1]});
 
-    let afterChangingStatusToDone = (await agreement.getStatus.call());
-    assert.equal(afterChangingStatusToDone,'Done', "Status should be set to Done ");
+     let afterChangingStatusToDone = (await agreement.getStatus.call());
+     assert.equal(afterChangingStatusToDone,Status.Done, "Status should be set to Done ");
   })
 })
 

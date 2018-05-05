@@ -4,13 +4,14 @@ import "./AgreementManager.sol";
 
 
 contract Agreement {
-    enum Status { New }
+    enum Status { New, Done}
 
     address[] private participants;
     mapping(address => bool) private participantsSet;
 
     uint private creationBlock;
     uint private creationTimestamp;
+    bool private doneFlag = false;
     AgreementManager private agreementManager;
 
     function Agreement(address creator) public {
@@ -46,8 +47,21 @@ contract Agreement {
         return creationTimestamp;
     }
 
+    function setDoneFlag(bool flag) public
+    {
+        doneFlag = flag;
+    }
+
     function getStatus() public view returns(Status) {
-        return Status.New;
+        if(doneFlag == false) {
+            return Status.New;
+        }
+        else return Status.Done;   
+    }
+
+    function conclude() public
+    {
+        setDoneFlag(true);
     }
 
     function remove() public {
@@ -55,5 +69,7 @@ contract Agreement {
         agreementManager.remove();
         selfdestruct(address(agreementManager));
     }
+
+
 
 }
