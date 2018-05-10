@@ -47,7 +47,7 @@ contract Agreement {
         return creationTimestamp;
     }
 
-    function setDoneFlag(bool flag) public
+    function setDoneFlag(bool flag) private
     {
         doneFlag = flag;
     }

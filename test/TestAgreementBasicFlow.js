@@ -1,4 +1,5 @@
 const {createManyAgreements} = require('./helpers/agreementFactory');
+const {assertRevert} = require('./helpers/assertThrow');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 
@@ -94,7 +95,7 @@ contract('Agreement flow', async (accounts) => {
   it('Test if alien address cannot change agreement status', async () =>
   {    
     let alienAddress = accounts[3];
-    expect(await agreement.conclude({from: alienAddress})).to.throw("Address isn't part of agreement ");
+    await assertRevert(agreement.conclude({from: alienAddress}),'Address is not part of agreement');
   })
 })
 
