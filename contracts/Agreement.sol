@@ -4,10 +4,12 @@ import "./AgreementManager.sol";
 
 
 contract Agreement {
-    enum Status { New, Done}
+    enum Status { New, Running, Done}
 
     address[] private participants;
     mapping(address => bool) private participantsSet;
+
+    Status private currentStatus;
 
     uint private creationBlock;
     uint private creationTimestamp;
@@ -22,6 +24,7 @@ contract Agreement {
 
         creationBlock = block.number;
         creationTimestamp = block.timestamp;
+        currentStatus = Status.New;
     }
 
     function join() public {
@@ -29,6 +32,13 @@ contract Agreement {
             participantsSet[msg.sender] = true;
             participants.push(msg.sender);
         }
+    }
+
+    function accept(address suplicant) public {
+        require(msg.sender == participants[0]);
+        require(participantsSet[suplicant]);
+        require(suplicant != participants[0]);
+        currentStatus = Status.Running;
     }
 
     function getParticipants() public view returns(address[64]) {
@@ -53,16 +63,14 @@ contract Agreement {
     }
 
     function getStatus() public view returns(Status) {
-        if(doneFlag == false) {
-            return Status.New;
-        }
-        else return Status.Done;   
+        return currentStatus;
     }
 
     function conclude() public
     {
         require(participantsSet[msg.sender],"Address isn't part of agreement");
         setDoneFlag(true);
+        currentStatus = Status.Done;
     }
 
     function remove() public {

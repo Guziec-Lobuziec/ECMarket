@@ -4,7 +4,7 @@ const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 
 
-contract('Agreement flow', async (accounts) => {
+contract('Agreement flow - joining', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
@@ -82,7 +82,7 @@ contract('Agreement flow', async (accounts) => {
 
   it('Test if agreement is set to Done', async () => 
   {
-    const Status = {New: 0,Done: 1};
+    const Status = {New: 0,Done: 2};
     let beforeChangingStatusToDone = (await agreement.getStatus.call());
     assert.equal(beforeChangingStatusToDone,Status.New, "Status should be set to New");
     
@@ -99,3 +99,36 @@ contract('Agreement flow', async (accounts) => {
   })
 })
 
+contract('Agreement flow - accept properties', async (accounts) => {
+  const creator = accounts[0];
+  let testManager;
+  let agreement;
+
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1}]);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+  })
+
+  it('Test if creator fails to accept himself', async () => {
+
+    await assertRevert(agreement.accept(creator, {from: creator}));
+
+  })
+
+  it('Test if creator fails to accept party, who didn\'t join', async () => {
+
+    await assertRevert(agreement.accept(accounts[1], {from: creator}));
+
+  })
+
+  it('Only creator can accept others', async () => {
+
+    await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (1)');
+    await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (2)');
+
+    await agreement.join({from: accounts[2]});
+    await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (3)');
+    await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (4)');
+  })
+})
