@@ -78,6 +78,7 @@ contract('Agreement flow', async (accounts) => {
     }
   })
 
+
   it('Test if agreement is set to Done', async () => 
   {
     const Status = {New: 0,Done: 1};
@@ -88,6 +89,12 @@ contract('Agreement flow', async (accounts) => {
 
      let afterChangingStatusToDone = (await agreement.getStatus.call());
      assert.equal(afterChangingStatusToDone,Status.Done, "Status should be set to Done ");
+  })
+
+  it('Test if alien address cannot change agreement status', async () =>
+  {    
+    let alienAddress = accounts[3];
+    expect(await agreement.conclude({from: alienAddress})).to.throw("Address isn't part of agreement ");
   })
 })
 
