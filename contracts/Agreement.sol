@@ -61,6 +61,7 @@ contract Agreement {
 
     function conclude() public
     {
+        require(participantsSet[msg.sender],"Address isn't part of agreement");
         setDoneFlag(true);
     }
 
