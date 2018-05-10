@@ -10,7 +10,7 @@ contract("VirtualRating Tests", async (accounts) => {
     it("test rank-presence", async () => {
         let testRating = 0;
 
-        assert.equal(testRank.getRank(testRank.address), testRating, "Should be 0");
+        assert.equal(testRank.getRank.call(accounts[0]), testRating, "Should be 0");
     })
 
 })
