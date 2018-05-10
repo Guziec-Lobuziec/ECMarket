@@ -159,6 +159,7 @@ contract('Agreement basic management - permissions to remove', async (accounts) 
     var i;
     for(i = 0; i < agreementsAddresses.length; i++ ) {
       assert.notEqual(await web3.eth.getCode(agreementsAddresses[i]), '0x0', 'should be untouched');
+      
     }
   })
 })
