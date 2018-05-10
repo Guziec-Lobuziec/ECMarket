@@ -75,6 +75,7 @@ contract Agreement {
 
     function remove() public {
         require(msg.sender == participants[0]);
+        require(currentStatus != Status.Running);
         agreementManager.remove();
         selfdestruct(address(agreementManager));
     }
