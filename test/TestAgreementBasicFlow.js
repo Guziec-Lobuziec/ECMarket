@@ -78,6 +78,25 @@ contract('Agreement flow - joining', async (accounts) => {
       assert.equal(afterSuplicantJoin[i], before[i], "Should be in same order");
     }
   })
+
+
+  it('Test if agreement is set to Done', async () => 
+  {
+    const Status = {New: 0,Done: 2};
+    let beforeChangingStatusToDone = (await agreement.getStatus.call());
+    assert.equal(beforeChangingStatusToDone,Status.New, "Status should be set to New");
+    
+     await agreement.conclude({from: accounts[1]});
+
+     let afterChangingStatusToDone = (await agreement.getStatus.call());
+     assert.equal(afterChangingStatusToDone,Status.Done, "Status should be set to Done ");
+  })
+
+  it('Test if alien address cannot change agreement status', async () =>
+  {    
+    let alienAddress = accounts[3];
+    await assertRevert(agreement.conclude({from: alienAddress}),'Address is not part of agreement');
+  })
 })
 
 contract('Agreement flow - accept properties', async (accounts) => {

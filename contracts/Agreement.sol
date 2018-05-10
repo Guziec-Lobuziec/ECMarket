@@ -4,7 +4,7 @@ import "./AgreementManager.sol";
 
 
 contract Agreement {
-    enum Status { New, Running }
+    enum Status { New, Running, Done}
 
     address[] private participants;
     mapping(address => bool) private participantsSet;
@@ -13,6 +13,7 @@ contract Agreement {
 
     uint private creationBlock;
     uint private creationTimestamp;
+    bool private doneFlag = false;
     AgreementManager private agreementManager;
 
     function Agreement(address creator) public {
@@ -56,8 +57,20 @@ contract Agreement {
         return creationTimestamp;
     }
 
+    function setDoneFlag(bool flag) private
+    {
+        doneFlag = flag;
+    }
+
     function getStatus() public view returns(Status) {
         return currentStatus;
+    }
+
+    function conclude() public
+    {
+        require(participantsSet[msg.sender],"Address isn't part of agreement");
+        setDoneFlag(true);
+        currentStatus = Status.Done;
     }
 
     function remove() public {
@@ -65,5 +78,7 @@ contract Agreement {
         agreementManager.remove();
         selfdestruct(address(agreementManager));
     }
+
+
 
 }
