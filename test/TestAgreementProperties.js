@@ -28,4 +28,9 @@ contract("Test Agreement - Properties", async(accounts) =>
         let RunningStatus = (await agreement.getStatus.call());
         assert.equal(RunningStatus,Status.Running,"Status should be set to Running");
     })
+
+    it('Agreement cannot be remove if Status is set to running', async () =>
+    {
+        await assertRevert(agreement.remove());
+    })
 })
