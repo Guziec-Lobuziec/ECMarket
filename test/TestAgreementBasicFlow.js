@@ -98,7 +98,6 @@ contract('Agreement flow - joining', async (accounts) => {
     await assertRevert(agreement.conclude({from: alienAddress}),'Address is not part of agreement');
   })
 
-  
 })
 
 contract('Agreement flow - accept properties', async (accounts) => {

@@ -31,6 +31,6 @@ contract("Test Agreement - Properties", async(accounts) =>
 
     it('Agreement cannot be remove if Status is set to running', async () =>
     {
-        await assertRevert(agreement.remove());
+        await assertRevert(agreement.remove({from: creator}));
     })
 })
