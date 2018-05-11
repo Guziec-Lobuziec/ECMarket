@@ -133,7 +133,7 @@ contract('Agreement basic management - permissions to remove', async (accounts) 
 
     let createTransactions = await createManyAgreements(
       testManager,
-      [{address: accounts[0], count: 2},{address: accounts[1], count: 1}]
+      [{address: accounts[0], count: 2, name: ["0", "0"]},{address: accounts[1], count: 1, name: ["0", "0"]}]
     );
 
     agreementsAddresses = (await testManager.search.call()).filter((e) => {return e != 0;});
@@ -159,7 +159,7 @@ contract('Agreement basic management - permissions to remove', async (accounts) 
     var i;
     for(i = 0; i < agreementsAddresses.length; i++ ) {
       assert.notEqual(await web3.eth.getCode(agreementsAddresses[i]), '0x0', 'should be untouched');
-      
+
     }
   })
 })

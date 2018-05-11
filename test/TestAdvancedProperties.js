@@ -11,12 +11,17 @@ contract('Test Advanced Properties', async (accounts) => {
       })
 
     it('Agreement returns name', async () => {
-        let transaction = await testManager.create("TestName", {from: accounts[0]});
+        let name  = [
+          "0x0000000000000000000000000000000000000000000000000000000000000033",
+          "0x0000000000000000000000000000000000000000000000000000000000000044"
+        ];
+        let transaction = await testManager.create(name, {from: accounts[0]});
         let agreementAdress = transaction.logs[0].args.created;
-        let agreement = await Agreement.at(agreementAddress);
-        let name = await agreement.getName.call();
-        assert.equal(name, "TestName", "Agreement doesn't return name");
+        let agreement = await Agreement.at(agreementAdress);
+        let nameGot = await agreement.getName.call();
+        assert.equal(nameGot[0], name[0], "Agreement doesn't return name (0)");
+        assert.equal(nameGot[1], name[1], "Agreement doesn't return name (1)");
 
     })
-    
+
 })

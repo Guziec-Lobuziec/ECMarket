@@ -59,11 +59,6 @@ contract Agreement {
         return creationTimestamp;
     }
 
-    function setDoneFlag(bool flag) private
-    {
-        doneFlag = flag;
-    }
-
     function getStatus() public view returns(Status) {
         return currentStatus;
     }
@@ -86,6 +81,9 @@ contract Agreement {
         return name;
     }
 
-
+    function setDoneFlag(bool flag) private
+    {
+        doneFlag = flag;
+    }
 
 }
