@@ -12,7 +12,8 @@ contract TestAgreement {
 
         AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
 
-        Agreement testAgreement = Agreement(testManager.create());
+        Agreement testAgreement = Agreement(testManager.create([0,0]));
+        //byte32[2]
 
         address[64] memory participants;
         participants = testAgreement.getParticipants();
@@ -21,6 +22,9 @@ contract TestAgreement {
         Assert.equal(testAgreement.getCreationBlock(), block.number, "Should be created in same block as test tx");
         Assert.equal(testAgreement.getCreationTimestamp(), block.timestamp, "Same timestamp as in test");
         Assert.equal(uint(testAgreement.getStatus()), uint(Agreement.Status.New), "Should have \"New\" Status");
+
+                byte32[2] memory none; 
+        testManager.create(none);
 
     }
 

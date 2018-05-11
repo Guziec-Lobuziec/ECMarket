@@ -15,9 +15,9 @@ contract Agreement {
     uint private creationTimestamp;
     bool private doneFlag = false;
     AgreementManager private agreementManager;
-    string private name;
+    bytes32[2] private name;
 
-    function Agreement(address creator, string _name) public {
+    function Agreement(address creator, bytes32[2] _name) public {
         agreementManager = AgreementManager(msg.sender);
         name = _name;
 
@@ -82,7 +82,7 @@ contract Agreement {
         selfdestruct(address(agreementManager));
     }
 
-    function getName() public view returns(string) {
+    function getName() public view returns(bytes32[2]) {
         return name;
     }
 
