@@ -15,7 +15,7 @@ contract('Test Advanced Properties', async (accounts) => {
         let agreementAdress = transaction.logs[0].args.created;
         let agreement = await Agreement.at(agreementAddress);
         let name = await agreement.getName.call();
-        assert.equal(name, "TestName", "Agreement doesn't return Name");
+        assert.equal(name, "TestName", "Agreement doesn't return name");
 
     })
     

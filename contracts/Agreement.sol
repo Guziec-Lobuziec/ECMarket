@@ -15,9 +15,11 @@ contract Agreement {
     uint private creationTimestamp;
     bool private doneFlag = false;
     AgreementManager private agreementManager;
+    string private name;
 
-    function Agreement(address creator) public {
+    function Agreement(address creator, string _name) public {
         agreementManager = AgreementManager(msg.sender);
+        name = _name;
 
         participantsSet[creator] = true;
         participants.push(creator);
@@ -78,6 +80,10 @@ contract Agreement {
         require(currentStatus != Status.Running);
         agreementManager.remove();
         selfdestruct(address(agreementManager));
+    }
+
+    function getName() public view returns(string) {
+        return name;
     }
 
 

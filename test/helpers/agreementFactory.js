@@ -5,7 +5,7 @@ module.exports = {
           var i;
           setupData.forEach((accountData) => {
             for(i = 0; i < accountData.count; i++) {
-              transactions.push(manager.create({from: accountData.address}));
+              transactions.push(manager.create(accountData.name,{from: accountData.address}));
             }
           });
           return Promise.all(transactions);

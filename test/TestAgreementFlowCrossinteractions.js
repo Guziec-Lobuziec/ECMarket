@@ -11,7 +11,7 @@ contract('Agreement flow cross-interactions', async (accounts) => {
 
   before(async () => {
     testManager = await AgreementManager.deployed();
-    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1}]);
+    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1, name: ""}]);
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
   })
 
