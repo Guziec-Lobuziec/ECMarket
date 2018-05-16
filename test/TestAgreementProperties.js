@@ -34,9 +34,27 @@ contract("Test Agreement - Properties", async(accounts) =>
     it('Agreement cannot be remove if Status is set to running', async () =>
     {
         await assertRevert(agreement.remove({from: creator}));
+    })    
+})
+
+contract("Test Agreement Properties - Expiration Time", async(accounts) =>
+{
+    const creator = accounts[0];
+    let testManager;
+    let agreement;
+
+    before(async () =>
+    {   
+        testManager = await AgreementManager.deployed();
+        let createTransactions = await createManyAgreements(testManager,[{address: creator, count: 2}]);
+        agreement = await Agreement.at(createTransactions[0].logs[0].args.created); 
+        agreementBlockChecker = await Agreement.at(createTransactions[1].logs[0].args.created);
+        await agreement.join({from: accounts[1]});
+        await agreement.join({from: accounts[2]});
+        await agreement.join({from: accounts[3]});
+        
     })
-
-
+    
     it('Agreement time is set to 100 blocks', async () => 
     {
 
@@ -53,17 +71,14 @@ contract("Test Agreement - Properties", async(accounts) =>
 
     it('User cannot use join to agreement after 100 blocks', async () =>
     {
-        assertRevert(agreement.join({from: accounts[5]}));
+        assertRevert(await agreement.join({from: accounts[5]}));
     })
 
     it('User cannot accept agreement after 100 blocks', async () => {
-        assertRevert(agreement.accept(accounts[3]), {from: creator});
+        assertRevert(await agreement.accept(accounts[3], {from: creator}));
     })
 
     it('User cannot conclude agreement after 100 blocks', async () => {
-        assertRevert(agreement.conclude({from: accounts[2]}));
+        assertRevert(await agreement.conclude({from: accounts[2]}));
     })
-
-    
-
 })
