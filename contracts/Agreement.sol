@@ -36,6 +36,7 @@ contract Agreement {
     }
 
     function accept(address suplicant) public {
+        require(getCreationBlock() < 100);
         require(msg.sender == participants[0]);
         require(participantsSet[suplicant]);
         require(suplicant != participants[0]);
