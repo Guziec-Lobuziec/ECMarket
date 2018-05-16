@@ -71,14 +71,14 @@ contract("Test Agreement Properties - Expiration Time", async(accounts) =>
 
     it('User cannot use join to agreement after 100 blocks', async () =>
     {
-        assertRevert(await agreement.join({from: accounts[5]}));
+        await assertRevert(agreement.join({from: accounts[5]}));
     })
 
     it('User cannot accept agreement after 100 blocks', async () => {
-        assertRevert(await agreement.accept(accounts[3], {from: creator}));
+        await assertRevert(agreement.accept(accounts[3], {from: creator}));
     })
 
     it('User cannot conclude agreement after 100 blocks', async () => {
-        assertRevert(await agreement.conclude({from: accounts[2]}));
+        await assertRevert(agreement.conclude({from: accounts[2]}));
     })
 })
