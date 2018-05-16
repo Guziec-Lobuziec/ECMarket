@@ -60,6 +60,10 @@ contract("Test Agreement - Properties", async(accounts) =>
         assertRevert(agreement.accept(accounts[3]), {from: creator});
     })
 
+    it('User cannot conclude agreement after 100 blocks', async () => {
+        assertRevert(agreement.conclude({from: accounts[2]}));
+    })
+
     
 
 })
