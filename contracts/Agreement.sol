@@ -28,6 +28,7 @@ contract Agreement {
     }
 
     function join() public {
+        require(block.number < creationBlock + 100);
         if (!participantsSet[msg.sender]) {
             participantsSet[msg.sender] = true;
             participants.push(msg.sender);
@@ -35,6 +36,7 @@ contract Agreement {
     }
 
     function accept(address suplicant) public {
+        require(block.number < creationBlock + 100);
         require(msg.sender == participants[0]);
         require(participantsSet[suplicant]);
         require(suplicant != participants[0]);
@@ -68,6 +70,7 @@ contract Agreement {
 
     function conclude() public
     {
+        require(block.number < creationBlock + 100);
         require(participantsSet[msg.sender],"Address isn't part of agreement");
         setDoneFlag(true);
         currentStatus = Status.Done;
