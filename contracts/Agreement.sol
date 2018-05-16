@@ -28,7 +28,7 @@ contract Agreement {
     }
 
     function join() public {
-        require(creationBlock < 100);
+        require(getCreationBlock() < 100);
         if (!participantsSet[msg.sender]) {
             participantsSet[msg.sender] = true;
             participants.push(msg.sender);

@@ -56,8 +56,10 @@ contract("Test Agreement - Properties", async(accounts) =>
         assertRevert(agreement.join({from: accounts[5]}));
     })
 
-    it('User cannot use join to agreement after 100 blocks', async () =>
-    {
-        assertRevert(agreement.conclude({from: creator}));
+    it('User cannot accept agreement after 100 blocks', async () => {
+        assertRevert(agreement.accept(accounts[3]), {from: creator});
     })
+
+    
+
 })
