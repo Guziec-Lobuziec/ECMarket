@@ -43,11 +43,21 @@ contract("Test Agreement - Properties", async(accounts) =>
         let blockBefore = await web3.eth.blockNumber;
         
         for (let i = 0; i < 100; i++) {
-            await web3.eth.sendTransaction({from: accounts[4],to: accounts[5]});
+            await web3.eth.sendTransaction({from: accounts[1],to: accounts[2]});
         }
         
         let numberOfBlocks = await web3.eth.blockNumber;
 
         assert.equal(numberOfBlocks,blockBefore+100,"Number of blocks should be 100");
+    })
+
+    it('User cannot use join to agreement after 100 blocks', async () =>
+    {
+        assertRevert(agreement.join({from: accounts[5]}));
+    })
+
+    it('User cannot use join to agreement after 100 blocks', async () =>
+    {
+        assertRevert(agreement.conclude({from: creator}));
     })
 })
