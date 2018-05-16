@@ -70,6 +70,7 @@ contract Agreement {
 
     function conclude() public
     {
+        require(getCreationBlock() < 100);
         require(participantsSet[msg.sender],"Address isn't part of agreement");
         setDoneFlag(true);
         currentStatus = Status.Done;
