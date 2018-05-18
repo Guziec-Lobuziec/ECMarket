@@ -16,10 +16,12 @@ contract Agreement {
     bool private doneFlag = false;
     AgreementManager private agreementManager;
     bytes32[2] private name;
+    bytes32[8] private description;
 
-    function Agreement(address creator, bytes32[2] _name) public {
+    function Agreement(address creator, bytes32[2] _name, bytes32[8] _description) public {
         agreementManager = AgreementManager(msg.sender);
         name = _name;
+        description = _description;
 
         participantsSet[creator] = true;
         participants.push(creator);
@@ -79,6 +81,10 @@ contract Agreement {
 
     function getName() public view returns(bytes32[2]) {
         return name;
+    }
+
+    function getDescription() public view returns(bytes32[8]) {
+        return description;
     }
 
     function setDoneFlag(bool flag) private

@@ -18,10 +18,10 @@ contract('Agreement basic management - creation, removal', async (accounts) => {
     let before = await testManager.search.call();
     assert.isTrue(before.every((e) => {return e == 0;}),'expected to be zeros before');
 
-    createTransactions = await createManyAgreements(testManager, [{address: accounts[0], count: 1, name: ["0","0"]}]);
+    createTransactions = await createManyAgreements(testManager, [{address: accounts[0], count: 1, name: ["0","0"], description: ["0","0","0","0","0","0","0","0"]}]);
 
     assert.equal(createTransactions[0].logs.length, 1, 'one event generated');
-    assert.equal(createTransactions[0].logs[0].event, 'AgreementCreation', 'event name');
+    assert.equal(createTransactions[0].logs[0].event, 'AgreementCreation', 'event name', 'event desciption');
 
   })
 
@@ -74,7 +74,7 @@ contract('Agreement basic management - remove selected', async (accounts) => {
       'expected to be zeros before'
     );
 
-    await createManyAgreements(testManager, [{address: accounts[0], count: 2, name: ["0","0"]}]);
+    await createManyAgreements(testManager, [{address: accounts[0], count: 2, name: ["0","0"], description: ["0","0","0","0","0","0","0","0"]}]);
 
     agreements = await testManager.search.call();
     assert.equal(agreements.filter((e) => {return e != 0;}).length, 2, 'Should be two non zero records');
@@ -133,7 +133,7 @@ contract('Agreement basic management - permissions to remove', async (accounts) 
 
     let createTransactions = await createManyAgreements(
       testManager,
-      [{address: accounts[0], count: 2, name: ["0", "0"]},{address: accounts[1], count: 1, name: ["0", "0"]}]
+      [{address: accounts[0], count: 2, name: ["0", "0"], description: ["0","0","0","0","0","0","0","0"]},{address: accounts[1], count: 1, name: ["0", "0"], description: ["0","0","0","0","0","0","0","0"]}]
     );
 
     agreementsAddresses = (await testManager.search.call()).filter((e) => {return e != 0;});

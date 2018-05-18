@@ -11,7 +11,7 @@ contract('Agreement flow - joining', async (accounts) => {
 
   before(async () => {
     testManager = await AgreementManager.deployed();
-    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1, name: ["0","0"]}]);
+    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1, name: ["0","0"], description: ["0","0","0","0","0","0","0","0"]}]);
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
   }) 
 
@@ -107,7 +107,7 @@ contract('Agreement flow - accept properties', async (accounts) => {
 
   before(async () => {
     testManager = await AgreementManager.deployed();
-    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1, name: ["0","0"]}]);
+    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1, name: ["0","0"], description: ["0","0","0","0","0","0","0","0"]}]);
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
   })
 
