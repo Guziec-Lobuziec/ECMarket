@@ -45,7 +45,7 @@ contract Agreement {
         currentStatus = Status.Running;
     }
 
-    function getParticipants() public view returns(address[64]) {
+    function getParticipants() public view returns(address[64]) { 
         address[64] memory page;
         for (uint i = 0; i < participants.length && i < 64; i++) {
             page[i] = participants[i];

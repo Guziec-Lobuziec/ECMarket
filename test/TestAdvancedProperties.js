@@ -11,8 +11,8 @@ contract('Test Advanced Properties', async (accounts) => {
       })
 
     let name  = [
-    "0x0000000000000000000000000000000000000000000000000000000000000033",
-    "0x0000000000000000000000000000000000000000000000000000000000000044"
+        "0x0000000000000000000000000000000000000000000000000000000000000033",
+        "0x0000000000000000000000000000000000000000000000000000000000000044"
     ];
 
     let description  = [
@@ -52,4 +52,29 @@ contract('Test Advanced Properties', async (accounts) => {
 
     })
 
+    it('Agreement JSON ABI', async () => {
+        let testJSON = '[{"name": "join","type": "function","inputs": [],"outputs": []},' +
+        '{"name": "accept","type": "function","inputs": [{"name": "suplicant","type": "address[64]",}],"outputs": []},' +
+        '{"name": "getParticipants","type": "function","inputs": [],"outputs": [{"type": "address[64]"}]},' +
+        '{"name": "getCreationBlock","type": "function","inputs": [],"outputs": [{"type": "uint"}]},' +
+        '{"name": "getCreationTimestamp","type": "function","inputs": [],"outputs": [{"type": "uint"}]},' +
+        '{"name": "getStatus","type": "function","inputs": [],"outputs": [{"type": "Status"}]},' +
+        '{"name": "conclude","type": "function","inputs": [],"outputs": []},' +
+        '{"name": "remove","type": "function","inputs": [],"outputs": []},' +
+        '{"name": "getName","type": "function","inputs": [],"outputs": [{"type": "bytes32[2]"}]},' +
+        '{"name": "getDescription","type": "function","inputs": [],"outputs": [{"type": "bytes32[8]"}]},' +
+        '{"name": "setDoneFlag","type": "function","inputs": [],"outputs": [{"type": "bool"}]}]';
+        let transaction = await testManager.create(name, description, {from: accounts[0]});
+        let agreementAdress = transaction.logs[0].args.created;
+        let myContract = web3.eth.contract(testJSON);
+        let abi = myContract.abi;
+
+        assert.equal(abi, testJSON, "Agreement doesn't return JSON ABI");
+
+    })
+    //porównanie wykreowanego JSONA z tym zwracanym
+    //https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethcontract
+    //wywolanie metod
+
+    
 })
