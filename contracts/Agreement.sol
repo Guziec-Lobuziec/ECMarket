@@ -13,7 +13,6 @@ contract Agreement {
 
     uint private creationBlock;
     uint private creationTimestamp;
-    bool private doneFlag = false;
     AgreementManager private agreementManager;
     bytes32[2] private name;
     bytes32[8] private description;
@@ -47,7 +46,7 @@ contract Agreement {
         currentStatus = Status.Running;
     }
 
-    function getParticipants() public view returns(address[64]) { 
+    function getParticipants() public view returns(address[64]) {
         address[64] memory page;
         for (uint i = 0; i < participants.length && i < 64; i++) {
             page[i] = participants[i];
@@ -71,7 +70,6 @@ contract Agreement {
     {
         require(block.number < creationBlock + 100);
         require(participantsSet[msg.sender],"Address isn't part of agreement");
-        setDoneFlag(true);
         currentStatus = Status.Done;
     }
 
@@ -88,11 +86,6 @@ contract Agreement {
 
     function getDescription() public view returns(bytes32[8]) {
         return description;
-    }
-
-    function setDoneFlag(bool flag) private
-    {
-        doneFlag = flag;
     }
 
 }
