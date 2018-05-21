@@ -62,19 +62,22 @@ contract('Test Advanced Properties', async (accounts) => {
         '{"name": "conclude","type": "function","inputs": [],"outputs": []},' +
         '{"name": "remove","type": "function","inputs": [],"outputs": []},' +
         '{"name": "getName","type": "function","inputs": [],"outputs": [{"type": "bytes32[2]"}]},' +
-        '{"name": "getDescription","type": "function","inputs": [],"outputs": [{"type": "bytes32[8]"}]},' +
-        '{"name": "setDoneFlag","type": "function","inputs": [],"outputs": [{"type": "bool"}]}]';
+        '{"name": "getDescription","type": "function","inputs": [],"outputs": [{"type": "bytes32[8]"}]},';
         let transaction = await testManager.create(name, description, {from: accounts[0]});
         let agreementAdress = transaction.logs[0].args.created;
-        let myContract = web3.eth.contract(testJSON);
-        let abi = myContract.abi;
+        let agreement = await Agreement.at(agreementAdress);
 
-        assert.equal(abi, testJSON, "Agreement doesn't return JSON ABI");
+        let agreementABIJSON = await agreement.getAPIJSON.call()
+        assert.equal(agreementABIJSON, testJSON, "Agreement doesn't return JSON ABI");
+
+        let testABI = web3.eth.contract(agreementABIJSON)
+
+        assert.equal(testABI.getName.call(), name, "Should be equal");
 
     })
     //porównanie wykreowanego JSONA z tym zwracanym
     //https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethcontract
     //wywolanie metod
 
-    
+
 })
