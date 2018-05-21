@@ -15,14 +15,13 @@ contract("Test Agreement - Properties", async(accounts) =>
     {
         testManager = await AgreementManager.deployed();
 
-        let createTransactions = await createManyAgreements(testManager,[{address: creator, count: 2, name: ["0","0"], description: ["0","0","0","0","0","0","0","0"]}]);
+        let createTransactions = await createManyAgreements(testManager,[{address: creator, count: 1, name: ["0","0"], description: ["0","0","0","0","0","0","0","0"]}]);
         agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-        agreementBlockChecker = await Agreement.at(createTransactions[1].logs[0].args.created);
 
         await agreement.join({from: accounts[1]});
         await agreement.join({from: accounts[2]});
         await agreement.join({from: accounts[3]});
-        
+
     })
 
     it('Agreement should set to Running', async () =>
@@ -48,9 +47,8 @@ contract("Test Agreement Properties - Expiration Time", async(accounts) =>
     before(async () =>
     {
         testManager = await AgreementManager.deployed();
-        let createTransactions = await createManyAgreements(testManager,[{address: creator, count: 2}]);
+        let createTransactions = await createManyAgreements(testManager,[{address: creator, count: 1, name: ["0","0"], description: ["0","0","0","0","0","0","0","0"]}]);
         agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-        agreementBlockChecker = await Agreement.at(createTransactions[1].logs[0].args.created);
         await agreement.join({from: accounts[1]});
         await agreement.join({from: accounts[2]});
         await agreement.join({from: accounts[3]});
