@@ -4,7 +4,7 @@ contract("VirtualRating Tests", async (accounts) => {
     let testRank;
     
     before(async () => {
-        testRank = await BasicRating.deployed();
+        testRank = await VirtualWallet.deployed();
     })
 
     it("test rank-presence", async () => {
