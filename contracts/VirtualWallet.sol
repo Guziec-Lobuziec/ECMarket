@@ -19,4 +19,8 @@ contract VirtualWallet {
         msg.sender.transfer(amount);
 
     }
+
+    function getRating(address ratingSystem) public view returns (uint rating) {
+        return 0;
+    }
 }

@@ -1,4 +1,4 @@
-var VirtualWallet = artifacts.require("BasicRating");
+var VirtualWallet = artifacts.require("VirtualWallet");
 
 contract("VirtualRating Tests", async (accounts) => {
     let testRank;
