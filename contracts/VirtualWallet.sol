@@ -22,6 +22,6 @@ contract VirtualWallet {
     }
 
     function getRating(address ratingSystem) public view returns (uint rating) {
-        return basicRating[ratingSystem];
+        return 0;
     }
 }
