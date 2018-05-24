@@ -30,7 +30,7 @@ contract AgreementManager {
         return page;
     }
 
-    function create() public returns (address) {
+    function create(uint price) public returns (address) {
         address newAgreement = new Agreement(msg.sender);
         uint previous = list[HEAD].pointers[PREV];
         uint newNode = uint(keccak256(previous, block.number));
