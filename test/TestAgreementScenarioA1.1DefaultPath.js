@@ -25,12 +25,25 @@ contract('Agreement A1.1 - default path', async (accounts) => {
     await testWallet.payIn({from: suplicant, value: 2000});
   })
 
-  it('check price', async () => {
-    assert.equal((await agreement.getPrice.call()), price, "Price should be "+price)
+  it('test price', async () => {
+    assert.equal((await agreement.getPrice.call()).toNumber(), price, "Price should be "+price)
   })
 
-  it('join agreement', async () => {
-
+  it('join agreement - tokens transfer', async () => {
+    assert.equal(
+      (await testWallet.balanceOf(agreement.address)).toNumber(),
+      0, "Agreement should have 0 (1)"
+    );
+    await agreement.join({from: buyer});
+    assert.equal(
+      (await testWallet.balanceOf(agreement.address)).toNumber(),
+      price, "Agreement should have "+price+" (2)"
+    );
+    await agreement.join({from: suplicant});
+    assert.equal(
+      (await testWallet.balanceOf(agreement.address)).toNumber(),
+      price*2, "Agreement should have "+price*2+" (3)"
+    );
   })
 
 })
