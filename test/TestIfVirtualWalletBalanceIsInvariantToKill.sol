@@ -20,7 +20,7 @@ contract DummyMortal {
 }
 
 
-contract TestVirtualWallet {
+contract TestIfVirtualWalletBalanceIsInvariantToKill {
 
     function () public payable {}
 
