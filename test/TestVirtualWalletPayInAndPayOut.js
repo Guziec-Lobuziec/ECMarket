@@ -1,5 +1,5 @@
 const {assertRevert} = require('./helpers/assertThrow');
-var VirtualWallet = artifacts.require("VirtualWallet");
+const VirtualWallet = artifacts.require("VirtualWallet");
 
 contract("VirtualWallet payin and payout test", async (accounts) => {
     let testWallet;
