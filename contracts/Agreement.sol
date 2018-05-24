@@ -16,7 +16,9 @@ contract Agreement {
     bool private doneFlag = false;
     AgreementManager private agreementManager;
 
-    function Agreement(address creator) public {
+    uint private price;
+
+    function Agreement(address creator, uint _price) public {
         agreementManager = AgreementManager(msg.sender);
 
         participantsSet[creator] = true;
@@ -25,6 +27,8 @@ contract Agreement {
         creationBlock = block.number;
         creationTimestamp = block.timestamp;
         currentStatus = Status.New;
+
+        price = _price;
     }
 
     function join() public {
@@ -43,6 +47,21 @@ contract Agreement {
         currentStatus = Status.Running;
     }
 
+    function conclude() public
+    {
+        require(block.number < creationBlock + 100);
+        require(participantsSet[msg.sender],"Address isn't part of agreement");
+        setDoneFlag(true);
+        currentStatus = Status.Done;
+    }
+
+    function remove() public {
+        require(msg.sender == participants[0]);
+        require(currentStatus != Status.Running);
+        agreementManager.remove();
+        selfdestruct(address(agreementManager));
+    }
+
     function getParticipants() public view returns(address[64]) {
         address[64] memory page;
         for (uint i = 0; i < participants.length && i < 64; i++) {
@@ -59,30 +78,17 @@ contract Agreement {
         return creationTimestamp;
     }
 
-    function setDoneFlag(bool flag) private
-    {
-        doneFlag = flag;
+    function getPrice() public view returns(uint) {
+        return price;
     }
 
     function getStatus() public view returns(Status) {
         return currentStatus;
     }
 
-    function conclude() public
+    function setDoneFlag(bool flag) private
     {
-        require(block.number < creationBlock + 100);
-        require(participantsSet[msg.sender],"Address isn't part of agreement");
-        setDoneFlag(true);
-        currentStatus = Status.Done;
+        doneFlag = flag;
     }
-
-    function remove() public {
-        require(msg.sender == participants[0]);
-        require(currentStatus != Status.Running);
-        agreementManager.remove();
-        selfdestruct(address(agreementManager));
-    }
-
-
 
 }
