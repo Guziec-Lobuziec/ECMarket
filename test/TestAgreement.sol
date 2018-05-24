@@ -12,7 +12,7 @@ contract TestAgreement {
 
         AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
 
-        Agreement testAgreement = Agreement(testManager.create());
+        Agreement testAgreement = Agreement(testManager.create(uint(0)));
 
         address[64] memory participants;
         participants = testAgreement.getParticipants();
