@@ -5,7 +5,7 @@ contract VirtualWallet {
 
     mapping (address => uint) walletValue;
 
-    function getBalance(address externalWallet) public view returns (uint balance) {
+    function balanceOf(address externalWallet) public view returns (uint balance) {
         return walletValue[externalWallet];
     }
 
@@ -20,7 +20,7 @@ contract VirtualWallet {
     }
 
     function transfer(address to, uint256 value) public returns (bool success) {
-        require(getBalance(msg.sender) >= value, "Not enough assets");
+        require(balanceOf(msg.sender) >= value, "Not enough assets");
         walletValue[msg.sender] -= value;
         walletValue[to] += value;
     }
