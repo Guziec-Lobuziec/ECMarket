@@ -20,7 +20,7 @@ contract DummyMortal {
 }
 
 
-contract TestVirtualWallet {
+contract TestIfVirtualWalletBalanceIsInvariantToKill {
 
     function () public payable {}
 
@@ -35,7 +35,7 @@ contract TestVirtualWallet {
     function testInitialBalanceOfWallet() {
         uint expected = 0;
 
-        Assert.equal(testWallet.getBalance(this), expected, "Wallet should have 0 units of basic token");
+        Assert.equal(testWallet.balanceOf(this), expected, "Wallet should have 0 units of basic token");
     }
 
     function testBalanceChangeOfTest() {
@@ -56,15 +56,15 @@ contract TestVirtualWallet {
 
         testWallet.payIn.value(expected)();
 
-        Assert.equal(testWallet.getBalance(this), expected, "Wallet should have 1000 units of basic token");
+        Assert.equal(testWallet.balanceOf(this), expected, "Wallet should have 1000 units of basic token");
 
         dummy.kill();
 
-        Assert.equal(testWallet.getBalance(this), expected, "Wallet should have 1000 units of basic token");
+        Assert.equal(testWallet.balanceOf(this), expected, "Wallet should have 1000 units of basic token");
 
         testWallet.payOut(expected);
 
-        Assert.equal(testWallet.getBalance(this), 0, "Wallet should have 0 units of basic token");
+        Assert.equal(testWallet.balanceOf(this), 0, "Wallet should have 0 units of basic token");
         Assert.equal(this.balance, initialBalance - sentToDummy, "Test balance after");
     }
 }
