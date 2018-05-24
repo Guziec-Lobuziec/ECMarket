@@ -24,4 +24,10 @@ contract VirtualWallet {
         walletValue[msg.sender] -= value;
         walletValue[to] += value;
     }
+
+    function transferFrom(address from, address to, uint256 value) public returns (bool success) {
+        require(balanceOf(from) >= value, "Not enough assets");
+        walletValue[from] -= value;
+        walletValue[to] += value;
+    }
 }
