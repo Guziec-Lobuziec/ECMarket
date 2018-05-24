@@ -15,8 +15,8 @@ contract("VirtualWallet transfer", async (accounts) => {
     await testWallet.transfer(accounts[1], 0, {from: accounts[0]});
     assert.equal(
       (await testWallet.balanceOf.call(accounts[0])).toNumber(),
-      1000,
-      "Should be "+1000
+      startBalance,
+      "Should be "+startBalance
     );
     assert.equal(
       (await testWallet.balanceOf.call(accounts[1])).toNumber(),
@@ -30,13 +30,13 @@ contract("VirtualWallet transfer", async (accounts) => {
     await testWallet.transfer(accounts[1], amount, {from: accounts[0]});
     assert.equal(
       (await testWallet.balanceOf.call(accounts[0])).toNumber(),
-      500,
-      "Should be "+500
+      startBalance-amount,
+      "Should be "+startBalance-amount
     );
     assert.equal(
       (await testWallet.balanceOf.call(accounts[1])).toNumber(),
-      500,
-      "Should be "+500
+      amount,
+      "Should be "+amount
     );
   })
 
@@ -64,6 +64,23 @@ contract("VirtualWallet transfer", async (accounts) => {
       500,
       "Should be "+500
     );
+  })
+
+})
+
+contract("VirtualWallet transferFrom", async (accounts) => {
+
+  const startBalance = 1000;
+  let testWallet;
+
+  before(async () => {
+    testWallet = await VirtualWallet.deployed();
+    await testWallet.payIn({from: accounts[0], value: startBalance});
+  })
+
+  it("test transfer 0", async () => {
+    await testWallet.transfer(accounts[0], 0, {from: accounts[2]});
+
   })
 
 })
