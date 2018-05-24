@@ -1,6 +1,7 @@
 pragma solidity 0.4.23;
 
 import "./AgreementManager.sol";
+import "./VirtualWallet.sol";
 
 
 contract Agreement {
@@ -15,11 +16,13 @@ contract Agreement {
     uint private creationTimestamp;
     bool private doneFlag = false;
     AgreementManager private agreementManager;
+    VirtualWallet private wallet;
 
     uint private price;
 
-    function Agreement(address creator, uint _price) public {
+    constructor(address creator, address _wallet, uint _price) public {
         agreementManager = AgreementManager(msg.sender);
+        wallet = VirtualWallet(_wallet);
 
         participantsSet[creator] = true;
         participants.push(creator);
@@ -33,10 +36,11 @@ contract Agreement {
 
     function join() public {
         require(block.number < creationBlock + 100);
-        if (!participantsSet[msg.sender]) {
-            participantsSet[msg.sender] = true;
-            participants.push(msg.sender);
-        }
+        if (participantsSet[msg.sender])
+            return;
+        wallet.transferFrom(msg.sender, this, getPrice());
+        participantsSet[msg.sender] = true;
+        participants.push(msg.sender);
     }
 
     function accept(address suplicant) public {

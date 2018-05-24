@@ -15,8 +15,13 @@ contract AgreementManager {
     }
 
     mapping (uint => AddressList) private list;
+    address private wallet;
 
     event AgreementCreation(address created);
+
+    constructor(address _wallet) public {
+        wallet = _wallet;
+    }
 
     function search() public view returns (address[64]) {
         address[64] memory page;
@@ -31,7 +36,7 @@ contract AgreementManager {
     }
 
     function create(uint price) public returns (address) {
-        address newAgreement = new Agreement(msg.sender, price);
+        address newAgreement = new Agreement(msg.sender, wallet, price);
         uint previous = list[HEAD].pointers[PREV];
         uint newNode = uint(keccak256(previous, block.number));
 
