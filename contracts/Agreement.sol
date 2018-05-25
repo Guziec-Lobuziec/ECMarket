@@ -84,7 +84,8 @@ contract Agreement {
         require(block.number < creationBlock + 100);
         require(participantsSet[msg.sender].joined,"Address isn't part of agreement");
         require(participantsSet[msg.sender].accepted);
-        
+        require(getStatus() == Status.Running);
+
         participantsSet[msg.sender].hasConcluded = true;
         bool testIfAcceptedConcluded = true;
         for(uint i = 0; i<accepted.length; i++)
