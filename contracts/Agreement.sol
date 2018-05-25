@@ -72,6 +72,8 @@ contract Agreement {
         require(participantsSet[suplicant].joined);
         require(!participantsSet[suplicant].creator);
 
+        wallet.transfer(participants[0], getPrice());
+
         participantsSet[suplicant].accepted = true;
         accepted.push(suplicant);
         currentStatus = Status.Running;
@@ -82,6 +84,7 @@ contract Agreement {
         require(block.number < creationBlock + 100);
         require(participantsSet[msg.sender].joined,"Address isn't part of agreement");
         require(participantsSet[msg.sender].accepted);
+        
         participantsSet[msg.sender].hasConcluded = true;
         bool testIfAcceptedConcluded = true;
         for(uint i = 0; i<accepted.length; i++)
