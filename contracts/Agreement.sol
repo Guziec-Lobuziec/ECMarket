@@ -7,14 +7,21 @@ import "./VirtualWallet.sol";
 contract Agreement {
     enum Status { New, Running, Done}
 
-    address[] private participants;
-    mapping(address => bool) private participantsSet;
+    struct Participant {
+      bool joined;
+      bool accepted;
+      bool creator;
+      bool hasConcluded;
+    }
+
+    mapping(address => Participant) private participantsSet;
+    address[] participants;
+    address[] accepted;
 
     Status private currentStatus;
 
     uint private creationBlock;
     uint private creationTimestamp;
-    bool private doneFlag = false;
     AgreementManager private agreementManager;
     VirtualWallet private wallet;
 
@@ -24,8 +31,16 @@ contract Agreement {
         agreementManager = AgreementManager(msg.sender);
         wallet = VirtualWallet(_wallet);
 
-        participantsSet[creator] = true;
+        Participant memory toAdd = Participant({
+            joined: true,
+            accepted: true,
+            creator: true,
+            hasConcluded: false
+        });
+
+        participantsSet[creator] = toAdd;
         participants.push(creator);
+        accepted.push(creator);
 
         creationBlock = block.number;
         creationTimestamp = block.timestamp;
@@ -36,31 +51,48 @@ contract Agreement {
 
     function join() public {
         require(block.number < creationBlock + 100);
-        if (participantsSet[msg.sender])
+        if (participantsSet[msg.sender].joined)
             return;
+
         wallet.transferFrom(msg.sender, this, getPrice());
-        participantsSet[msg.sender] = true;
+
+        Participant memory toAdd = Participant({
+            joined: true,
+            accepted: false,
+            creator: false,
+            hasConcluded: false
+        });
+        participantsSet[msg.sender] = toAdd;
         participants.push(msg.sender);
     }
 
     function accept(address suplicant) public {
         require(block.number < creationBlock + 100);
-        require(msg.sender == participants[0]);
-        require(participantsSet[suplicant]);
-        require(suplicant != participants[0]);
+        require(participantsSet[msg.sender].creator);
+        require(participantsSet[suplicant].joined);
+        require(!participantsSet[suplicant].creator);
+
+        participantsSet[suplicant].accepted = true;
+        accepted.push(suplicant);
         currentStatus = Status.Running;
     }
 
     function conclude() public
     {
         require(block.number < creationBlock + 100);
-        require(participantsSet[msg.sender],"Address isn't part of agreement");
-        setDoneFlag(true);
-        currentStatus = Status.Done;
+        require(participantsSet[msg.sender].joined,"Address isn't part of agreement");
+        require(participantsSet[msg.sender].accepted);
+        participantsSet[msg.sender].hasConcluded = true;
+        bool testIfAcceptedConcluded = true;
+        for(uint i = 0; i<accepted.length; i++)
+          testIfAcceptedConcluded =
+            testIfAcceptedConcluded && participantsSet[accepted[i]].hasConcluded;
+        if(testIfAcceptedConcluded)
+          currentStatus = Status.Done;
     }
 
     function remove() public {
-        require(msg.sender == participants[0]);
+        require(participantsSet[msg.sender].creator);
         require(currentStatus != Status.Running);
         agreementManager.remove();
         selfdestruct(address(agreementManager));
@@ -88,11 +120,6 @@ contract Agreement {
 
     function getStatus() public view returns(Status) {
         return currentStatus;
-    }
-
-    function setDoneFlag(bool flag) private
-    {
-        doneFlag = flag;
     }
 
 }
