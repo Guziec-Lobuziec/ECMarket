@@ -1,5 +1,6 @@
 const {createManyAgreements} = require('./helpers/agreementFactory');
 const {assertRevert} = require('./helpers/assertThrow');
+const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 
@@ -137,6 +138,16 @@ contract('Agreement flow - conclude properties', async (accounts) => {
   {
     await agreement.join({from: suplicant});
     await assertRevert(agreement.conclude({from: suplicant}),'Address is not part of agreement');
+  })
+
+  it('Test if agreement cannot be concluded status before Running status', async () => {
+    assert.equal(
+      (await agreement.getStatus.call()),
+      AgreementEnumerations.Status.New,
+      "Status should be set to New"
+    );
+
+    await assertRevert(agreement.conclude({from: creator}),'If reach Done before Running should revert');
   })
 
 })
