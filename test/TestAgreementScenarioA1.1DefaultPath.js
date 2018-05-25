@@ -1,5 +1,6 @@
 const {createManyAgreements} = require('./helpers/agreementFactory');
 const {assertRevert} = require('./helpers/assertThrow');
+const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const VirtualWallet = artifacts.require("VirtualWallet");
@@ -29,6 +30,14 @@ contract('Agreement A1.1 - default path', async (accounts) => {
 
   it('test price', async () => {
     assert.equal((await agreement.getPrice.call()).toNumber(), price, "Price should be "+price)
+  })
+
+  it('test if status is New', async () => {
+    assert.equal(
+      (await agreement.getStatus.call()),
+      AgreementEnumerations.Status.New,
+      "Status should be set to New"
+    );
   })
 
   it('join agreement - tokens transfer', async () => {
@@ -72,6 +81,14 @@ contract('Agreement A1.1 - default path', async (accounts) => {
     assert.equal(
       (await testWallet.balanceOf(creator)).toNumber(),
       price, "Creator should have "+price
+    );
+  })
+
+  it('test if status is Running', async () => {
+    assert.equal(
+      (await agreement.getStatus.call()),
+      AgreementEnumerations.Status.Running,
+      "Status should be set to Running"
     );
   })
 
