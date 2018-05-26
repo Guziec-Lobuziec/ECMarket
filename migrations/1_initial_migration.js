@@ -4,6 +4,7 @@ var AgreementManager = artifacts.require("AgreementManager");
 
 module.exports = function(deployer) {
   deployer.deploy(Migrations);
-  deployer.deploy(VirtualWallet);
-  deployer.deploy(AgreementManager);
+  deployer.deploy(VirtualWallet).then(function() {
+    return deployer.deploy(AgreementManager, VirtualWallet.address);
+  });
 };
