@@ -42,32 +42,32 @@ contract('Agreement A1.1 - default path', async (accounts) => {
 
   it('join agreement - tokens transfer', async () => {
     assert.equal(
-      (await testWallet.balanceOf(agreement.address)).toNumber(),
+      (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       0, "Agreement should have 0 (1)"
     );
     await agreement.join({from: buyer});
     assert.equal(
-      (await testWallet.balanceOf(agreement.address)).toNumber(),
+      (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price, "Agreement should have "+price+" (2)"
     );
     await agreement.join({from: suplicant});
     assert.equal(
-      (await testWallet.balanceOf(agreement.address)).toNumber(),
+      (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price*2, "Agreement should have "+price*2+" (3)"
     );
   })
 
   it('check participants balances', async () => {
     assert.equal(
-      (await testWallet.balanceOf(creator)).toNumber(),
+      (await testWallet.balanceOf.call(creator)).toNumber(),
       0, "Creator should have 0"
     );
     assert.equal(
-      (await testWallet.balanceOf(buyer)).toNumber(),
+      (await testWallet.balanceOf.call(buyer)).toNumber(),
       buyerBalance-price, "Buyer should have "+(buyerBalance-price)
     );
     assert.equal(
-      (await testWallet.balanceOf(suplicant)).toNumber(),
+      (await testWallet.balanceOf.call(suplicant)).toNumber(),
       suplicantBalance-price, "Suplicant should have "+(buyerBalance-price)
     );
   })
@@ -75,11 +75,11 @@ contract('Agreement A1.1 - default path', async (accounts) => {
   it('accept buyer - token transfer', async () => {
     await agreement.accept(buyer);
     assert.equal(
-      (await testWallet.balanceOf(agreement.address)).toNumber(),
+      (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price, "Agreement should have "+price
     );
     assert.equal(
-      (await testWallet.balanceOf(creator)).toNumber(),
+      (await testWallet.balanceOf.call(creator)).toNumber(),
       price, "Creator should have "+price
     );
   })
