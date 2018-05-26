@@ -93,7 +93,7 @@ contract('Agreement flow - joining properties', async (accounts) => {
 
 })
 
-contract('Agreement flow - accept properties', async (accounts) => {
+contract('Agreement flow - accept permissions related properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
@@ -122,21 +122,42 @@ contract('Agreement flow - accept properties', async (accounts) => {
     await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (2)');
 
     await agreement.join({from: accounts[2]});
-    await agreement.join({from: accounts[3]});
     await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (3)');
     await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (4)');
   })
 
-  if('Cannot double accept', async () => {
+
+
+})
+
+contract('Agreement flow - accept state related properties', async (accounts) => {
+  const creator = accounts[0];
+  let testManager;
+  let agreement;
+
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1}]);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+    await agreement.join({from: accounts[2]});
+    await agreement.join({from: accounts[3]});
+  })
+
+  it('Cannot double accept', async () => {
+    await agreement.accept(accounts[2], {from: creator});
     await assertRevert(agreement.accept(accounts[2], {from: creator}));
   })
 
   it('Cannot accept if agreement is Done', async () => {
+    assert.equal(
+      (await agreement.getStatus.call()),
+      AgreementEnumerations.Status.Running,
+      "Status should be set to Running"
+    );
     await agreement.conclude({from: creator});
     await agreement.conclude({from: accounts[2]});
-    await assertRevert(agreement.join({from: accounts[3]}));
+    await assertRevert(agreement.accept(accounts[3], {from: creator}));
   })
-
 })
 
 contract('Agreement flow - conclude properties', async (accounts) => {

@@ -26,13 +26,10 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
   it('test if accept does not affect remove', async () => {
     await agreement.accept(accounts[1], {from: creator});
     await assertRevert(agreement.remove({from: accounts[1]}));
-    await agreement.accept(accounts[2], {from: creator});
-    await assertRevert(agreement.remove({from: accounts[2]}));
   })
 
   it('Agreement should set to Running', async () =>
   {
-      await agreement.accept(accounts[1], {from: creator});
       let RunningStatus = (await agreement.getStatus.call());
       assert.equal(
         RunningStatus,

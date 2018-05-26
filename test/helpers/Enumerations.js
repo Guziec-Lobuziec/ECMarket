@@ -7,5 +7,5 @@ function define(name, value, where) {
 }
 
 let AgreementEnumerations = {}
-define('Status', {New: 0,Running: 1, Done: 2}, AgreementEnumerations);
+define('Status', {New: 0, Running: 1, Done: 2}, AgreementEnumerations);
 define('AgreementEnumerations', AgreementEnumerations, exports);
