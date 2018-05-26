@@ -73,7 +73,7 @@ contract('Agreement A1.1 - default path', async (accounts) => {
   })
 
   it('accept buyer - token transfer', async () => {
-    await agreement.accept(buyer);
+    await agreement.accept(buyer, {from: creator});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price, "Agreement should have "+price

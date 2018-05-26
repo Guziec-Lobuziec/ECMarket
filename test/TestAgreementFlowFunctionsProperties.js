@@ -80,6 +80,17 @@ contract('Agreement flow - joining properties', async (accounts) => {
     }
   })
 
+  it('Cannot join if agreement is Running', async () => {
+    await agreement.accept(accounts[1], {from: creator});
+    await assertRevert(agreement.join({from: accounts[3]}));
+  })
+
+  it('Cannot join if agreement is Done', async () => {
+    await agreement.conclude({from: creator});
+    await agreement.conclude({from: accounts[1]});
+    await assertRevert(agreement.join({from: accounts[3]}));
+  })
+
 })
 
 contract('Agreement flow - accept properties', async (accounts) => {
@@ -111,9 +122,21 @@ contract('Agreement flow - accept properties', async (accounts) => {
     await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (2)');
 
     await agreement.join({from: accounts[2]});
+    await agreement.join({from: accounts[3]});
     await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (3)');
     await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (4)');
   })
+
+  if('Cannot double accept', async () => {
+    await assertRevert(agreement.accept(accounts[2], {from: creator}));
+  })
+
+  it('Cannot accept if agreement is Done', async () => {
+    await agreement.conclude({from: creator});
+    await agreement.conclude({from: accounts[2]});
+    await assertRevert(agreement.join({from: accounts[3]}));
+  })
+
 })
 
 contract('Agreement flow - conclude properties', async (accounts) => {
@@ -126,16 +149,13 @@ contract('Agreement flow - conclude properties', async (accounts) => {
     testManager = await AgreementManager.deployed();
     let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1}]);
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-
   })
 
-  it('Test if alien address cannot conclude agreement', async () =>
-  {
+  it('Test if alien address cannot conclude agreement', async () => {
     await assertRevert(agreement.conclude({from: suplicant}),'Address is not part of agreement');
   })
 
-  it('Test if not accepted address cannot conclude agreement', async () =>
-  {
+  it('Test if not accepted address cannot conclude agreement', async () => {
     await agreement.join({from: suplicant});
     await assertRevert(agreement.conclude({from: suplicant}),'Address is not part of agreement');
   })
@@ -148,6 +168,12 @@ contract('Agreement flow - conclude properties', async (accounts) => {
     );
 
     await assertRevert(agreement.conclude({from: creator}),'If reach Done before Running should revert');
+  })
+
+  it('Cannot double conclude', async () => {
+    await agreement.accept(suplicant, {from: creator});
+    await agreement.conclude({from: creator});
+    await assertRevert(agreement.conclude({from: creator}));
   })
 
 })
