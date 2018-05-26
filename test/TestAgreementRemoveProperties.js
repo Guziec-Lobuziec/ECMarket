@@ -30,42 +30,25 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
     await assertRevert(agreement.remove({from: accounts[2]}));
   })
 
+  it('Agreement should set to Running', async () =>
+  {
+      await agreement.accept(accounts[1], {from: creator});
+      let RunningStatus = (await agreement.getStatus.call());
+      assert.equal(
+        RunningStatus,
+        AgreementEnumerations.Status.Running,
+        "Status should be set to Running"
+      );
+  })
+
+  it('Agreement cannot be remove if Status is set to running', async () =>
+  {
+      await assertRevert(agreement.remove({from: creator}));
+  })
+
 })
 
-contract("Agreement remove restrictions", async(accounts) =>
-{
-    const creator = accounts[0];
-    let testManager;
-    let agreement;
 
-    before(async () =>
-    {
-        testManager = await AgreementManager.deployed();
-        let createTransactions = await createManyAgreements(testManager,[{address: creator, count: 2}]);
-        agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-        agreementBlockChecker = await Agreement.at(createTransactions[1].logs[0].args.created);
-        await agreement.join({from: accounts[1]});
-        await agreement.join({from: accounts[2]});
-        await agreement.join({from: accounts[3]});
-
-    })
-
-    it('Agreement should set to Running', async () =>
-    {
-        await agreement.accept(accounts[1], {from: creator});
-        let RunningStatus = (await agreement.getStatus.call());
-        assert.equal(
-          RunningStatus,
-          AgreementEnumerations.Status.Running,
-          "Status should be set to Running"
-        );
-    })
-
-    it('Agreement cannot be remove if Status is set to running', async () =>
-    {
-        await assertRevert(agreement.remove({from: creator}));
-    })
-})
 
 contract("Test Agreement Properties - Expiration Time", async(accounts) =>
 {

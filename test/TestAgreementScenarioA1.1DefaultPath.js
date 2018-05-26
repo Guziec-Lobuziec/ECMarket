@@ -24,8 +24,8 @@ contract('Agreement A1.1 - default path', async (accounts) => {
     );
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
     testWallet = await VirtualWallet.deployed();
-    await testWallet.payIn({from: buyer, value: 2000});
-    await testWallet.payIn({from: suplicant, value: 2000});
+    await testWallet.payIn({from: buyer, value: buyerBalance});
+    await testWallet.payIn({from: suplicant, value: suplicantBalance});
   })
 
   it('test price', async () => {
