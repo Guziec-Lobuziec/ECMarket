@@ -163,3 +163,23 @@ contract('Agreement basic management - permissions to remove', async (accounts) 
     }
   })
 })
+
+contract('Agreement Manager - check if agreements is registered', async(accounts) =>
+{
+
+  let testManager;
+  let createTransactions = [];
+  let agreement;
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    createTransactions = await createManyAgreements(testManager, [{address: accounts[0], count: 1}]);
+    
+  })
+
+  it('Test if agreements create by Agreement Manager are registered', async () =>{
+        agreement = createTransactions[0].logs[0].args.created;
+        let registerAgreement = testManager.checkReg(agreement);
+        asssert.isTrue(registerAgreement, 'agreement is register to Agreement Manager');
+  })
+
+})
