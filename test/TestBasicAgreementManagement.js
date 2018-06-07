@@ -160,7 +160,7 @@ contract('Agreement basic management - permissions to remove', async (accounts) 
     var i;
     for(i = 0; i < agreementsAddresses.length; i++ ) {
       assert.notEqual(await web3.eth.getCode(agreementsAddresses[i]), '0x0', 'should be untouched');
-      
+
     }
   })
 })
@@ -182,8 +182,8 @@ contract('Agreement Manager - check if agreements is registered', async(accounts
   })
 
   it('Test if alien agreement is returns false in checkReg func', async () =>{
-    let number = web3.toBigNumber('200000000000000000000001');
-     let alienAgreement = await Agreement.new(web3.eth.accounts[1],web3.eth.accounts[2],number);
-     assert.isNotTrue(await testManager.checkReg(alienAgreement),'agreement is register to Agreement Manager');
+    let number = await web3.toBigNumber('200000000000000000000001');
+    let alienAgreement = await Agreement.new(accounts[1],accounts[2],number);
+    assert.isNotTrue(await testManager.checkReg(alienAgreement.address),'agreement is register to Agreement Manager');
   })
 })
