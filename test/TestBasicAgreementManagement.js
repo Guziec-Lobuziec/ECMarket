@@ -2,6 +2,7 @@ const {assertRevert} = require('./helpers/assertThrow');
 const {createManyAgreements} = require('./helpers/agreementFactory');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
+const VirtualWallet = artifacts.require('VirtualWallet');
 
 contract('Agreement basic management - creation, removal', async (accounts) => {
 
@@ -173,12 +174,16 @@ contract('Agreement Manager - check if agreements is registered', async(accounts
   before(async () => {
     testManager = await AgreementManager.deployed();
     createTransactions = await createManyAgreements(testManager, [{address: accounts[0], count: 1}]);
-    
   })
 
   it('Test if agreements create by Agreement Manager are registered', async () =>{
         agreement = createTransactions[0].logs[0].args.created;
-        assert.equal(testManager.checkReg(agreement),true,'agreement is register to Agreement Manager');
+        assert.isTrue(await testManager.checkReg(agreement),'agreement is register to Agreement Manager');
   })
 
+  it('Test if alien agreement is returns false in checkReg func', async () =>{
+    let number = web3.toBigNumber('200000000000000000000001');
+     let alienAgreement = await Agreement.new(web3.eth.accounts[1],web3.eth.accounts[2],number);
+     assert.isNotTrue(await testManager.checkReg(alienAgreement),'agreement is register to Agreement Manager');
+  })
 })

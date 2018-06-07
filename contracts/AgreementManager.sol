@@ -72,7 +72,7 @@ contract AgreementManager {
         }
     }
 
-    function checkReg(address agreementAddress) public returns (bool)
+    function checkReg(address agreementAddress) public view returns (bool)
     {
         uint current = HEAD;
         uint i = 0;
