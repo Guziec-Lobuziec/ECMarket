@@ -178,12 +178,12 @@ contract('Agreement Manager - check if agreements is registered', async(accounts
 
   it('Test if agreements create by Agreement Manager are registered', async () =>{
         agreement = createTransactions[0].logs[0].args.created;
-        assert.isTrue(await testManager.checkReg(agreement),'agreement is register to Agreement Manager');
+        assert.isTrue(await testManager.checkReg.call(agreement),'agreement is register to Agreement Manager');
   })
 
   it('Test if alien agreement is returns false in checkReg func', async () =>{
     let number = await web3.toBigNumber('200000000000000000000001');
     let alienAgreement = await Agreement.new(accounts[1],accounts[2],number);
-    assert.isNotTrue(await testManager.checkReg(alienAgreement.address),'agreement is register to Agreement Manager');
+    assert.isNotTrue(await testManager.checkReg.call(alienAgreement.address),'agreement is register to Agreement Manager');
   })
 })
