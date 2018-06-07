@@ -72,5 +72,22 @@ contract AgreementManager {
         }
     }
 
+    function checkReg(address agreementAddress) public returns (bool)
+    {
+        uint current = HEAD;
+        uint i = 0;
+
+        for(i = 0; i < 64 ; i++)
+        {
+            if(agreementAddress == list[current].data)
+            {
+                return true;
+            }
+            current = list[current].pointers[NEXT];
+            
+        }
+        return false;
+    }
+
 
 }

@@ -178,8 +178,7 @@ contract('Agreement Manager - check if agreements is registered', async(accounts
 
   it('Test if agreements create by Agreement Manager are registered', async () =>{
         agreement = createTransactions[0].logs[0].args.created;
-        let registerAgreement = testManager.checkReg(agreement);
-        asssert.isTrue(registerAgreement, 'agreement is register to Agreement Manager');
+        assert.equal(testManager.checkReg(agreement),true,'agreement is register to Agreement Manager');
   })
 
 })
