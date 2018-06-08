@@ -1,10 +1,11 @@
 const {createManyAgreements} = require('./helpers/agreementFactory');
 const {assertRevert} = require('./helpers/assertThrow');
+const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
+const VirtualWallet = artifacts.require("VirtualWallet");
 
-
-contract('Agreement flow - joining', async (accounts) => {
+contract('Agreement flow - joining properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
@@ -79,28 +80,20 @@ contract('Agreement flow - joining', async (accounts) => {
     }
   })
 
-
-  it('Test if agreement is set to Done', async () => 
-  {
-    const Status = {New: 0,Done: 2};
-    let beforeChangingStatusToDone = (await agreement.getStatus.call());
-    assert.equal(beforeChangingStatusToDone,Status.New, "Status should be set to New");
-    
-     await agreement.conclude({from: accounts[1]});
-
-     let afterChangingStatusToDone = (await agreement.getStatus.call());
-     assert.equal(afterChangingStatusToDone,Status.Done, "Status should be set to Done ");
+  it('Cannot join if agreement is Running', async () => {
+    await agreement.accept(accounts[1], {from: creator});
+    await assertRevert(agreement.join({from: accounts[3]}));
   })
 
-  it('Test if alien address cannot change agreement status', async () =>
-  {    
-    let alienAddress = accounts[3];
-    await assertRevert(agreement.conclude({from: alienAddress}),'Address is not part of agreement');
+  it('Cannot join if agreement is Done', async () => {
+    await agreement.conclude({from: creator});
+    await agreement.conclude({from: accounts[1]});
+    await assertRevert(agreement.join({from: accounts[3]}));
   })
 
 })
 
-contract('Agreement flow - accept properties', async (accounts) => {
+contract('Agreement flow - accept permissions related properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
@@ -132,4 +125,105 @@ contract('Agreement flow - accept properties', async (accounts) => {
     await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (3)');
     await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (4)');
   })
+
+
+
+})
+
+contract('Agreement flow - accept state related properties', async (accounts) => {
+  const creator = accounts[0];
+  let testManager;
+  let agreement;
+
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1}]);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+    await agreement.join({from: accounts[2]});
+    await agreement.join({from: accounts[3]});
+  })
+
+  it('Cannot double accept', async () => {
+    await agreement.accept(accounts[2], {from: creator});
+    await assertRevert(agreement.accept(accounts[2], {from: creator}));
+  })
+
+  it('Cannot accept if agreement is Done', async () => {
+    assert.equal(
+      (await agreement.getStatus.call()),
+      AgreementEnumerations.Status.Running,
+      "Status should be set to Running"
+    );
+    await agreement.conclude({from: creator});
+    await agreement.conclude({from: accounts[2]});
+    await assertRevert(agreement.accept(accounts[3], {from: creator}));
+  })
+})
+
+contract('Agreement flow - conclude properties', async (accounts) => {
+  const creator = accounts[0];
+  const suplicant = accounts[1];
+  let testManager;
+  let agreement;
+
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1}]);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+  })
+
+  it('Test if alien address cannot conclude agreement', async () => {
+    await assertRevert(agreement.conclude({from: suplicant}),'Address is not part of agreement');
+  })
+
+  it('Test if not accepted address cannot conclude agreement', async () => {
+    await agreement.join({from: suplicant});
+    await assertRevert(agreement.conclude({from: suplicant}),'Address is not part of agreement');
+  })
+
+  it('Test if agreement cannot be concluded status before Running status', async () => {
+    assert.equal(
+      (await agreement.getStatus.call()),
+      AgreementEnumerations.Status.New,
+      "Status should be set to New"
+    );
+
+    await assertRevert(agreement.conclude({from: creator}),'If reach Done before Running should revert');
+  })
+
+  it('Cannot double conclude', async () => {
+    await agreement.accept(suplicant, {from: creator});
+    await agreement.conclude({from: creator});
+    await assertRevert(agreement.conclude({from: creator}));
+  })
+
+})
+
+contract('Funds related tests', async (accounts) => {
+
+  const creator = accounts[0];
+  const buyer = accounts[1];
+  const suplicant = accounts[2];
+  const price = 2000;
+  const buyerBalance = 4000;
+  const suplicantBalance = 1000;
+  let testManager;
+  let testWallet;
+  let agreement;
+
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    let createTransactions = await createManyAgreements(
+      testManager, [{address: creator, count: 1, price: price}]
+    );
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+    testWallet = await VirtualWallet.deployed();
+    await testWallet.payIn({from: buyer, value: buyerBalance});
+    await testWallet.payIn({from: suplicant, value: suplicantBalance});
+  })
+
+  it('join agreement - insufficient funds', async () => {
+    await assertRevert(agreement.join({from: suplicant}));
+  })
+
 })

@@ -7,6 +7,10 @@
 # EthPM dependencies
 /installed_contracts
 
+# Solidity coverage
+/coverage
+coverage.json
+
 # IDEs and editors
 /.idea
 .project
@@ -19,3 +23,6 @@
 # System Files
 .DS_Store
 Thumbs.db
+
+# Others
+.node-*

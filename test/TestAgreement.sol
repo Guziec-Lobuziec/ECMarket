@@ -11,9 +11,12 @@ contract TestAgreement {
     function testAgreementDefaultProperties() {
 
         AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
-        
-        Agreement testAgreement = Agreement(testManager.create([bytes32(0), bytes32(0)],
-        [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)]));
+
+        Agreement testAgreement = Agreement(testManager.create(
+          uint(0),
+          [bytes32(0), bytes32(0)],
+          [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)]
+        ));
         //byte32[2]
 
         address[64] memory participants;

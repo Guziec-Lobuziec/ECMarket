@@ -1,0 +1,28 @@
+{
+  "name": "ecmarket",
+  "version": "1.0.0",
+  "description": "ethereum DAO market",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "coveralls": "^3.0.1"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Guziec-Lobuziec/ECMarket.git"
+  },
+  "keywords": [
+    "ethereum"
+  ],
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/Guziec-Lobuziec/ECMarket/issues"
+  },
+  "homepage": "https://github.com/Guziec-Lobuziec/ECMarket#readme"
+}
