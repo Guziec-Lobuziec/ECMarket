@@ -5,10 +5,7 @@ const Agreement = artifacts.require('Agreement');
 
 contract('Test Advanced Properties', async (accounts) => {
     let testManager;
-
-    before(async () => {
-        testManager = await AgreementManager.deployed();
-      })
+    let agreement;
 
     let name  = [
         "0x0000000000000000000000000000000000000000000000000000000000000033",
@@ -26,10 +23,21 @@ contract('Test Advanced Properties', async (accounts) => {
         "0x0000000000000000000000000000000000000000000000000000000000000044"
       ];
 
+
+    before(async () => {
+        testManager = await AgreementManager.deployed();
+        let transaction = await createManyAgreements(testManager,[{
+          address: accounts[0],
+          count: 1,
+          name: name,
+          description: description
+        }]);
+        let agreementAdress = transaction[0].logs[0].args.created;
+        agreement = await Agreement.at(agreementAdress);
+      })
+
     it('Agreement returns name', async () => {
-        let transaction = await testManager.create(name, description, {from: accounts[0]});
-        let agreementAdress = transaction.logs[0].args.created;
-        let agreement = await Agreement.at(agreementAdress);
+
         let nameGot = await agreement.getName.call();
         assert.equal(nameGot[0], name[0], "Agreement doesn't return name (0)");
         assert.equal(nameGot[1], name[1], "Agreement doesn't return name (1)");
@@ -37,9 +45,7 @@ contract('Test Advanced Properties', async (accounts) => {
     })
 
     it('Agreement returns descyption', async () => {
-        let transaction = await testManager.create(name, description, {from: accounts[0]});
-        let agreementAdress = transaction.logs[0].args.created;
-        let agreement = await Agreement.at(agreementAdress);
+
         let descriptionGot = await agreement.getDescription.call();
         assert.equal(descriptionGot[0], description[0], "Agreement doesn't return descryption (0)");
         assert.equal(descriptionGot[1], description[1], "Agreement doesn't return descryption (1)");
@@ -63,9 +69,6 @@ contract('Test Advanced Properties', async (accounts) => {
         '{"name": "remove","type": "function","inputs": [],"outputs": []},' +
         '{"name": "getName","type": "function","inputs": [],"outputs": [{"type": "bytes32[2]"}]},' +
         '{"name": "getDescription","type": "function","inputs": [],"outputs": [{"type": "bytes32[8]"}]},';
-        let transaction = await testManager.create(name, description, {from: accounts[0]});
-        let agreementAdress = transaction.logs[0].args.created;
-        let agreement = await Agreement.at(agreementAdress);
 
         let agreementABIJSON = await agreement.getAPIJSON.call()
         assert.equal(agreementABIJSON, testJSON, "Agreement doesn't return JSON ABI");

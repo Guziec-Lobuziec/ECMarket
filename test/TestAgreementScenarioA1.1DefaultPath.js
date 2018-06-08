@@ -20,7 +20,13 @@ contract('Agreement A1.1 - default path', async (accounts) => {
   before(async () => {
     testManager = await AgreementManager.deployed();
     let createTransactions = await createManyAgreements(
-      testManager, [{address: creator, count: 1, price: price}]
+      testManager, [{
+        address: creator,
+        count: 1,
+        price: price,
+        name: ["0","0"],
+        description: ["0","0","0","0","0","0","0","0"]
+      }]
     );
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
     testWallet = await VirtualWallet.deployed();
