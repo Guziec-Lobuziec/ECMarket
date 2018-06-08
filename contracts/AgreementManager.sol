@@ -75,16 +75,14 @@ contract AgreementManager {
     function checkReg(address agreementAddress) public view returns (bool)
     {
         uint current = HEAD;
-        uint i = 0;
 
-        for(i = 0; i < 64 ; i++)
+        while(list[current].pointers[NEXT] != HEAD)
         {
+            current = list[current].pointers[NEXT];
             if(agreementAddress == list[current].data)
             {
                 return true;
             }
-            current = list[current].pointers[NEXT];
-            
         }
         return false;
     }
