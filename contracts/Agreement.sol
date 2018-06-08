@@ -8,10 +8,10 @@ contract Agreement {
     enum Status { New, Running, Done}
 
     struct Participant {
-      bool joined;
-      bool accepted;
-      bool creator;
-      bool hasConcluded;
+        bool joined;
+        bool accepted;
+        bool creator;
+        bool hasConcluded;
     }
 
     mapping(address => Participant) private participantsSet;
@@ -26,10 +26,21 @@ contract Agreement {
     VirtualWallet private wallet;
 
     uint private price;
+    bytes32[2] private name;
+    bytes32[8] private description;
 
-    constructor(address creator, address _wallet, uint _price) public {
+    constructor(
+        address creator,
+        address _wallet,
+        uint _price,
+        bytes32[2] _name,
+        bytes32[8] _description
+      ) public {
         agreementManager = AgreementManager(msg.sender);
         wallet = VirtualWallet(_wallet);
+
+        name = _name;
+        description = _description;
 
         Participant memory toAdd = Participant({
             joined: true,
@@ -121,12 +132,24 @@ contract Agreement {
         return creationTimestamp;
     }
 
+    function getStatus() public view returns(Status) {
+        return currentStatus;
+    }
+
+    function getName() public view returns(bytes32[2]) {
+        return name;
+    }
+
+    function getDescription() public view returns(bytes32[8]) {
+        return description;
+    }
+
     function getPrice() public view returns(uint) {
         return price;
     }
 
-    function getStatus() public view returns(Status) {
-        return currentStatus;
+    function getAPIJSON() public view returns(string) {
+        return "[{\"name\": \"join\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"accept\",\"type\": \"function\",\"inputs\": [{\"name\": \"suplicant\",\"type\": \"address[64]\"}],\"outputs\": []},{\"name\": \"getParticipants\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"address[64]\"}]},{\"name\": \"getCreationBlock\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"uint256\"}]},{\"name\": \"getCreationTimestamp\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"uint256\"}]},{\"name\": \"getStatus\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"Status\"}]},{\"name\": \"conclude\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"remove\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"getName\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"bytes32[2]\"}]},{\"name\": \"getDescription\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"bytes32[8]\"}]},{\"name\": \"getPrice\",\"type\": \"function\",\"inputs\":[],\"outputs\": [{\"type\": \"uint256\"}]}]";
     }
 
 }

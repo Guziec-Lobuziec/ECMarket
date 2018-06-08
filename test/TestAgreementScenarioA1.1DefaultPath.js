@@ -20,7 +20,13 @@ contract('Agreement A1.1 - default path', async (accounts) => {
   before(async () => {
     testManager = await AgreementManager.deployed();
     let createTransactions = await createManyAgreements(
-      testManager, [{address: creator, count: 1, price: price}]
+      testManager, [{
+        address: creator,
+        count: 1,
+        price: price,
+        name: ["0","0"],
+        description: ["0","0","0","0","0","0","0","0"]
+      }]
     );
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
     testWallet = await VirtualWallet.deployed();
@@ -40,6 +46,8 @@ contract('Agreement A1.1 - default path', async (accounts) => {
     );
   })
 
+  //creator i seller jednoczesnie
+
   it('join agreement - tokens transfer', async () => {
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
@@ -56,6 +64,8 @@ contract('Agreement A1.1 - default path', async (accounts) => {
       price*2, "Agreement should have "+price*2+" (3)"
     );
   })
+
+  //test pobiera participantow i sprawdza jakie maja role, suplicant i buyer maja miec role suplicant
 
   it('check participants balances', async () => {
     assert.equal(
@@ -83,6 +93,8 @@ contract('Agreement A1.1 - default path', async (accounts) => {
       price, "Creator should have "+price
     );
   })
+
+ // buyer ma miec role buyer
 
   it('test if status is Running', async () => {
     assert.equal(

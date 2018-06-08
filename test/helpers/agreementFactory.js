@@ -13,6 +13,7 @@ module.exports = {
                     return 0;
                   }
                 })(),
+                accountData.name, accountData.description,
                 {from: accountData.address}
               ));
             }

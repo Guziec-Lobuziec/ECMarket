@@ -10,10 +10,18 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
   let testManager;
   let agreement;
 
-  before(async () => {
-    testManager = await AgreementManager.deployed();
-    let createTransactions = await createManyAgreements(testManager, [{address: creator, count: 1}]);
-    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+  before(async () =>
+  {
+      testManager = await AgreementManager.deployed();
+
+      let createTransactions = await createManyAgreements(testManager,[{
+        address: creator,
+        count: 1,
+        name: ["0","0"],
+        description: ["0","0","0","0","0","0","0","0"]
+      }]);
+      agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+
   })
 
   it('test if join does not affect remove', async () => {
@@ -56,9 +64,13 @@ contract("Test Agreement Properties - Expiration Time", async(accounts) =>
     before(async () =>
     {
         testManager = await AgreementManager.deployed();
-        let createTransactions = await createManyAgreements(testManager,[{address: creator, count: 2}]);
+        let createTransactions = await createManyAgreements(testManager,[{
+          address: creator,
+          count: 1,
+          name: ["0","0"],
+          description: ["0","0","0","0","0","0","0","0"]
+        }]);
         agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-        agreementBlockChecker = await Agreement.at(createTransactions[1].logs[0].args.created);
         await agreement.join({from: accounts[1]});
         await agreement.join({from: accounts[2]});
         await agreement.join({from: accounts[3]});

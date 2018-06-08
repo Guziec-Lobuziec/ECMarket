@@ -17,7 +17,11 @@ contract DummyParticipant {
     }
 
     function createAgreement() public returns(address) {
-        return manager.create(uint(0));
+        return manager.create(
+          uint(0),
+          [bytes32(0), bytes32(0)],
+          [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)]
+        );
     }
 
     function joinAgreement(address agreement) public {
