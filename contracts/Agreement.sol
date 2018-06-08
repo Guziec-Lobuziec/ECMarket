@@ -148,4 +148,8 @@ contract Agreement {
         return description;
     }
 
+    function getAPIJSON() public view returns(string) {
+        return "[{\"name\": \"join\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"accept\",\"type\": \"function\",\"inputs\": [{\"name\": \"suplicant\",\"type\": \"address[64]\"}],\"outputs\": []},{\"name\": \"getParticipants\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"address[64]\"}]},{\"name\": \"getCreationBlock\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"uint\"}]},{\"name\": \"getCreationTimestamp\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"uint\"}]},{\"name\": \"getStatus\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"Status\"}]},{\"name\": \"conclude\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"remove\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"getName\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"bytes32[2]\"}]},{\"name\": \"getDescription\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"bytes32[8]\"}]}]";
+    }
+
 }

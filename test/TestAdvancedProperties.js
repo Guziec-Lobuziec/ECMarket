@@ -59,23 +59,44 @@ contract('Test Advanced Properties', async (accounts) => {
     })
 
     it('Agreement JSON ABI', async () => {
-        let testJSON = '[{"name": "join","type": "function","inputs": [],"outputs": []},' +
-        '{"name": "accept","type": "function","inputs": [{"name": "suplicant","type": "address[64]",}],"outputs": []},' +
-        '{"name": "getParticipants","type": "function","inputs": [],"outputs": [{"type": "address[64]"}]},' +
-        '{"name": "getCreationBlock","type": "function","inputs": [],"outputs": [{"type": "uint"}]},' +
-        '{"name": "getCreationTimestamp","type": "function","inputs": [],"outputs": [{"type": "uint"}]},' +
-        '{"name": "getStatus","type": "function","inputs": [],"outputs": [{"type": "Status"}]},' +
-        '{"name": "conclude","type": "function","inputs": [],"outputs": []},' +
-        '{"name": "remove","type": "function","inputs": [],"outputs": []},' +
-        '{"name": "getName","type": "function","inputs": [],"outputs": [{"type": "bytes32[2]"}]},' +
-        '{"name": "getDescription","type": "function","inputs": [],"outputs": [{"type": "bytes32[8]"}]},';
+        let testJSON = [
+            {"name": "join","type": "function","inputs": [],"outputs": []},
+            {"name": "accept","type": "function","inputs": [{"name": "suplicant","type": "address[64]"}],"outputs": []},
+            {"name": "getParticipants","type": "function","inputs": [],"outputs": [{"type": "address[64]"}]},
+            {"name": "getCreationBlock","type": "function","inputs": [],"outputs": [{"type": "uint"}]},
+            {"name": "getCreationTimestamp","type": "function","inputs": [],"outputs": [{"type": "uint"}]},
+            {"name": "getStatus","type": "function","inputs": [],"outputs": [{"type": "Status"}]},
+            {"name": "conclude","type": "function","inputs": [],"outputs": []},
+            {"name": "remove","type": "function","inputs": [],"outputs": []},
+            {"name": "getName","type": "function","inputs": [],"outputs": [{"type": "bytes32[2]"}]},
+            {"name": "getDescription","type": "function","inputs": [],"outputs": [{"type": "bytes32[8]"}]}
+        ];
 
-        let agreementABIJSON = await agreement.getAPIJSON.call()
-        assert.equal(agreementABIJSON, testJSON, "Agreement doesn't return JSON ABI");
+        let agreementABIJSON = await agreement.getAPIJSON.call();
 
-        let testABI = web3.eth.contract(agreementABIJSON)
+        let abi = [];
+        try {
+            abi = JSON.parse(agreementABIJSON);
+        }
+        catch (e) {
+            assert.fail('invalid JSON');
+        }
+        console.log(abi);
 
-        assert.equal(testABI.getName.call(), name, "Should be equal");
+        console.log(abi.length);
+        console.log(testJSON.length);
+        let i;
+        assert.equal(abi.length,testJSON.length, "Should have the same length");
+        for(i = 0; i<testJSON.length; i++){
+            assert.include(abi,testJSON[i], "ABI doesn't match given definition ("+i+")");
+        }
+
+        let testABI = web3.eth.contract(abi);
+        let agreementWithABI = testABI.at(agreement.address);
+        let gotName = await agreementWithABI.getName.call();
+
+        assert.equal(gotName[0], name[0], "Should be equal (name0)");
+        assert.equal(gotName[1], name[1], "Should be equal (name1)");
 
     })
     //porównanie wykreowanego JSONA z tym zwracanym
