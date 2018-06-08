@@ -63,13 +63,15 @@ contract('Test Advanced Properties', async (accounts) => {
             {"name": "join","type": "function","inputs": [],"outputs": []},
             {"name": "accept","type": "function","inputs": [{"name": "suplicant","type": "address[64]"}],"outputs": []},
             {"name": "getParticipants","type": "function","inputs": [],"outputs": [{"type": "address[64]"}]},
-            {"name": "getCreationBlock","type": "function","inputs": [],"outputs": [{"type": "uint"}]},
-            {"name": "getCreationTimestamp","type": "function","inputs": [],"outputs": [{"type": "uint"}]},
+            {"name": "getCreationBlock","type": "function","inputs": [],"outputs": [{"type": "uint256"}]},
+            {"name": "getCreationTimestamp","type": "function","inputs": [],"outputs": [{"type": "uint256"}]},
             {"name": "getStatus","type": "function","inputs": [],"outputs": [{"type": "Status"}]},
             {"name": "conclude","type": "function","inputs": [],"outputs": []},
             {"name": "remove","type": "function","inputs": [],"outputs": []},
             {"name": "getName","type": "function","inputs": [],"outputs": [{"type": "bytes32[2]"}]},
-            {"name": "getDescription","type": "function","inputs": [],"outputs": [{"type": "bytes32[8]"}]}
+            {"name": "getDescription","type": "function","inputs": [],"outputs": [{"type": "bytes32[8]"}]},
+            {"name": "getPrice","type": "function","inputs":[],"outputs": [{"type": "uint256"}]}
+
         ];
 
         let agreementABIJSON = await agreement.getAPIJSON.call();
@@ -81,10 +83,7 @@ contract('Test Advanced Properties', async (accounts) => {
         catch (e) {
             assert.fail('invalid JSON');
         }
-        console.log(abi);
 
-        console.log(abi.length);
-        console.log(testJSON.length);
         let i;
         assert.equal(abi.length,testJSON.length, "Should have the same length");
         for(i = 0; i<testJSON.length; i++){
@@ -97,11 +96,15 @@ contract('Test Advanced Properties', async (accounts) => {
 
         assert.equal(gotName[0], name[0], "Should be equal (name0)");
         assert.equal(gotName[1], name[1], "Should be equal (name1)");
+        assert.equal(
+            (await agreementWithABI.getPrice.call()).toNumber(),
+            (await agreement.getPrice.call()).toNumber(),
+            "Price should be equal"
+        );
 
     })
-    //porównanie wykreowanego JSONA z tym zwracanym
-    //https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethcontract
-    //wywolanie metod
+
+    //getparticipants razem z adresami role
 
 
 })
