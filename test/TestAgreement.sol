@@ -13,9 +13,10 @@ contract TestAgreement {
         AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
 
         Agreement testAgreement = Agreement(testManager.create(
-          uint(0),
           [bytes32(0), bytes32(0)],
-          [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)]
+          [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)],
+          uint(0),
+          uint(100)
         ));
         //byte32[2]
 
