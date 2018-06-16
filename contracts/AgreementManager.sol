@@ -35,7 +35,12 @@ contract AgreementManager {
         return page;
     }
 
-    function create(uint price, bytes32[2] name, bytes32[8] description) public returns (address) {
+    function create(
+      bytes32[2] name,
+      bytes32[8] description,
+      uint price,
+      uint blocksToExpiration
+    ) public returns (address) {
         address newAgreement = new Agreement(msg.sender, wallet, price, name, description);
         uint previous = list[HEAD].pointers[PREV];
         uint newNode = uint(keccak256(previous, block.number));
