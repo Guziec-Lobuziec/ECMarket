@@ -6,6 +6,7 @@ module.exports = {
           setupData.forEach((accountData) => {
             for(i = 0; i < accountData.count; i++) {
               transactions.push(manager.create(
+                accountData.name, accountData.description,
                 (function(){
                   if(accountData.hasOwnProperty('price')){
                     return accountData.price;
@@ -13,7 +14,13 @@ module.exports = {
                     return 0;
                   }
                 })(),
-                accountData.name, accountData.description,
+                (function(){
+                  if(accountData.hasOwnProperty('expirationTime')){
+                    return accountData.expirationTime;
+                  } else {
+                    return 100;
+                  }
+                })(),
                 {from: accountData.address}
               ));
             }
