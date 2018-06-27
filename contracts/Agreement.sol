@@ -147,6 +147,10 @@ contract Agreement {
         return description;
     }
 
+    function getBlocksToExpiration() public view returns(uint) {
+        return blocksToExpiration;
+    }
+
     function getPrice() public view returns(uint) {
         return price;
     }

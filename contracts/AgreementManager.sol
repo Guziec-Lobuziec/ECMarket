@@ -16,11 +16,15 @@ contract AgreementManager {
 
     mapping (uint => AddressList) private list;
     address private wallet;
+    uint private lowerExpirationLimit;
+    uint private upperExpirationLimit;
 
     event AgreementCreation(address created);
 
-    constructor(address _wallet) public {
+    constructor(address _wallet, uint _lowerExpirationLimit, uint _upperExpirationLimit) public {
         wallet = _wallet;
+        lowerExpirationLimit = _lowerExpirationLimit;
+        upperExpirationLimit = _upperExpirationLimit;
     }
 
     function search() public view returns (address[64]) {
@@ -41,6 +45,13 @@ contract AgreementManager {
       uint price,
       uint blocksToExpiration
     ) public returns (address) {
+
+        if(blocksToExpiration < lowerExpirationLimit)
+          blocksToExpiration = lowerExpirationLimit;
+        
+        if(blocksToExpiration >= upperExpirationLimit)
+          blocksToExpiration = upperExpirationLimit-1;
+
         address newAgreement = new Agreement(
           msg.sender,
           wallet,

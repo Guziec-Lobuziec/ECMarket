@@ -116,7 +116,7 @@ contract("Expiration Time - upper and lower limit (test env: upper 10000, lower:
           name: ["0","0"],
           description: ["0","0","0","0","0","0","0","0"]
         },
-        expirationLimit: 10000
+        expirationLimit: 9999
       }
     ];
 
@@ -140,7 +140,7 @@ contract("Expiration Time - upper and lower limit (test env: upper 10000, lower:
       {
           assert.equal(
             await agreement.getBlocksToExpiration.call(),
-            expirationLimit,
+            test.expirationLimit,
             'Should not pass given limit'
           )
       })
