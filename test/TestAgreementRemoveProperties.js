@@ -58,49 +58,88 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
 contract("Test Agreement Properties - Expiration Time", async(accounts) =>
 {
     const creator = accounts[0];
-    let testManager;
-    let agreement;
-
-    before(async () =>
-    {
-        testManager = await AgreementManager.deployed();
-        let createTransactions = await createManyAgreements(testManager,[{
+    var tests = [
+      {
+        args: {
           address: creator,
           count: 1,
+          expirationTime: 50,
           name: ["0","0"],
           description: ["0","0","0","0","0","0","0","0"]
-        }]);
-        agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-        await agreement.join({from: accounts[1]});
-        await agreement.join({from: accounts[2]});
-        await agreement.join({from: accounts[3]});
+        },
+        blocksCount: 50
+      },
+      {
+        args: {
+          address: creator,
+          count: 1,
+          expirationTime: 100,
+          name: ["0","0"],
+          description: ["0","0","0","0","0","0","0","0"]
+        },
+        blocksCount: 110
+      },
+      {
+        args: {
+          address: creator,
+          count: 1,
+          expirationTime: 130,
+          name: ["0","0"],
+          description: ["0","0","0","0","0","0","0","0"]
+        },
+        blocksCount: 130
+      }
+    ];
 
+    tests.forEach(function(test) {
+
+      let agreement;
+      let testManager;
+
+      before(async () =>
+      {
+          testManager = await AgreementManager.deployed();
+          let createTransactions = await createManyAgreements(
+            testManager,
+            [test.args]
+          )
+          agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+
+          await agreement.join({from: accounts[1]});
+          await agreement.join({from: accounts[2]});
+          await agreement.join({from: accounts[3]});
+
+      })
+
+      it('creating '+test.blocksCount+' blocks', async () =>
+      {
+
+          let blockBefore = await web3.eth.blockNumber;
+
+          for (let i = 0; i < test.blocksCount; i++) {
+              await web3.eth.sendTransaction({from: accounts[1],to: accounts[2]});
+          }
+
+          let numberOfBlocks = await web3.eth.blockNumber;
+
+          assert.equal(
+            numberOfBlocks,blockBefore+test.blocksCount,
+            'Should have created '+test.blocksCount+' blocks'
+          );
+      })
+
+      it('User cannot use join to agreement after '+test.blocksCount+' blocks', async () =>
+      {
+          await assertRevert(agreement.join({from: accounts[5]}));
+      })
+
+      it('User cannot accept agreement after '+test.blocksCount+' blocks', async () => {
+          await assertRevert(agreement.accept(accounts[3], {from: creator}));
+      })
+
+      it('User cannot conclude agreement after '+test.blocksCount+' blocks', async () => {
+          await assertRevert(agreement.conclude({from: accounts[2]}));
+      })
     })
 
-    it('Agreement time is set to 100 blocks', async () =>
-    {
-
-        let blockBefore = await web3.eth.blockNumber;
-
-        for (let i = 0; i < 100; i++) {
-            await web3.eth.sendTransaction({from: accounts[1],to: accounts[2]});
-        }
-
-        let numberOfBlocks = await web3.eth.blockNumber;
-
-        assert.equal(numberOfBlocks,blockBefore+100,"Number of blocks should be 100");
-    })
-
-    it('User cannot use join to agreement after 100 blocks', async () =>
-    {
-        await assertRevert(agreement.join({from: accounts[5]}));
-    })
-
-    it('User cannot accept agreement after 100 blocks', async () => {
-        await assertRevert(agreement.accept(accounts[3], {from: creator}));
-    })
-
-    it('User cannot conclude agreement after 100 blocks', async () => {
-        await assertRevert(agreement.conclude({from: accounts[2]}));
-    })
 })
