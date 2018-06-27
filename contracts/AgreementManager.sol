@@ -16,11 +16,15 @@ contract AgreementManager {
 
     mapping (uint => AddressList) private list;
     address private wallet;
+    uint private lowerExpirationLimit;
+    uint private upperExpirationLimit;
 
     event AgreementCreation(address created);
 
-    constructor(address _wallet) public {
+    constructor(address _wallet, uint _lowerExpirationLimit, uint _upperExpirationLimit) public {
         wallet = _wallet;
+        lowerExpirationLimit = _lowerExpirationLimit;
+        upperExpirationLimit = _upperExpirationLimit;
     }
 
     function search() public view returns (address[64]) {
@@ -35,8 +39,27 @@ contract AgreementManager {
         return page;
     }
 
-    function create(uint price, bytes32[2] name, bytes32[8] description) public returns (address) {
-        address newAgreement = new Agreement(msg.sender, wallet, price, name, description);
+    function create(
+      bytes32[2] name,
+      bytes32[8] description,
+      uint price,
+      uint blocksToExpiration
+    ) public returns (address) {
+
+        if(blocksToExpiration < lowerExpirationLimit)
+          blocksToExpiration = lowerExpirationLimit;
+        
+        if(blocksToExpiration >= upperExpirationLimit)
+          blocksToExpiration = upperExpirationLimit-1;
+
+        address newAgreement = new Agreement(
+          msg.sender,
+          wallet,
+          price,
+          blocksToExpiration,
+          name,
+          description
+        );
         uint previous = list[HEAD].pointers[PREV];
         uint newNode = uint(keccak256(previous, block.number));
 

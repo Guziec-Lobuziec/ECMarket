@@ -15,8 +15,8 @@ contract Agreement {
     }
 
     mapping(address => Participant) private participantsSet;
-    address[] participants;
-    address[] accepted;
+    address[] private participants;
+    address[] private accepted;
 
     Status private currentStatus;
 
@@ -26,6 +26,7 @@ contract Agreement {
     VirtualWallet private wallet;
 
     uint private price;
+    uint private blocksToExpiration;
     bytes32[2] private name;
     bytes32[8] private description;
 
@@ -33,6 +34,7 @@ contract Agreement {
         address creator,
         address _wallet,
         uint _price,
+        uint _blocksToExpiration,
         bytes32[2] _name,
         bytes32[8] _description
       ) public {
@@ -41,6 +43,7 @@ contract Agreement {
 
         name = _name;
         description = _description;
+        blocksToExpiration = _blocksToExpiration;
 
         Participant memory toAdd = Participant({
             joined: true,
@@ -61,7 +64,7 @@ contract Agreement {
     }
 
     function join() public {
-        require(block.number < creationBlock + 100);
+        require(block.number < creationBlock + blocksToExpiration);
         require(getStatus() == Status.New);
         if (participantsSet[msg.sender].joined)
             return;
@@ -79,7 +82,7 @@ contract Agreement {
     }
 
     function accept(address suplicant) public {
-        require(block.number < creationBlock + 100);
+        require(block.number < creationBlock + blocksToExpiration);
         require(getStatus() == Status.New);
         require(participantsSet[msg.sender].creator);
         require(participantsSet[suplicant].joined);
@@ -94,7 +97,7 @@ contract Agreement {
 
     function conclude() public
     {
-        require(block.number < creationBlock + 100);
+        require(block.number < creationBlock + blocksToExpiration);
         require(participantsSet[msg.sender].joined,"Address isn't part of agreement");
         require(participantsSet[msg.sender].accepted);
         require(!participantsSet[msg.sender].hasConcluded);
@@ -142,6 +145,10 @@ contract Agreement {
 
     function getDescription() public view returns(bytes32[8]) {
         return description;
+    }
+
+    function getBlocksToExpiration() public view returns(uint) {
+        return blocksToExpiration;
     }
 
     function getPrice() public view returns(uint) {
