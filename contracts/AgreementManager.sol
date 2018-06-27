@@ -41,7 +41,14 @@ contract AgreementManager {
       uint price,
       uint blocksToExpiration
     ) public returns (address) {
-        address newAgreement = new Agreement(msg.sender, wallet, price, name, description);
+        address newAgreement = new Agreement(
+          msg.sender,
+          wallet,
+          price,
+          blocksToExpiration,
+          name,
+          description
+        );
         uint previous = list[HEAD].pointers[PREV];
         uint newNode = uint(keccak256(previous, block.number));
 
