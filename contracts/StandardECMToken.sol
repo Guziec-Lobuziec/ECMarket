@@ -47,6 +47,7 @@ contract StandardECMToken {
         require((value == 0) || (allowed[msg.sender][spender] == 0));
 
         allowed[msg.sender][spender] = value;
+        return true;
     }
 
     function getRating(address ratingSystem) public view returns (uint rating) {

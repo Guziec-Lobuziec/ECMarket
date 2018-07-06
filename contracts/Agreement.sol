@@ -69,8 +69,6 @@ contract Agreement {
         if (participantsSet[msg.sender].joined)
             return;
 
-        wallet.transferFrom(msg.sender, this, getPrice());
-
         Participant memory toAdd = Participant({
             joined: true,
             accepted: false,
@@ -79,6 +77,9 @@ contract Agreement {
         });
         participantsSet[msg.sender] = toAdd;
         participants.push(msg.sender);
+
+        bool success = wallet.transferFrom(msg.sender, this, getPrice());
+        require(success);
     }
 
     function accept(address suplicant) public {
