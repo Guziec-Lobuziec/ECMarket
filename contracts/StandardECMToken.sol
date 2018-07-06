@@ -8,8 +8,8 @@ contract StandardECMToken {
     mapping (address => uint256) private walletValue;
     mapping (address => mapping(address => uint256)) private allowed;
 
-    function balanceOf(address externalWallet) public view returns (uint256 balance) {
-        return walletValue[externalWallet];
+    function balanceOf(address owner) public view returns (uint256 balance) {
+        return walletValue[owner];
     }
 
     function payIn() public payable {
@@ -43,11 +43,15 @@ contract StandardECMToken {
         return true;
     }
 
-    function approve(address spender, uint256 value) returns (bool success) {
+    function approve(address spender, uint256 value) public returns (bool success) {
         require((value == 0) || (allowed[msg.sender][spender] == 0));
 
         allowed[msg.sender][spender] = value;
         return true;
+    }
+
+    function allowance(address owner, address spender) public view returns (uint256 remaining) {
+        return allowed[owner][spender];
     }
 
     function getRating(address ratingSystem) public view returns (uint rating) {

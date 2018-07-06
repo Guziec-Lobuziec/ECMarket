@@ -66,4 +66,15 @@ contract("StandardECMToken transfer", async (accounts) => {
     );
   })
 
+  it("test if transfer cannot send tokens to 0x0 or token contract address", async () => {
+    await assertRevert(
+      testWallet.transfer(0, 500, {from: accounts[0]}),
+      "sending to 0x0"
+    );
+    await assertRevert(
+      testWallet.transfer(testWallet.address, 500, {from: accounts[0]}),
+      "sending to token contract address"
+    );
+  })
+
 })
