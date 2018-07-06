@@ -1,13 +1,13 @@
 var Migrations = artifacts.require("./Migrations.sol");
-var VirtualWallet = artifacts.require("VirtualWallet");
+var StandardECMToken = artifacts.require("StandardECMToken");
 var AgreementManager = artifacts.require("AgreementManager");
 
 module.exports = function(deployer, network) {
   deployer.deploy(Migrations);
-  deployer.deploy(VirtualWallet).then(function() {
+  deployer.deploy(StandardECMToken).then(function() {
     return deployer.deploy(
       AgreementManager,
-      VirtualWallet.address,
+      StandardECMToken.address,
       (function(){
         if(network === "development" || network === "coverage"){
           return 10;

@@ -3,7 +3,7 @@ pragma solidity 0.4.23;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 
-import "../contracts/VirtualWallet.sol";
+import "../contracts/StandardECMToken.sol";
 
 
 contract DummyMortal {
@@ -20,16 +20,16 @@ contract DummyMortal {
 }
 
 
-contract TestIfVirtualWalletBalanceIsInvariantToKill {
+contract TestIfStandardECMTokenBalanceIsInvariantToKill {
 
     function () public payable {}
 
     uint public initialBalance = 5000;
 
-    VirtualWallet testWallet;
+    StandardECMToken testWallet;
 
     function beforeAll() {
-        testWallet = VirtualWallet(DeployedAddresses.VirtualWallet());
+        testWallet = StandardECMToken(DeployedAddresses.StandardECMToken());
     }
 
     function testInitialBalanceOfWallet() {

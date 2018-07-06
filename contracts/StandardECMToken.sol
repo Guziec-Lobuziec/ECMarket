@@ -1,7 +1,7 @@
 pragma solidity 0.4.23;
 
 
-contract VirtualWallet {
+contract StandardECMToken {
 
     mapping (address => uint) walletValue;
     mapping (address => uint) basicRating;

@@ -1,7 +1,7 @@
 pragma solidity 0.4.23;
 
 import "./AgreementManager.sol";
-import "./VirtualWallet.sol";
+import "./StandardECMToken.sol";
 
 
 contract Agreement {
@@ -23,7 +23,7 @@ contract Agreement {
     uint private creationBlock;
     uint private creationTimestamp;
     AgreementManager private agreementManager;
-    VirtualWallet private wallet;
+    StandardECMToken private wallet;
 
     uint private price;
     uint private blocksToExpiration;
@@ -39,7 +39,7 @@ contract Agreement {
         bytes32[8] _description
       ) public {
         agreementManager = AgreementManager(msg.sender);
-        wallet = VirtualWallet(_wallet);
+        wallet = StandardECMToken(_wallet);
 
         name = _name;
         description = _description;

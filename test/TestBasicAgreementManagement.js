@@ -2,7 +2,7 @@ const {assertRevert} = require('./helpers/assertThrow');
 const {createManyAgreements} = require('./helpers/agreementFactory');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
-const VirtualWallet = artifacts.require('VirtualWallet');
+const StandardECMToken = artifacts.require('StandardECMToken');
 
 contract('Agreement basic management - creation, removal', async (accounts) => {
 

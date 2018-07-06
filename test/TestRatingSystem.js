@@ -1,10 +1,10 @@
-var VirtualWallet = artifacts.require("VirtualWallet");
+var StandardECMToken = artifacts.require("StandardECMToken");
 
 contract("VirtualRating Tests", async (accounts) => {
     let testRank;
-    
+
     before(async () => {
-        testRank = await VirtualWallet.deployed();
+        testRank = await StandardECMToken.deployed();
     })
 
     it("test rank-presence", async () => {

@@ -1,11 +1,11 @@
 const {assertRevert} = require('./helpers/assertThrow');
-const VirtualWallet = artifacts.require("VirtualWallet");
+const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract("VirtualWallet payin and payout test", async (accounts) => {
+contract("StandardECMToken payin and payout test", async (accounts) => {
     let testWallet;
 
     before(async () => {
-      testWallet = await VirtualWallet.deployed();
+      testWallet = await StandardECMToken.deployed();
     })
 
     it("test payin", async () => {
@@ -40,11 +40,11 @@ contract("VirtualWallet payin and payout test", async (accounts) => {
     })
 })
 
-contract("VirtualWallet multiple users test", async (accounts) => {
+contract("StandardECMToken multiple users test", async (accounts) => {
   let testWallet;
 
   before(async () => {
-    testWallet = await VirtualWallet.deployed();
+    testWallet = await StandardECMToken.deployed();
   })
 
     it("multiple payins", async () => {
@@ -99,12 +99,12 @@ contract("VirtualWallet multiple users test", async (accounts) => {
     })
 })
 
-contract("VirtualWallet with invalid input", async (accounts) => {
+contract("StandardECMToken with invalid input", async (accounts) => {
 
   let testWallet;
 
   before(async () => {
-    testWallet = await VirtualWallet.deployed();
+    testWallet = await StandardECMToken.deployed();
   })
 
   it("throw if trying withdraw more than curently in wallet", async () => {

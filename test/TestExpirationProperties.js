@@ -3,7 +3,7 @@ const {createManyAgreements} = require('./helpers/agreementFactory');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
 const Agreement = artifacts.require('Agreement');
 const {assertRevert} = require('./helpers/assertThrow');
-const VirtualWallet = artifacts.require("VirtualWallet");
+const StandardECMToken = artifacts.require("StandardECMToken");
 
 contract("Expiration Time A1.1 - join, accept, conclude", async(accounts) =>
 {
