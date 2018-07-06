@@ -53,11 +53,13 @@ contract('Agreement A1.1 - default path', async (accounts) => {
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       0, "Agreement should have 0 (1)"
     );
+    await testWallet.approve(agreement.address, price, {from: buyer});
     await agreement.join({from: buyer});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price, "Agreement should have "+price+" (2)"
     );
+    await testWallet.approve(agreement.address, price, {from: suplicant});
     await agreement.join({from: suplicant});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),

@@ -92,3 +92,63 @@ contract("StandardECMToken transferFrom", async (accounts) => {
   })
 
 })
+
+contract("StandardECMToken approve and allowance", async (accounts) => {
+  const startBalance = 1000;
+  let testWallet;
+
+  before(async () => {
+    testWallet = await StandardECMToken.deployed();
+    await testWallet.payIn({from: accounts[0], value: startBalance});
+  })
+
+  it("test allowance return value", async () => {
+    let amount = 1000;
+    await testWallet.approve(accounts[1], amount, {from: accounts[0]});
+    assert.equal(
+      (await testWallet.allowance.call(accounts[0],accounts[1])).toNumber(),
+      amount,
+      "allowance should equal "+amount+" from accounts[0] to accounts[1]"
+    );
+    assert.equal(
+      (await testWallet.allowance.call(accounts[1],accounts[0])).toNumber(),
+      0,
+      "allowance should equal "+amount+" from accounts[1] to accounts[0]"
+    );
+  })
+
+  it("test allowance after transferFrom", async () => {
+    let amount = 1000;
+    await testWallet.transferFrom(accounts[0], accounts[2], amount, {from: accounts[1]})
+    assert.equal(
+      (await testWallet.allowance.call(accounts[0],accounts[1])).toNumber(),
+      0,
+      "allowance should equal "+0+" from accounts[0] to accounts[1]"
+    );
+  })
+
+  it("test transferFrom when not allowed", async () => {
+    let amount = 1000;
+    await assertRevert(testWallet.transferFrom(accounts[2], accounts[0], amount, {from: accounts[1]}));
+  })
+
+  it("test consecutive nonzero approve calls", async () => {
+    await testWallet.approve(accounts[1], 500, {from: accounts[2]});
+    await assertRevert(testWallet.approve(accounts[1], 1000, {from: accounts[2]}));
+  })
+
+  it("test consecutive zero and nonzero approve calls", async () => {
+    await testWallet.approve(accounts[1], 0, {from: accounts[2]});
+    assert.equal(
+      (await testWallet.allowance.call(accounts[2],accounts[1])).toNumber(),
+      0,
+      "allowance should equal "+0+" from accounts[2] to accounts[1]"
+    );
+    await testWallet.approve(accounts[1], 1000, {from: accounts[2]});
+    assert.equal(
+      (await testWallet.allowance.call(accounts[2],accounts[1])).toNumber(),
+      1000,
+      "allowance should equal "+1000+" from accounts[2] to accounts[1]"
+    );
+  })
+})
