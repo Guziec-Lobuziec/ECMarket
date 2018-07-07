@@ -246,6 +246,7 @@ contract('Funds related tests', async (accounts) => {
     testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant, value: suplicantBalance});
+    await testWallet.approve(agreement.address, price, {from: suplicant})
   })
 
   it('join agreement - insufficient funds', async () => {
