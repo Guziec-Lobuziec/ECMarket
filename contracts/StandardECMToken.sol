@@ -42,6 +42,7 @@ contract StandardECMToken {
         require((to != 0) && (to != address(this)));
         walletValue[msg.sender] -= value;
         walletValue[to] += value;
+        emit Transfer(msg.sender,to,value);
         return true;
     }
 
@@ -53,6 +54,7 @@ contract StandardECMToken {
         allowed[from][msg.sender] -= value;
         walletValue[from] -= value;
         walletValue[to] += value;
+        emit Transfer(from,to,value);
         return true;
     }
 
@@ -60,6 +62,7 @@ contract StandardECMToken {
         require((value == 0) || (allowed[msg.sender][spender] == 0));
 
         allowed[msg.sender][spender] = value;
+        emit Approval(msg.sender,spender,value);
         return true;
     }
 
