@@ -122,6 +122,7 @@ contract("Total supply test and creation/destruction Transfer events", async (ac
   let valueIn1 = 1000;
   let valueIn2 = 1000;
   let valueOut1 = 500;
+  let transaction;
 
   before(async () => {
     testWallet = await StandardECMToken.deployed();
@@ -136,32 +137,42 @@ contract("Total supply test and creation/destruction Transfer events", async (ac
   })
 
   it("Supply after first payIn", async () => {
-    let transaction = await testWallet.payIn({from: accounts[0], value: valueIn1});
+    transaction = await testWallet.payIn({from: accounts[0], value: valueIn1});
     assert.equal(
       (await testWallet.totalSupply.call()).toNumber(),
       valueIn1,
       "Should be "+valueIn1
     )
-     console.log(transaction.logs[0].args)
+
+  })
+
+  it("payIn event", async () => {
+    assert.equal(transaction.logs[0].args._from, 0, "Sholud be 0x0");
+    assert.equal(transaction.logs[0].args._to, accounts[0], "Sholud be accounts[0]");
+    assert.equal(transaction.logs[0].args._value, valueIn1, "Sholud be "+valueIn1);
   })
 
   it("Supply after second payIn", async () => {
-    let transaction = await testWallet.payIn({from: accounts[1], value: valueIn2});
+    testWallet.payIn({from: accounts[1], value: valueIn2});
     assert.equal(
       (await testWallet.totalSupply.call()).toNumber(),
       valueIn1+valueIn2,
       "Should be "+(valueIn1+valueIn2)
     )
-     console.log(transaction.logs[0].args)
   })
 
   it("Supply after payOut", async () => {
-    let transaction = await testWallet.payOut(valueOut1,{from: accounts[0]});
+    transaction = await testWallet.payOut(valueOut1,{from: accounts[0]});
     assert.equal(
       (await testWallet.totalSupply.call()).toNumber(),
       valueIn1+valueIn2-valueOut1,
       "Should be "+(valueIn1+valueIn2-valueOut1)
     )
-     console.log(transaction.logs[0].args)
+  })
+
+  it("payOut event", async () => {
+    assert.equal(transaction.logs[0].args._from, accounts[0], "Sholud be accounts[0]");
+    assert.equal(transaction.logs[0].args._to, 0, "Sholud be 0x0");
+    assert.equal(transaction.logs[0].args._value, valueOut1, "Sholud be "+valueOut1);
   })
 })
