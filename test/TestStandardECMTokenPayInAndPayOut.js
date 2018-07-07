@@ -116,3 +116,52 @@ contract("StandardECMToken with invalid input", async (accounts) => {
     await assertRevert(testWallet.payOut(valueOut,{from: accounts[0]}));
   })
 })
+
+contract("Total supply test and creation/destruction Transfer events", async (accounts) => {
+  let testWallet;
+  let valueIn1 = 1000;
+  let valueIn2 = 1000;
+  let valueOut1 = 500;
+
+  before(async () => {
+    testWallet = await StandardECMToken.deployed();
+  })
+
+  it("Supply at begining", async () => {
+    assert.equal(
+      (await testWallet.totalSupply.call()).toNumber(),
+      0,
+      "Should be zero"
+    )
+  })
+
+  it("Supply after first payIn", async () => {
+    let transaction = await testWallet.payIn({from: accounts[0], value: valueIn1});
+    assert.equal(
+      (await testWallet.totalSupply.call()).toNumber(),
+      valueIn1,
+      "Should be "+valueIn1
+    )
+     console.log(transaction.logs[0].args)
+  })
+
+  it("Supply after second payIn", async () => {
+    let transaction = await testWallet.payIn({from: accounts[1], value: valueIn2});
+    assert.equal(
+      (await testWallet.totalSupply.call()).toNumber(),
+      valueIn1+valueIn2,
+      "Should be "+(valueIn1+valueIn2)
+    )
+     console.log(transaction.logs[0].args)
+  })
+
+  it("Supply after payOut", async () => {
+    let transaction = await testWallet.payOut(valueOut1,{from: accounts[0]});
+    assert.equal(
+      (await testWallet.totalSupply.call()).toNumber(),
+      valueIn1+valueIn2-valueOut1,
+      "Should be "+(valueIn1+valueIn2-valueOut1)
+    )
+     console.log(transaction.logs[0].args)
+  })
+})
