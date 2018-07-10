@@ -1,6 +1,6 @@
 pragma solidity 0.4.23;
 
-import "./Agreement.sol";
+import "./Agreement1_1.sol";
 
 
 contract AgreementManager {
@@ -52,7 +52,7 @@ contract AgreementManager {
         if(blocksToExpiration >= upperExpirationLimit)
           blocksToExpiration = upperExpirationLimit-1;
 
-        address newAgreement = new Agreement(
+        address newAgreement = new Agreement1_1(
           msg.sender,
           wallet,
           price,

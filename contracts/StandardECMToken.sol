@@ -1,7 +1,8 @@
 pragma solidity 0.4.23;
 
+import "./IEIP20.sol";
 
-contract StandardECMToken {
+contract StandardECMToken is IEIP20 {
 
     mapping (address => uint) private basicRating;
 

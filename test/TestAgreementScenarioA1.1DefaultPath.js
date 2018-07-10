@@ -2,10 +2,10 @@ const {createManyAgreements} = require('./helpers/agreementFactory');
 const {assertRevert} = require('./helpers/assertThrow');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
-const Agreement = artifacts.require('Agreement');
+const Agreement1_1 = artifacts.require('Agreement1_1');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract('Agreement A1.1 - default path', async (accounts) => {
+contract('Agreement1_1 - default path', async (accounts) => {
 
   const creator = accounts[0];
   const buyer = accounts[1];
@@ -28,7 +28,7 @@ contract('Agreement A1.1 - default path', async (accounts) => {
         description: ["0","0","0","0","0","0","0","0"]
       }]
     );
-    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
     testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant1, value: suplicantBalance});
@@ -51,21 +51,21 @@ contract('Agreement A1.1 - default path', async (accounts) => {
   it('join agreement - tokens transfer', async () => {
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
-      0, "Agreement should have 0 (1)"
+      0, "Agreement1_1 should have 0 (1)"
     );
 
     await testWallet.approve(agreement.address, price, {from: buyer});
     await agreement.join({from: buyer});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
-      price, "Agreement should have "+price+" (2)"
+      price, "Agreement1_1 should have "+price+" (2)"
     );
 
     await testWallet.approve(agreement.address, price, {from: suplicant1});
     await agreement.join({from: suplicant1});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
-      price*2, "Agreement should have "+price*2+" (3)"
+      price*2, "Agreement1_1 should have "+price*2+" (3)"
     );
   })
 

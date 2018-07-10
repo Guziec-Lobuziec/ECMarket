@@ -26,11 +26,11 @@ contract DummyParticipant {
     }
 
     function joinAgreement(address agreement) public {
-        Agreement(agreement).join();
+        Agreement1_1(agreement).join();
     }
 
     function acceptParticipant(address participant, address agreement) public {
-        Agreement(agreement).accept(participant);
+        Agreement1_1(agreement).accept(participant);
     }
 
 }

@@ -2,9 +2,10 @@ pragma solidity 0.4.23;
 
 import "./AgreementManager.sol";
 import "./StandardECMToken.sol";
+import "./IAgreement.sol";
 
 
-contract Agreement {
+contract Agreement1_1 is IAgreement {
 
     uint constant private HEAD = 0;
     bool constant private NEXT = true;
@@ -165,7 +166,7 @@ contract Agreement {
         require(participantsSet[msg.sender].creator);
         require(currentStatus != Status.Running);
         agreementManager.remove();
-        
+
         selfdestruct(address(agreementManager));
     }
 

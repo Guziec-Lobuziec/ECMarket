@@ -12,7 +12,7 @@ contract TestAgreement {
 
         AgreementManager testManager = AgreementManager(DeployedAddresses.AgreementManager());
 
-        Agreement testAgreement = Agreement(testManager.create(
+        Agreement1_1 testAgreement = Agreement1_1(testManager.create(
           [bytes32(0), bytes32(0)],
           [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)],
           uint(0),
@@ -26,7 +26,7 @@ contract TestAgreement {
         Assert.equal(participants[0], this, "Should have agreement creator");
         Assert.equal(testAgreement.getCreationBlock(), block.number, "Should be created in same block as test tx");
         Assert.equal(testAgreement.getCreationTimestamp(), block.timestamp, "Same timestamp as in test");
-        Assert.equal(uint(testAgreement.getStatus()), uint(Agreement.Status.New), "Should have \"New\" Status");
+        Assert.equal(uint(testAgreement.getStatus()), uint(Agreement1_1.Status.New), "Should have \"New\" Status");
 
     }
 
