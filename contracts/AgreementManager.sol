@@ -48,7 +48,7 @@ contract AgreementManager {
 
         if(blocksToExpiration < lowerExpirationLimit)
           blocksToExpiration = lowerExpirationLimit;
-        
+
         if(blocksToExpiration >= upperExpirationLimit)
           blocksToExpiration = upperExpirationLimit-1;
 
@@ -76,6 +76,7 @@ contract AgreementManager {
     function remove() public {
         address toBeRemoved = msg.sender;
         uint current = HEAD;
+        //Insecure loop!
         while ((list[current].pointers[NEXT] != HEAD)) {
             current = list[current].pointers[NEXT];
             if (list[current].data == toBeRemoved) {

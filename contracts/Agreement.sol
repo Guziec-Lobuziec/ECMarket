@@ -138,6 +138,7 @@ contract Agreement {
 
         address toBeRemoved = msg.sender;
         uint current = HEAD;
+        //Insecure loop!
         while ((list[current].pointers[NEXT] != HEAD)) {
             current = list[current].pointers[NEXT];
             if (list[current].data == toBeRemoved) {
@@ -164,6 +165,7 @@ contract Agreement {
         require(participantsSet[msg.sender].creator);
         require(currentStatus != Status.Running);
         agreementManager.remove();
+        
         selfdestruct(address(agreementManager));
     }
 
