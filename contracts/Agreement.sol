@@ -100,8 +100,6 @@ contract Agreement {
         require(participantsSet[suplicant].joined);
         require(!participantsSet[suplicant].creator);
 
-        wallet.transfer(list[list[HEAD].pointers[NEXT]].data, getPrice());
-
         participantsSet[suplicant].accepted = true;
         accepted.push(suplicant);
         currentStatus = Status.Running;
