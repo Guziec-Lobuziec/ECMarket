@@ -1,11 +1,11 @@
 const {assertRevert} = require('./helpers/assertThrow');
-const VirtualWallet = artifacts.require("VirtualWallet");
+const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract("VirtualWallet payin and payout test", async (accounts) => {
+contract("StandardECMToken payin and payout test", async (accounts) => {
     let testWallet;
 
     before(async () => {
-      testWallet = await VirtualWallet.deployed();
+      testWallet = await StandardECMToken.deployed();
     })
 
     it("test payin", async () => {
@@ -40,11 +40,11 @@ contract("VirtualWallet payin and payout test", async (accounts) => {
     })
 })
 
-contract("VirtualWallet multiple users test", async (accounts) => {
+contract("StandardECMToken multiple users test", async (accounts) => {
   let testWallet;
 
   before(async () => {
-    testWallet = await VirtualWallet.deployed();
+    testWallet = await StandardECMToken.deployed();
   })
 
     it("multiple payins", async () => {
@@ -99,12 +99,12 @@ contract("VirtualWallet multiple users test", async (accounts) => {
     })
 })
 
-contract("VirtualWallet with invalid input", async (accounts) => {
+contract("StandardECMToken with invalid input", async (accounts) => {
 
   let testWallet;
 
   before(async () => {
-    testWallet = await VirtualWallet.deployed();
+    testWallet = await StandardECMToken.deployed();
   })
 
   it("throw if trying withdraw more than curently in wallet", async () => {
@@ -114,5 +114,65 @@ contract("VirtualWallet with invalid input", async (accounts) => {
     await testWallet.payIn({from: accounts[0], value: valueIn});
 
     await assertRevert(testWallet.payOut(valueOut,{from: accounts[0]}));
+  })
+})
+
+contract("Total supply test and creation/destruction Transfer events", async (accounts) => {
+  let testWallet;
+  let valueIn1 = 1000;
+  let valueIn2 = 1000;
+  let valueOut1 = 500;
+  let transaction;
+
+  before(async () => {
+    testWallet = await StandardECMToken.deployed();
+  })
+
+  it("Supply at begining", async () => {
+    assert.equal(
+      (await testWallet.totalSupply.call()).toNumber(),
+      0,
+      "Should be zero"
+    )
+  })
+
+  it("Supply after first payIn", async () => {
+    transaction = await testWallet.payIn({from: accounts[0], value: valueIn1});
+    assert.equal(
+      (await testWallet.totalSupply.call()).toNumber(),
+      valueIn1,
+      "Should be "+valueIn1
+    )
+
+  })
+
+  it("payIn event", async () => {
+    assert.equal(transaction.logs[0].args._from, 0, "Sholud be 0x0");
+    assert.equal(transaction.logs[0].args._to, accounts[0], "Sholud be accounts[0]");
+    assert.equal(transaction.logs[0].args._value, valueIn1, "Sholud be "+valueIn1);
+  })
+
+  it("Supply after second payIn", async () => {
+    testWallet.payIn({from: accounts[1], value: valueIn2});
+    assert.equal(
+      (await testWallet.totalSupply.call()).toNumber(),
+      valueIn1+valueIn2,
+      "Should be "+(valueIn1+valueIn2)
+    )
+  })
+
+  it("Supply after payOut", async () => {
+    transaction = await testWallet.payOut(valueOut1,{from: accounts[0]});
+    assert.equal(
+      (await testWallet.totalSupply.call()).toNumber(),
+      valueIn1+valueIn2-valueOut1,
+      "Should be "+(valueIn1+valueIn2-valueOut1)
+    )
+  })
+
+  it("payOut event", async () => {
+    assert.equal(transaction.logs[0].args._from, accounts[0], "Sholud be accounts[0]");
+    assert.equal(transaction.logs[0].args._to, 0, "Sholud be 0x0");
+    assert.equal(transaction.logs[0].args._value, valueOut1, "Sholud be "+valueOut1);
   })
 })

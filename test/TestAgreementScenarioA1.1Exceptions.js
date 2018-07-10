@@ -3,7 +3,7 @@ const {assertRevert} = require('./helpers/assertThrow');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
-const VirtualWallet = artifacts.require("VirtualWallet");
+const StandardECMToken = artifacts.require("StandardECMToken");
 
 contract('Agreement flow - joining properties', async (accounts) => {
   const creator = accounts[0];
@@ -243,9 +243,10 @@ contract('Funds related tests', async (accounts) => {
       }]
     );
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-    testWallet = await VirtualWallet.deployed();
+    testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant, value: suplicantBalance});
+    await testWallet.approve(agreement.address, price, {from: suplicant})
   })
 
   it('join agreement - insufficient funds', async () => {

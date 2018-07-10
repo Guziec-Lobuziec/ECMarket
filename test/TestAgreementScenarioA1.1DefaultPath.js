@@ -3,13 +3,13 @@ const {assertRevert} = require('./helpers/assertThrow');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
-const VirtualWallet = artifacts.require("VirtualWallet");
+const StandardECMToken = artifacts.require("StandardECMToken");
 
 contract('Agreement A1.1 - default path', async (accounts) => {
 
   const creator = accounts[0];
   const buyer = accounts[1];
-  const suplicant = accounts[2];
+  const suplicant1 = accounts[2];
   const price = 1000;
   const buyerBalance = 2000;
   const suplicantBalance = 2000;
@@ -29,9 +29,9 @@ contract('Agreement A1.1 - default path', async (accounts) => {
       }]
     );
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-    testWallet = await VirtualWallet.deployed();
+    testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
-    await testWallet.payIn({from: suplicant, value: suplicantBalance});
+    await testWallet.payIn({from: suplicant1, value: suplicantBalance});
   })
 
   it('test price', async () => {
@@ -53,19 +53,21 @@ contract('Agreement A1.1 - default path', async (accounts) => {
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       0, "Agreement should have 0 (1)"
     );
+
+    await testWallet.approve(agreement.address, price, {from: buyer});
     await agreement.join({from: buyer});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price, "Agreement should have "+price+" (2)"
     );
-    await agreement.join({from: suplicant});
+
+    await testWallet.approve(agreement.address, price, {from: suplicant1});
+    await agreement.join({from: suplicant1});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price*2, "Agreement should have "+price*2+" (3)"
     );
   })
-
-  //test pobiera participantow i sprawdza jakie maja role, suplicant i buyer maja miec role suplicant
 
   it('check participants balances', async () => {
     assert.equal(
@@ -77,21 +79,27 @@ contract('Agreement A1.1 - default path', async (accounts) => {
       buyerBalance-price, "Buyer should have "+(buyerBalance-price)
     );
     assert.equal(
-      (await testWallet.balanceOf.call(suplicant)).toNumber(),
-      suplicantBalance-price, "Suplicant should have "+(buyerBalance-price)
+      (await testWallet.balanceOf.call(suplicant1)).toNumber(),
+      suplicantBalance-price, "suplicant1 should have "+(buyerBalance-price)
     );
   })
 
-  it('accept buyer - token transfer', async () => {
+  it('accept buyer - token allowance', async () => {
+    let before = await testWallet.balanceOf.call(agreement.address);
     await agreement.accept(buyer, {from: creator});
+
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
-      price, "Agreement should have "+price
+      before.toNumber(),
+      "Accept should use pull-oriented transfer"
     );
+
     assert.equal(
-      (await testWallet.balanceOf.call(creator)).toNumber(),
-      price, "Creator should have "+price
+      (await testWallet.allowance.call(agreement.address, creator)).toNumber(),
+      price,
+      "Creator should be allowed to withdraw price: "+price
     );
+
   })
 
  // buyer ma miec role buyer
