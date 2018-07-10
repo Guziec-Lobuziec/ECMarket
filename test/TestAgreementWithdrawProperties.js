@@ -18,6 +18,7 @@ contract('Agreement withdraw properties', async (accounts) => {
   let agreement;
 
   before(async () => {
+    testWallet = await StandardECMToken.deployed();
     testManager = await AgreementManager.deployed();
     let createTransactions = await createManyAgreements(
       testManager, [{
@@ -29,12 +30,11 @@ contract('Agreement withdraw properties', async (accounts) => {
       }]
     );
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-    testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant1, value: suplicantBalance});
   })
 
-  afterEach(async () => {
+  beforeEach(async () => {
     accounts.forEach(async (account) => {
       if((await testWallet.allowance.call(agreement.address,account)).toNumber() !== 0){
         await testWallet.transferFrom(agreement.address, account, price,{from: account});
@@ -64,8 +64,8 @@ contract('Agreement withdraw properties', async (accounts) => {
   it('after withdraw caller will be removed from participants list', async () => {
     let participants = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
     assert.notInclude(
-      afterCreatorJoin.toString(),
-      suplicant1,
+      participants.toString(),
+      [suplicant1],
       "Creator or suplicant missing"
     );
   })

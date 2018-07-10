@@ -5,6 +5,11 @@ import "./StandardECMToken.sol";
 
 
 contract Agreement {
+
+    uint constant private HEAD = 0;
+    bool constant private NEXT = true;
+    bool constant private PREV = false;
+
     enum Status { New, Running, Done}
 
     struct Participant {
@@ -14,8 +19,14 @@ contract Agreement {
         bool hasConcluded;
     }
 
+    struct AddressList {
+        address data;
+        mapping(bool => uint) pointers;
+    }
+
+    mapping (uint => AddressList) private list;
+
     mapping(address => Participant) private participantsSet;
-    address[] private participants;
     address[] private accepted;
 
     Status private currentStatus;
@@ -53,7 +64,7 @@ contract Agreement {
         });
 
         participantsSet[creator] = toAdd;
-        participants.push(creator);
+        addParticipant(creator);
         accepted.push(creator);
 
         creationBlock = block.number;
@@ -76,7 +87,7 @@ contract Agreement {
             hasConcluded: false
         });
         participantsSet[msg.sender] = toAdd;
-        participants.push(msg.sender);
+        addParticipant(msg.sender);
 
         bool success = wallet.transferFrom(msg.sender, this, getPrice());
         require(success);
@@ -89,15 +100,17 @@ contract Agreement {
         require(participantsSet[suplicant].joined);
         require(!participantsSet[suplicant].creator);
 
-        wallet.transfer(participants[0], getPrice());
+        wallet.transfer(list[list[HEAD].pointers[NEXT]].data, getPrice());
 
         participantsSet[suplicant].accepted = true;
         accepted.push(suplicant);
         currentStatus = Status.Running;
+
+        bool success = wallet.approve(list[list[HEAD].pointers[NEXT]].data, getPrice());
+        require(success);
     }
 
-    function conclude() public
-    {
+    function conclude() public {
         require(block.number < creationBlock + blocksToExpiration);
         require(participantsSet[msg.sender].joined,"Address isn't part of agreement");
         require(participantsSet[msg.sender].accepted);
@@ -113,6 +126,42 @@ contract Agreement {
           currentStatus = Status.Done;
     }
 
+    function withdraw() public {
+        require(participantsSet[msg.sender].joined,"Address isn't part of agreement");
+        require(!participantsSet[msg.sender].accepted);
+        require(!participantsSet[msg.sender].creator);
+
+        participantsSet[msg.sender] = Participant({
+            joined: false,
+            accepted: false,
+            creator: false,
+            hasConcluded: false
+        });
+
+        address toBeRemoved = msg.sender;
+        uint current = HEAD;
+        while ((list[current].pointers[NEXT] != HEAD)) {
+            current = list[current].pointers[NEXT];
+            if (list[current].data == toBeRemoved) {
+
+                list[list[current].pointers[PREV]].pointers[NEXT]
+                = list[current].pointers[NEXT];
+
+                list[list[current].pointers[NEXT]].pointers[PREV]
+                = list[current].pointers[PREV];
+
+                delete list[current].pointers[NEXT];
+                delete list[current].pointers[PREV];
+                delete list[current];
+
+                break;
+            }
+        }
+
+        bool success = wallet.approve(msg.sender, getPrice());
+        require(success);
+    }
+
     function remove() public {
         require(participantsSet[msg.sender].creator);
         require(currentStatus != Status.Running);
@@ -122,8 +171,12 @@ contract Agreement {
 
     function getParticipants() public view returns(address[64]) {
         address[64] memory page;
-        for (uint i = 0; i < participants.length && i < 64; i++) {
-            page[i] = participants[i];
+        uint current = HEAD;
+        uint i = 0;
+        while ((list[current].pointers[NEXT] != HEAD) && (i < 64)) {
+            current = list[current].pointers[NEXT];
+            page[i] = list[current].data;
+            i++;
         }
         return page;
     }
@@ -158,6 +211,19 @@ contract Agreement {
 
     function getAPIJSON() public view returns(string) {
         return "[{\"name\": \"join\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"accept\",\"type\": \"function\",\"inputs\": [{\"name\": \"suplicant\",\"type\": \"address[64]\"}],\"outputs\": []},{\"name\": \"getParticipants\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"address[64]\"}]},{\"name\": \"getCreationBlock\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"uint256\"}]},{\"name\": \"getCreationTimestamp\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"uint256\"}]},{\"name\": \"getStatus\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"Status\"}]},{\"name\": \"conclude\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"remove\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"getName\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"bytes32[2]\"}]},{\"name\": \"getDescription\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"bytes32[8]\"}]},{\"name\": \"getPrice\",\"type\": \"function\",\"inputs\":[],\"outputs\": [{\"type\": \"uint256\"}]}]";
+    }
+
+    function addParticipant(address _participant) private {
+      uint previous = list[HEAD].pointers[PREV];
+      uint newNode = uint(keccak256(previous, block.number));
+
+      list[previous].pointers[NEXT] = newNode;
+      list[HEAD].pointers[PREV] = newNode;
+
+      list[newNode].data = _participant;
+
+      list[newNode].pointers[NEXT] = HEAD;
+      list[newNode].pointers[PREV] = previous;
     }
 
 }
