@@ -42,8 +42,8 @@ contract AgreementManager {
     function create(
       bytes32[2] name,
       bytes32[8] description,
-      uint price,
-      uint blocksToExpiration
+      uint blocksToExpiration,
+      bytes32[] extra
     ) public returns (address) {
 
         if(blocksToExpiration < lowerExpirationLimit)
@@ -51,6 +51,12 @@ contract AgreementManager {
 
         if(blocksToExpiration >= upperExpirationLimit)
           blocksToExpiration = upperExpirationLimit-1;
+
+        uint price = 0;
+
+        if(extra.length >= 3)
+          if(extra[0] == 1 && extra[2] == 1)
+            price = uint(extra[1]);
 
         address newAgreement = new Agreement1_1(
           msg.sender,
@@ -60,6 +66,8 @@ contract AgreementManager {
           name,
           description
         );
+
+
         uint previous = list[HEAD].pointers[PREV];
         uint newNode = uint(keccak256(previous, block.number));
 

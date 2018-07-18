@@ -38,24 +38,32 @@ function encodeCreateParams(dataObject) {
     ]}
   ];
 
-  function encode(obj,def = encodingDef) {
+  function encode(obj,def = encodingDef, elementSize = 32) {
     var encoded = [];
     var index = 0;
     Object.keys(obj).forEach(function (key) {
       if(def[index].key === key) {
-        encoded.push(def[index].code);
+        encoded.push('0x'+(
+          '0'.repeat(elementSize*2)
+          +web3.toHex(def[index].code).substr(2)
+        ).substr(-elementSize*2));
         if (typeof obj[key] === 'object') {
             encoded = encoded.concat(encode(obj[key],def[index].submarks));
         }
         else {
-          encoded.push(obj[key]);
+          encoded.push('0x'+(
+            '0'.repeat(elementSize*2)
+            +web3.toHex(obj[key]).substr(2)
+          ).substr(-elementSize*2));
         }
-        encoded.push(def[index].code);
+        encoded.push('0x'+(
+          '0'.repeat(elementSize*2)
+          +web3.toHex(def[index].code).substr(2)
+        ).substr(-elementSize*2));
         index++;
       }
     });
     return encoded;
   }
-
   return encode(dataObject);
 }
