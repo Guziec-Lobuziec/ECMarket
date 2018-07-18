@@ -237,9 +237,9 @@ contract('Funds related tests', async (accounts) => {
       testManager, [{
         address: creator,
         count: 1,
-        price: price,
         name: ["0","0"],
-        description: ["0","0","0","0","0","0","0","0"]
+        description: ["0","0","0","0","0","0","0","0"],
+        extra: {price: price}
       }]
     );
     agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
