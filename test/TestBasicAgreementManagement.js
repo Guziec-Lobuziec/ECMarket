@@ -4,63 +4,81 @@ const AgreementManager = artifacts.require('AgreementManager');
 const Agreement1_1 = artifacts.require('Agreement1_1');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract('Agreement1_1 basic management - creation, removal', async (accounts) => {
+contract('Agreement basic management - creation, removal', async (accounts) => {
 
-  let testManager;
-  let createTransactions = [];
-  let agreementAddress = {};
+  const creator = accounts[0];
+  var tests = [
+    {extra: {}, title: "A1.1 (no arguments)"},
+    {extra: {price: 1000}, title: "A1.1 (price)"},
+    {extra: {price: 1500, contractOut: {advancePayment: 250, timeToFallback: 50}}, title: "A1.2 (contractOut)"}
+  ];
 
-  before(async () => {
+  tests.forEach(function(test) {
 
-    testManager = await AgreementManager.deployed();
-  })
+    let testManager;
+    let createTransactions = [];
+    let agreementAddress = {};
 
-  it('Agreement1_1 creation events', async () => {
+    before(async () => {
+      testManager = await AgreementManager.deployed();
+    })
 
-    let before = await testManager.search.call();
-    assert.isTrue(before.every((e) => {return e == 0;}),'expected to be zeros before');
+    it('Agreement creation events '+test.title, async () => {
 
-    createTransactions = await createManyAgreements(testManager, [{address: accounts[0], count: 1, name: ["0","0"], description: ["0","0","0","0","0","0","0","0"]}]);
+      let before = await testManager.search.call();
+      assert.isTrue(before.every((e) => {return e == 0;}),'expected to be zeros before');
 
-    assert.equal(createTransactions[0].logs.length, 1, 'one event generated');
-    assert.equal(createTransactions[0].logs[0].event, 'AgreementCreation', 'event name', 'event desciption');
+      createTransactions = await createManyAgreements(
+        testManager,
+        [{
+          address: creator,
+          count: 1,
+          name: ["0","0"],
+          description: ["0","0","0","0","0","0","0","0"],
+          extra: test.extra
+        }]
+      );
 
-  })
+      assert.equal(createTransactions[0].logs.length, 1, 'one event generated');
+      assert.equal(createTransactions[0].logs[0].event, 'AgreementCreation', 'event name', 'event desciption');
 
-  it('Checking if contract exists under given address', async () => {
+    })
 
-    agreementAddress = createTransactions[0].logs[0].args.created;
+    it('Checking if contract exists under given address '+test.title, async () => {
 
-    assert.notEqual(agreementAddress, 0, 'should have valid address');
+      agreementAddress = createTransactions[0].logs[0].args.created;
 
-    let codeOfAgreementBefore = await web3.eth.getCode(agreementAddress);
-    assert.notEqual(codeOfAgreementBefore, '0x0', 'should have some code');
+      assert.notEqual(agreementAddress, 0, 'should have valid address');
 
-  })
+      let codeOfAgreementBefore = await web3.eth.getCode(agreementAddress);
+      assert.notEqual(codeOfAgreementBefore, '0x0', 'should have some code');
 
-  it('Checking if search results match events logs', async () => {
+    })
 
-    let one = (await testManager.search.call()).filter((e) => {return e != 0;});
-    assert.lengthOf(one, 1,'exactly one non zero');
-    assert.equal(one[0], agreementAddress, 'manager should return the same address');
+    it('Checking if search results match events logs '+test.title, async () => {
 
-  })
+      let one = (await testManager.search.call()).filter((e) => {return e != 0;});
+      assert.lengthOf(one, 1,'exactly one non zero');
+      assert.equal(one[0], agreementAddress, 'manager should return the same address');
 
-  it('Test if agreement did selfdestruction', async () => {
-    let agreement = await Agreement1_1.at(agreementAddress);
-    await agreement.remove({from: accounts[0]});
+    })
 
-    let codeOfAgreementAfter = await web3.eth.getCode(agreementAddress);
-    assert.equal(codeOfAgreementAfter, '0x0', 'should have none');
+    it('Test if agreement did selfdestruction '+test.title, async () => {
+      let agreement = await Agreement1_1.at(agreementAddress);
+      await agreement.remove({from: creator});
 
-    let after = await testManager.search.call();
-    assert.isTrue(after.every((e) => {return e == 0;}),'expected to be zeros after');
+      let codeOfAgreementAfter = await web3.eth.getCode(agreementAddress);
+      assert.equal(codeOfAgreementAfter, '0x0', 'should have none');
 
+      let after = await testManager.search.call();
+      assert.isTrue(after.every((e) => {return e == 0;}),'expected to be zeros after');
+
+    })
   })
 
 })
 
-contract('Agreement1_1 basic management - remove selected', async (accounts) => {
+contract('Agreement basic management - remove selected', async (accounts) => {
 
   let testManager;
   let agreements;
@@ -166,7 +184,7 @@ contract('Agreement1_1 basic management - permissions to remove', async (account
   })
 })
 
-contract('Agreement1_1 Manager - check if agreements is registered', async(accounts) =>
+contract('AgreementManager - check if agreements is registered', async(accounts) =>
 {
 
   let testManager;
