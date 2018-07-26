@@ -1,22 +1,41 @@
 pragma solidity 0.4.23;
 
-import "./AgreementManager.sol";
-import "./StandardECMToken.sol";
-import "./IAgreement.sol";
+import "./Agreement1_1.sol";
 
+contract Agreement1_2 is Agreement1_1 {
 
-contract Agreement1_2 is IAgreement {
+    uint private advancePayment;
+    uint private blocksToFallback;
 
-  function getName() public view returns(bytes32[2]) {
-      return [bytes32(0), bytes32(0)];
-  }
+    constructor(
+      address _agreementManager,
+      address _wallet,
+      address creator,
+      uint _price,
+      uint _blocksToExpiration,
+      bytes32[2] _name,
+      bytes32[8] _description,
+      uint _advancePayment,
+      uint _blocksToFallback
+    ) Agreement1_1(
+      _agreementManager,
+      _wallet,
+      creator,
+      _price,
+      _blocksToExpiration,
+      _name,
+      _description
+    ) public {
+      advancePayment = _advancePayment;
+      blocksToFallback = _blocksToFallback;
+    }
 
-  function getDescription() public view returns(bytes32[8]) {
-      return [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)];
-  }
+    function getAdvancePayment() public view returns(uint) {
+      return advancePayment;
+    }
 
-  function getAPIJSON() public view returns(string) {
-    return "";
-  }
+    function getBlocksToFallback() public view returns(uint) {
+      return blocksToFallback;
+    }
 
 }

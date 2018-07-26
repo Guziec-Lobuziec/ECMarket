@@ -1,6 +1,7 @@
 pragma solidity 0.4.23;
 
 import "../../contracts/AgreementManager.sol";
+import "../../contracts/Agreement1_1.sol";
 
 
 contract DummyParticipant {

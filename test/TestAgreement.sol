@@ -4,6 +4,7 @@ import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 
 import "../contracts/AgreementManager.sol";
+import "../contracts/Agreement1_1.sol";
 
 
 contract TestAgreement {

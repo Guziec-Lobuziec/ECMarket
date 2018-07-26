@@ -208,6 +208,7 @@ contract('AgreementManager - check if agreements is registered', async(accounts)
   it('Test if checkReg func returns false on alien agreement', async () =>{
     let number = await web3.toBigNumber('200000000000000000000001');
     let alienAgreement = await Agreement1_1.new(
+      testManager.address,
       accounts[1],
       accounts[2],
       number,
