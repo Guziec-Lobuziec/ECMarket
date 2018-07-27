@@ -1,7 +1,7 @@
 const AgreementManager = artifacts.require('AgreementManager');
 const {createManyAgreements} = require('./helpers/agreementFactory');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
-const Agreement = artifacts.require('Agreement');
+const Agreement1_1 = artifacts.require('Agreement1_1');
 const {assertRevert} = require('./helpers/assertThrow');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
@@ -53,7 +53,7 @@ contract("Expiration Time A1.1 - join, accept, conclude", async(accounts) =>
             testManager,
             [test.args]
           )
-          agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+          agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
 
           await agreement.join({from: accounts[1]});
           await agreement.join({from: accounts[2]});
@@ -132,7 +132,7 @@ contract("Expiration Time - upper and lower limit (test env: upper 10000, lower:
             testManager,
             [test.args]
           )
-          agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+          agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
 
       })
 

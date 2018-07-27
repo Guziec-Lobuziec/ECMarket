@@ -2,10 +2,10 @@ const {createManyAgreements} = require('./helpers/agreementFactory');
 const {assertRevert} = require('./helpers/assertThrow');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
-const Agreement = artifacts.require('Agreement');
+const Agreement1_1 = artifacts.require('Agreement1_1');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract('Agreement withdraw properties', async (accounts) => {
+contract('Agreement1_1 withdraw properties', async (accounts) => {
 
   const creator = accounts[0];
   const buyer = accounts[1];
@@ -24,12 +24,12 @@ contract('Agreement withdraw properties', async (accounts) => {
       testManager, [{
         address: creator,
         count: 1,
-        price: price,
         name: ["0","0"],
-        description: ["0","0","0","0","0","0","0","0"]
+        description: ["0","0","0","0","0","0","0","0"],
+        extra: {price: price}
       }]
     );
-    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant1, value: suplicantBalance});
   })

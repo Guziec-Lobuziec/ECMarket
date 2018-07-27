@@ -1,6 +1,7 @@
 pragma solidity 0.4.23;
 
 import "../../contracts/AgreementManager.sol";
+import "../../contracts/Agreement1_1.sol";
 
 
 contract DummyParticipant {
@@ -17,20 +18,22 @@ contract DummyParticipant {
     }
 
     function createAgreement() public returns(address) {
+        bytes32[] memory extra;
+
         return manager.create(
           [bytes32(0), bytes32(0)],
           [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)],
-          uint(0),
-          uint(100)
+          uint(100),
+          extra
         );
     }
 
     function joinAgreement(address agreement) public {
-        Agreement(agreement).join();
+        Agreement1_1(agreement).join();
     }
 
     function acceptParticipant(address participant, address agreement) public {
-        Agreement(agreement).accept(participant);
+        Agreement1_1(agreement).accept(participant);
     }
 
 }

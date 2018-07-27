@@ -1,10 +1,10 @@
 pragma solidity 0.4.23;
 
-import "./AgreementManager.sol";
-import "./StandardECMToken.sol";
+import "./IAgreementManager.sol";
+import "./IEIP20.sol";
 
 
-contract Agreement {
+contract Agreement1_1 {
 
     uint constant private HEAD = 0;
     bool constant private NEXT = true;
@@ -33,8 +33,8 @@ contract Agreement {
 
     uint private creationBlock;
     uint private creationTimestamp;
-    AgreementManager private agreementManager;
-    StandardECMToken private wallet;
+    IAgreementManager private agreementManager;
+    IEIP20 private tokenContract;
 
     uint private price;
     uint private blocksToExpiration;
@@ -42,15 +42,16 @@ contract Agreement {
     bytes32[8] private description;
 
     constructor(
+        address _agreementManager,
+        address _tokenContract,
         address creator,
-        address _wallet,
         uint _price,
         uint _blocksToExpiration,
         bytes32[2] _name,
         bytes32[8] _description
       ) public {
-        agreementManager = AgreementManager(msg.sender);
-        wallet = StandardECMToken(_wallet);
+        agreementManager = IAgreementManager(_agreementManager);
+        tokenContract = IEIP20(_tokenContract);
 
         name = _name;
         description = _description;
@@ -89,7 +90,7 @@ contract Agreement {
         participantsSet[msg.sender] = toAdd;
         addParticipant(msg.sender);
 
-        bool success = wallet.transferFrom(msg.sender, this, getPrice());
+        bool success = tokenContract.transferFrom(msg.sender, this, getPrice());
         require(success);
     }
 
@@ -104,7 +105,7 @@ contract Agreement {
         accepted.push(suplicant);
         currentStatus = Status.Running;
 
-        bool success = wallet.approve(list[list[HEAD].pointers[NEXT]].data, getPrice());
+        bool success = tokenContract.approve(list[list[HEAD].pointers[NEXT]].data, getPrice());
         require(success);
     }
 
@@ -157,7 +158,7 @@ contract Agreement {
             }
         }
 
-        bool success = wallet.approve(msg.sender, getPrice());
+        bool success = tokenContract.approve(msg.sender, getPrice());
         require(success);
     }
 
@@ -165,7 +166,7 @@ contract Agreement {
         require(participantsSet[msg.sender].creator);
         require(currentStatus != Status.Running);
         agreementManager.remove();
-        
+
         selfdestruct(address(agreementManager));
     }
 

@@ -1,9 +1,11 @@
 pragma solidity 0.4.23;
 
-import "./Agreement.sol";
+
+import "./IAgreementManager.sol";
+import "./IAgreementFactory.sol";
 
 
-contract AgreementManager {
+contract AgreementManager is IAgreementManager {
 
     uint constant private HEAD = 0;
     bool constant private NEXT = true;
@@ -15,51 +17,30 @@ contract AgreementManager {
     }
 
     mapping (uint => AddressList) private list;
-    address private wallet;
-    uint private lowerExpirationLimit;
-    uint private upperExpirationLimit;
+    IAgreementFactory private factory;
 
     event AgreementCreation(address created);
 
-    constructor(address _wallet, uint _lowerExpirationLimit, uint _upperExpirationLimit) public {
-        wallet = _wallet;
-        lowerExpirationLimit = _lowerExpirationLimit;
-        upperExpirationLimit = _upperExpirationLimit;
-    }
-
-    function search() public view returns (address[64]) {
-        address[64] memory page;
-        uint current = HEAD;
-        uint i = 0;
-        while ((list[current].pointers[NEXT] != HEAD) && (i < 64)) {
-            current = list[current].pointers[NEXT];
-            page[i] = list[current].data;
-            i++;
-        }
-        return page;
+    function setAgreementFactory(address _factory) public {
+        factory = IAgreementFactory(_factory);
     }
 
     function create(
       bytes32[2] name,
       bytes32[8] description,
-      uint price,
-      uint blocksToExpiration
+      uint blocksToExpiration,
+      bytes32[] extra
     ) public returns (address) {
 
-        if(blocksToExpiration < lowerExpirationLimit)
-          blocksToExpiration = lowerExpirationLimit;
-
-        if(blocksToExpiration >= upperExpirationLimit)
-          blocksToExpiration = upperExpirationLimit-1;
-
-        address newAgreement = new Agreement(
+        address newAgreement = factory.create(
           msg.sender,
-          wallet,
-          price,
-          blocksToExpiration,
           name,
-          description
+          description,
+          blocksToExpiration,
+          extra
         );
+
+
         uint previous = list[HEAD].pointers[PREV];
         uint newNode = uint(keccak256(previous, block.number));
 
@@ -94,6 +75,18 @@ contract AgreementManager {
                 break;
             }
         }
+    }
+
+    function search() public view returns (address[64]) {
+        address[64] memory page;
+        uint current = HEAD;
+        uint i = 0;
+        while ((list[current].pointers[NEXT] != HEAD) && (i < 64)) {
+            current = list[current].pointers[NEXT];
+            page[i] = list[current].data;
+            i++;
+        }
+        return page;
     }
 
     function checkReg(address agreementAddress) public view returns (bool)
