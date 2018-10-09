@@ -18,7 +18,7 @@ contract DummyParticipant {
     }
 
     function createAgreement() public returns(address) {
-        bytes32[] memory extra;
+        bytes memory extra;
 
         return manager.create(
           [bytes32(0), bytes32(0)],

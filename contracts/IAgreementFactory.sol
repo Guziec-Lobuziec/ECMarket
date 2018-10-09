@@ -7,7 +7,7 @@ contract IAgreementFactory {
         bytes32[2] name,
         bytes32[8] description,
         uint blocksToExpiration,
-        bytes32[] extra
+        bytes  extra
     ) public returns(address);
 
 }

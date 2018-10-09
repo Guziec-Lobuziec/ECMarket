@@ -4,8 +4,8 @@ import "./IAgreementFactory.sol";
 import "./Agreement1_1.sol";
 import "./Agreement1_2.sol";
 
-contract AgreementFactory is IAgreementFactory {
 
+contract AgreementFactory is IAgreementFactory {
     address private agreementManager;
     address private tokenContract;
     uint private lowerExpirationLimit;
@@ -28,7 +28,7 @@ contract AgreementFactory is IAgreementFactory {
         bytes32[2] name,
         bytes32[8] description,
         uint blocksToExpiration,
-        bytes32[] extra
+        bytes extra
     ) public returns(address) {
 
       if(blocksToExpiration < lowerExpirationLimit)
