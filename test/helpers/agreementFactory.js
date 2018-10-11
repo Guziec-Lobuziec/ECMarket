@@ -37,6 +37,10 @@ module.exports = {
 }
 
 function encodeCreateParams(dataArray) {
+
+  if(dataArray.length <= 0)
+    return '';
+
   var builderABI = [
   	{
   		"constant": true,
@@ -58,7 +62,7 @@ function encodeCreateParams(dataArray) {
   	}
   ]
 
-  var builder = web3.eth.contract(abi);
+  var builder = web3.eth.contract(builderABI);
   var payload = '';
 
   dataArray.forEach(call => {

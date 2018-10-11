@@ -24,6 +24,7 @@ contract DummyParticipant {
           [bytes32(0), bytes32(0)],
           [bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0), bytes32(0)],
           uint(100),
+          uint(0),
           extra
         );
     }

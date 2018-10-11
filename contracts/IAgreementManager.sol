@@ -8,6 +8,7 @@ contract IAgreementManager {
       bytes32[2] name,
       bytes32[8] description,
       uint blocksToExpiration,
+      uint price,
       bytes extra
     ) public returns (address);
     function remove() public;

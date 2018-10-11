@@ -29,9 +29,8 @@ contract('Agreement1_2 - default path', async (accounts) => {
         count: 1,
         name: ["0","0"],
         description: ["0","0","0","0","0","0","0","0"],
-        extra: {
-          price: price,
-          contractOut: {advancePayment: advancePayment, timeToFallback: timeToFallback}}
+        price: price,
+        extra: [{name: "setAdvancePayment", args:[advancePayment,timeToFallback]}]
       }]
     );
 
@@ -48,7 +47,7 @@ contract('Agreement1_2 - default path', async (accounts) => {
       "getAdvancePayment should return "+advancePayment
     );
   })
-  
+
   it('test if Agreement1_2 has blocksToFallback', async () => {
     assert.equal(
       await agreement.getBlocksToFallback.call(),

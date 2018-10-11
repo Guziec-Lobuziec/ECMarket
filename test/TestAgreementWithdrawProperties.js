@@ -26,7 +26,7 @@ contract('Agreement1_1 withdraw properties', async (accounts) => {
         count: 1,
         name: ["0","0"],
         description: ["0","0","0","0","0","0","0","0"],
-        extra: {price: price}
+        price: price
       }]
     );
     agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);

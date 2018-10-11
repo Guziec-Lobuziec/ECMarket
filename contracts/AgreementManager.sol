@@ -29,6 +29,7 @@ contract AgreementManager is IAgreementManager {
       bytes32[2] name,
       bytes32[8] description,
       uint blocksToExpiration,
+      uint price,
       bytes extra
     ) public returns (address) {
 
@@ -37,6 +38,7 @@ contract AgreementManager is IAgreementManager {
           name,
           description,
           blocksToExpiration,
+          price,
           extra
         );
 

@@ -7,10 +7,16 @@ const StandardECMToken = artifacts.require("StandardECMToken");
 contract('Agreement basic management - creation, removal', async (accounts) => {
 
   const creator = accounts[0];
+  const advancePayment = 250;
+  const timeToFallback = 50;
   var tests = [
-    {extra: {}, title: "A1.1 (no arguments)"},
-    {extra: {price: 1000}, title: "A1.1 (price)"},
-    {extra: {price: 1500, contractOut: {advancePayment: 250, timeToFallback: 50}}, title: "A1.2 (contractOut)"}
+    {extra: [], price: 0, title: "A1.1 (no arguments)"},
+    {extra: [], price: 1000, title: "A1.1 (price)"},
+    {
+      extra: [{name: "setAdvancePayment", args:[advancePayment,timeToFallback]}],
+      price: 1500,
+      title: "A1.2 (contractOut)"
+    }
   ];
 
   tests.forEach(function(test) {
@@ -35,6 +41,7 @@ contract('Agreement basic management - creation, removal', async (accounts) => {
           count: 1,
           name: ["0","0"],
           description: ["0","0","0","0","0","0","0","0"],
+          price: test.price,
           extra: test.extra
         }]
       );
