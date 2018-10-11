@@ -1,7 +1,7 @@
 const AgreementManager = artifacts.require('AgreementManager');
 const {createManyAgreements} = require('./helpers/agreementFactory');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
-const Agreement1_1 = artifacts.require('Agreement1_1');
+const Agreement = artifacts.require('Agreement');
 const {assertRevert} = require('./helpers/assertThrow');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
@@ -20,7 +20,7 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
         name: ["0","0"],
         description: ["0","0","0","0","0","0","0","0"]
       }]);
-      agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+      agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
 
   })
 
@@ -36,7 +36,7 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
     await assertRevert(agreement.remove({from: accounts[1]}));
   })
 
-  it('Agreement1_1 should set to Running', async () =>
+  it('Agreement 1.1 should set to Running', async () =>
   {
       let RunningStatus = (await agreement.getStatus.call());
       assert.equal(
@@ -46,7 +46,7 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
       );
   })
 
-  it('Agreement1_1 cannot be remove if Status is set to running', async () =>
+  it('Agreement 1.1 cannot be remove if Status is set to running', async () =>
   {
       await assertRevert(agreement.remove({from: creator}));
   })

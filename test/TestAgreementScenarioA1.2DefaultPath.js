@@ -2,10 +2,10 @@ const {createManyAgreements} = require('./helpers/agreementFactory');
 const {assertRevert} = require('./helpers/assertThrow');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
-const Agreement1_2 = artifacts.require('Agreement1_2');
+const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract('Agreement1_2 - default path', async (accounts) => {
+contract('Agreement 1.2 - default path', async (accounts) => {
   const creator = accounts[0];
   const buyer = accounts[1];
   const suplicant1 = accounts[2];
@@ -34,13 +34,13 @@ contract('Agreement1_2 - default path', async (accounts) => {
       }]
     );
 
-    agreement = await Agreement1_2.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
     testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant1, value: suplicantBalance});
   })
 
-  it('test if Agreement1_2 has advancePayment', async () => {
+  it('test if Agreement 1.2 has advancePayment', async () => {
     assert.equal(
       await agreement.getAdvancePayment.call(),
       advancePayment,
@@ -48,7 +48,7 @@ contract('Agreement1_2 - default path', async (accounts) => {
     );
   })
 
-  it('test if Agreement1_2 has blocksToFallback', async () => {
+  it('test if Agreement 1.2 has blocksToFallback', async () => {
     assert.equal(
       await agreement.getBlocksToFallback.call(),
       timeToFallback,

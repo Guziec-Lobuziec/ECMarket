@@ -4,7 +4,7 @@ import "./IAgreementManager.sol";
 import "./IEIP20.sol";
 
 
-contract Agreement1_1 {
+contract Agreement {
 
     uint constant private HEAD = 0;
     bool constant private NEXT = true;

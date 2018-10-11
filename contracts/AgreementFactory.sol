@@ -3,8 +3,7 @@ pragma solidity 0.4.23;
 import "bytes/BytesLib.sol";
 
 import "./IAgreementFactory.sol";
-import "./Agreement1_1.sol";
-import "./Agreement1_2.sol";
+import "./Agreement.sol";
 
 
 contract AgreementFactory is IAgreementFactory {
@@ -74,7 +73,7 @@ contract AgreementFactory is IAgreementFactory {
       expirationDateConstraint(spec);
       decodeExtra(spec, extra);
 
-      newAgreement = new Agreement1_1(
+      newAgreement = new Agreement(
         agreementManager,
         tokenContract,
         creator,

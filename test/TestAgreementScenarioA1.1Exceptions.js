@@ -2,10 +2,10 @@ const {createManyAgreements} = require('./helpers/agreementFactory');
 const {assertRevert} = require('./helpers/assertThrow');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
-const Agreement1_1 = artifacts.require('Agreement1_1');
+const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract('Agreement1_1 flow - joining properties', async (accounts) => {
+contract('Agreement 1.1 flow - joining properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
@@ -18,7 +18,7 @@ contract('Agreement1_1 flow - joining properties', async (accounts) => {
       name: ["0","0"],
       description: ["0","0","0","0","0","0","0","0"]
     }]);
-    agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
   })
 
   it('Test joining agreement', async () => {
@@ -98,7 +98,7 @@ contract('Agreement1_1 flow - joining properties', async (accounts) => {
 
 })
 
-contract('Agreement1_1 flow - accept permissions related properties', async (accounts) => {
+contract('Agreement 1.1 flow - accept permissions related properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
@@ -111,7 +111,7 @@ contract('Agreement1_1 flow - accept permissions related properties', async (acc
       name: ["0","0"],
       description: ["0","0","0","0","0","0","0","0"]
     }]);
-    agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
   })
 
   it('Test if creator fails to accept himself', async () => {
@@ -140,7 +140,7 @@ contract('Agreement1_1 flow - accept permissions related properties', async (acc
 
 })
 
-contract('Agreement1_1 flow - accept state related properties', async (accounts) => {
+contract('Agreement 1.1 flow - accept state related properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
@@ -153,7 +153,7 @@ contract('Agreement1_1 flow - accept state related properties', async (accounts)
       name: ["0","0"],
       description: ["0","0","0","0","0","0","0","0"]
     }]);
-    agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
     await agreement.join({from: accounts[2]});
     await agreement.join({from: accounts[3]});
   })
@@ -175,7 +175,7 @@ contract('Agreement1_1 flow - accept state related properties', async (accounts)
   })
 })
 
-contract('Agreement1_1 flow - conclude properties', async (accounts) => {
+contract('Agreement 1.1 flow - conclude properties', async (accounts) => {
   const creator = accounts[0];
   const suplicant = accounts[1];
   let testManager;
@@ -189,7 +189,7 @@ contract('Agreement1_1 flow - conclude properties', async (accounts) => {
       name: ["0","0"],
       description: ["0","0","0","0","0","0","0","0"]
     }]);
-    agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
   })
 
   it('Test if alien address cannot conclude agreement', async () => {
@@ -242,7 +242,7 @@ contract('Funds related tests', async (accounts) => {
         price: price
       }]
     );
-    agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
     testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant, value: suplicantBalance});
