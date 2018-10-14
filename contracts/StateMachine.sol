@@ -1,5 +1,6 @@
 pragma solidity 0.4.23;
 
+import "./IState.sol";
 import "./IStateMachine.sol";
 
 
@@ -9,7 +10,7 @@ contract StateMachine is IStateMachine {
 
   struct State {
       bytes32[] reachableStates;
-      IStateMachine mutator;
+      IState mutator;
   }
 
   mapping(bytes32 => State) private machineStates;
@@ -34,13 +35,23 @@ contract StateMachine is IStateMachine {
         }
 
         offset += lengthOfReachableStates[i];
-        current.mutator = IStateMachine(mutators[i]);
+        current.mutator = IState(mutators[i]);
       }
 
       currentState = entryState;
     }
 
     function setNewState(bytes32 next) public returns (bool) {
+
+      require(msg.sender == address(this), "State must be part of machine");
+
+      bytes32[] storage reachable = machineStates[currentState].reachableStates;
+      bool found = false;
+      for(uint i = 0; i < reachable.length; i++)
+        if(reachable[i] == next)
+          found = true;
+
+      require(found, "Illegal state transition");
       currentState = next;
     }
 
@@ -50,6 +61,10 @@ contract StateMachine is IStateMachine {
 
     function getListOfReachableStates() public view returns (bytes32[]) {
       return machineStates[currentState].reachableStates;
+    }
+
+    function amIMachine() public view returns (bool) {
+      return true;
     }
 
     function() external {

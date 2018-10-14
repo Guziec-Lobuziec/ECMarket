@@ -1,8 +1,8 @@
 pragma solidity 0.4.23;
 
-import "../../contracts/IStateMachine.sol";
+import "../../contracts/AbstractState.sol";
 
-contract StateForTests2 {
+contract StateForTests2 is AbstractState {
 
   event Executed(string what);
 
@@ -13,18 +13,14 @@ contract StateForTests2 {
 
     function backToStart() public {
       emit Executed("backToStart()");
-      bytes32[] memory reachable = IStateMachine(this).getListOfReachableStates();
-      IStateMachine(this).setNewState(reachable[0]);
+      bytes32[] memory reachable = getMachineReachableStates();
+      setMachineNextState(reachable[0]);
     }
 
     function illegalTransition() public {
-      IStateMachine(this).setNewState(
-        0x1000000000000000000000000000000000000000000000000000000000000000
+      setMachineNextState(
+        0x2000000000000000000000000000000000000000000000000000000000000000
       );
-    }
-
-    function currentState() public view returns(bytes32) {
-      return (IStateMachine(this)).getCurrentState();
     }
 
 }

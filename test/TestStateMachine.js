@@ -138,7 +138,8 @@ contract.only("StateMachine", async (accounts) => {
   })
 
   it("Try transition to unreachable state", async () => {
-    await assertRevert(stateInterface1.illegalTransition())
+
+    await assertRevert(stateInterface2.illegalTransition())
   })
 
   it("Step to next state", async () => {
@@ -147,12 +148,6 @@ contract.only("StateMachine", async (accounts) => {
       (await stateInterface2.getMachineState.call()),
       '0x1000000000000000000000000000000000000000000000000000000000000000',
       "Should be in previous state"
-    );
-  })
-
-  it("State can be altered only by state specific functions", async () =>{
-    await assertRevert(
-      stateInterface1.setMachineNextState('0x2000000000000000000000000000000000000000000000000000000000000000')
     );
   })
 
