@@ -2,7 +2,7 @@ pragma solidity 0.4.23;
 
 import "../../contracts/IStateMachine.sol";
 
-contract StateForTests {
+contract StateForTests1 {
 
   event Executed(string what);
 
@@ -20,6 +20,12 @@ contract StateForTests {
       } else {
         emit Executed("transition(bool) false");
       }
+    }
+
+    function differentCode() public {
+      emit Executed("differentCode()");
+      bytes32[] memory reachable = IStateMachine(this).getListOfReachableStates();
+      IStateMachine(this).setNewState(reachable[1]);
     }
 
     function currentState() public view returns(bytes32) {
