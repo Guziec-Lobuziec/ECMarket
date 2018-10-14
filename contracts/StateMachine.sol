@@ -1,15 +1,15 @@
 pragma solidity 0.4.23;
 
-import "./IStateMutator.sol";
+import "./IStateMachine.sol";
 
 
-contract StateMachine {
+contract StateMachine is IStateMachine {
 
   uint256 constant FORWARD_GAS_LIMIT = 10000;
 
   struct State {
       bytes32[] reachableStates;
-      IStateMutator mutator;
+      IStateMachine mutator;
   }
 
   mapping(bytes32 => State) private machineStates;
@@ -34,13 +34,23 @@ contract StateMachine {
         }
 
         offset += lengthOfReachableStates[i];
-        current.mutator = IStateMutator(mutators[i]);
+        current.mutator = IStateMachine(mutators[i]);
       }
 
       currentState = entryState;
     }
 
+    function setNewState(bytes32 next) public returns (bool) {
+      currentState = next;
+    }
 
+    function getCurrentState() public view returns (bytes32) {
+      return currentState;
+    }
+
+    function getListOfReachableStates() public view returns (bytes32[]) {
+      return machineStates[currentState].reachableStates;
+    }
 
     function() external {
 
