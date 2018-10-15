@@ -16,6 +16,11 @@ contract StateMachine is IStateMachine {
   mapping(bytes32 => State) private machineStates;
   bytes32 private currentState;
 
+  modifier self {
+      require(msg.sender == address(this));
+      _;
+  }
+
   constructor(
     address[] mutators,
     bytes32[] states,
@@ -41,9 +46,7 @@ contract StateMachine is IStateMachine {
       currentState = entryState;
     }
 
-    function setNewState(bytes32 next) public returns (bool) {
-
-      require(msg.sender == address(this), "State must be part of machine");
+    function setNewState(bytes32 next) public self returns (bool) {
 
       bytes32[] storage reachable = machineStates[currentState].reachableStates;
       bool found = false;
@@ -76,18 +79,28 @@ contract StateMachine is IStateMachine {
 
       assembly {
 
+        //calldata size
         let _callsize := calldatasize
+        //get free memory pointer
         let _calldata := mload(0x40)
+        //allocate memory
         mstore(0x40,add(_calldata,_callsize))
+        //copy calldata
         calldatacopy(_calldata, 0x0, _callsize)
 
+        //execute delegatecall on state mutator
         let _result := delegatecall(sub(gas,_limit), _mutator, _calldata, _callsize, 0, 0)
 
+        //returndata size
         let _returnsize := returndatasize
+        //get free memory pointer
         let _returndata := mload(0x40)
+        //allocate memory
         mstore(0x40,add(_returndata,_returnsize))
+        //copy returndata
         returndatacopy(_returndata, 0x0,_returnsize)
 
+        //if delegatecall was succesful return returndata otherwise revert
         switch _result
         case 0 { revert(_returndata, _returnsize) }
         default { return(_returndata, _returnsize) }

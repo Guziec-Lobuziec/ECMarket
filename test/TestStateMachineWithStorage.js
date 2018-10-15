@@ -1,6 +1,6 @@
 const {assertRevert} = require('./helpers/assertThrow');
-const StateMachine = artifacts.require("StateMachine");
-const StateWithStorage = artifacts.require("./helpers/StateWithStorage.sol");
+const StateMachineWithStorage = artifacts.require("StateMachineWithStorage");
+const StateForTests3 = artifacts.require("./helpers/StateForTests3.sol");
 
 contract.only("State Machine with storage", async (accounts) => {
 
@@ -9,21 +9,21 @@ contract.only("State Machine with storage", async (accounts) => {
   var stateInterface;
 
   before(async () => {
-    state = await StateWithStorage.new();
+    state = await StateForTests3.new();
 
-    machine = await StateMachine.new(
+    machine = await StateMachineWithStorage.new(
       [state.address, state.address],
       [web3.toBigNumber(1),web3.toBigNumber(2)],
       [1,1],
       [web3.toBigNumber(2),web3.toBigNumber(1)],
       web3.toBigNumber(1)
     );
-    stateInterface = await StateWithStorage.at(machine.address);
+    stateInterface = await StateForTests3.at(machine.address);
   })
 
   it("Test if value is set in storage", async () => {
-    await stateInterface.setUint(1);
-    assert.equal((await stateInterface.getUint.call()), 1, "Should be one");
+    let transaction = await stateInterface.setUint(1);
+    assert.equal((await stateInterface.getUint.call()).toNumber(), 1, "Should be one");
   })
 
 })
