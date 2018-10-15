@@ -33,4 +33,8 @@ contract StateForTests3 is AbstractState {
         return tmp;
     }
 
+    function getStorageSize() public view returns(uint) {
+        return IArbitraryStorage(this).storageSize();
+    }
+
 }
