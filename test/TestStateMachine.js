@@ -96,8 +96,8 @@ contract.only("StateMachine", async (accounts) => {
       '0x3000000000000000000000000000000000000000000000000000000000000000'
     ];
     let got = await stateInterface1.getMachineReachableStates.call();
-    states.forEach(s => {
-      assert.include(got,s,"Should equal state: "+s);
+    states.forEach( (s,i) => {
+      assert.equal(got[i],s,"At index: "+i+" should equal state: "+s);
     });
 
   })

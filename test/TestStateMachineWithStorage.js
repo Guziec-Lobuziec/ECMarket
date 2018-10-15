@@ -22,8 +22,22 @@ contract.only("State Machine with storage", async (accounts) => {
   })
 
   it("Test if value is set in storage", async () => {
-    let transaction = await stateInterface.setUint(1);
+    await stateInterface.setUint(1);
     assert.equal((await stateInterface.getUint.call()).toNumber(), 1, "Should be one");
+  })
+
+  it("Test adding multiple elements", async () => {
+    let elements = [
+      '0x1000000000000000000000000000000000000000000000000000000000000000',
+      '0x2000000000000000000000000000000000000000000000000000000000000000',
+      '0x3000000000000000000000000000000000000000000000000000000000000000'
+    ];
+    let transaction = await stateInterface.setBytes32Array(elements);
+    console.log(transaction);
+    let got = await stateInterface.getBytes32Array.call();
+    elements.forEach( (e,i) => {
+      assert.equal(got[i], e, "At index: "+i+" should be: "+e);
+    })
   })
 
 })
