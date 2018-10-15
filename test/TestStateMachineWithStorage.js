@@ -32,8 +32,7 @@ contract.only("State Machine with storage", async (accounts) => {
       '0x2000000000000000000000000000000000000000000000000000000000000000',
       '0x3000000000000000000000000000000000000000000000000000000000000000'
     ];
-    let transaction = await stateInterface.setBytes32Array(elements);
-    console.log(transaction);
+    await stateInterface.setBytes32Array(elements);
     let got = await stateInterface.getBytes32Array.call();
     elements.forEach( (e,i) => {
       assert.equal(got[i], e, "At index: "+i+" should be: "+e);

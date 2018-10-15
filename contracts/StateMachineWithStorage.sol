@@ -46,7 +46,7 @@ contract StateMachineWithStorage is StateMachine, IArbitraryStorage {
 
       //fast, unsafe memory to storage copy
       for{ let _i := 0 } lt(_i, _valueSize) { _i := add(_i, 1) } {
-        sstore(add(_mStoragePtr, _i), mload(add(add(_value, 0x20), mul(_i, 0x20))))
+        sstore(add(add(_mStoragePtr, _i), _position), mload(add(add(_value, 0x20), mul(_i, 0x20))))
       }
 
     }
