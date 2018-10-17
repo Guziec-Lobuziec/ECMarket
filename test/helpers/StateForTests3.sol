@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.4.24;
 
 import "../../contracts/AbstractState.sol";
 import "../../contracts/IArbitraryStorage.sol";
@@ -11,11 +11,11 @@ contract StateForTests3 is AbstractState {
       bytes32[] memory tmp = new bytes32[](1);
       tmp[0] = bytes32(x);
       emit Executed("setUint(uint)", tmp);
-      IArbitraryStorage(this).setBytes(0,tmp);
+      IArbitraryStorage(this).setSlots(0,tmp);
     }
 
     function getUint() public view returns(uint) {
-        bytes32[] memory tmp = IArbitraryStorage(this).getBytes(0,1);
+        bytes32[] memory tmp = IArbitraryStorage(this).getSlots(0,1);
         return uint(tmp[0]);
     }
 
@@ -23,13 +23,13 @@ contract StateForTests3 is AbstractState {
       emit Executed("setBytes32Array(bytes32[])", x);
       bytes32[] memory size = new bytes32[](1);
       size[0] = bytes32(x.length);
-      IArbitraryStorage(this).setBytes(1,size);
-      IArbitraryStorage(this).setBytes(2,x);
+      IArbitraryStorage(this).setSlots(1,size);
+      IArbitraryStorage(this).setSlots(2,x);
     }
 
     function getBytes32Array() public view returns(bytes32[]) {
-        bytes32[] memory size = IArbitraryStorage(this).getBytes(1,1);
-        bytes32[] memory tmp = IArbitraryStorage(this).getBytes(2,uint(size[0]));
+        bytes32[] memory size = IArbitraryStorage(this).getSlots(1,1);
+        bytes32[] memory tmp = IArbitraryStorage(this).getSlots(2,uint(size[0]));
         return tmp;
     }
 

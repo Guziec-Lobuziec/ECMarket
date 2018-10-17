@@ -3,7 +3,7 @@ const StateMachine = artifacts.require("StateMachine");
 const StateForTests1 = artifacts.require("./helpers/StateForTests1.sol");
 const StateForTests2 = artifacts.require("./helpers/StateForTests2.sol");
 
-contract.only("StateMachine:", async (accounts) => {
+contract("StateMachine:", async (accounts) => {
 
   var state1;
   var state2;
@@ -144,7 +144,7 @@ contract.only("StateMachine:", async (accounts) => {
 
 })
 
-contract.only("StateMachine constraints:", async (accounts) => {
+contract("StateMachine constraints:", async (accounts) => {
 
   var state1;
   var state2;

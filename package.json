@@ -5,9 +5,11 @@
   "directories": {
     "test": "test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "openzeppelin-solidity": "^1.12.0"
+  },
   "devDependencies": {
-    "coveralls": "^3.0.1"
+    "coveralls": "^3.0.2"
   },
   "scripts": {
     "test": "truffle test"

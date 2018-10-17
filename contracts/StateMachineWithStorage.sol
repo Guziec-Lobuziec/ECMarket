@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.4.24;
 
 import "./IArbitraryStorage.sol";
 import "./StateMachine.sol";
@@ -22,7 +22,7 @@ contract StateMachineWithStorage is StateMachine, IArbitraryStorage {
       entryState
     ) {}
 
-  function setBytes(uint256 _position, bytes32[] memory _value) public self {
+  function setSlots(uint256 _position, bytes32[] memory _value) public self {
 
       bytes32[] storage _mStorage = machineStorage;
       uint256 _valueSize = _value.length;
@@ -53,7 +53,7 @@ contract StateMachineWithStorage is StateMachine, IArbitraryStorage {
 
   }
 
-  function getBytes(
+  function getSlots(
     uint256 _position,
     uint256 _size
   ) public view self returns(bytes32[]) {
