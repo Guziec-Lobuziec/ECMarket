@@ -14,6 +14,7 @@ contract StateForTests2 is AbstractState {
     function backToStart() public {
       emit Executed("backToStart()");
       bytes32[] memory reachable = getMachineReachableStates();
+      //0x1000000000000000000000000000000000000000000000000000000000000000
       setMachineNextState(reachable[0]);
     }
 
@@ -21,6 +22,22 @@ contract StateForTests2 is AbstractState {
       setMachineNextState(
         0x2000000000000000000000000000000000000000000000000000000000000000
       );
+    }
+
+    function machineTransitionMechanismAbuse() public {
+      bytes32[] memory reachable = getMachineReachableStates();
+      //0x1000000000000000000000000000000000000000000000000000000000000000
+      setMachineNextState(reachable[0]);
+      reachable = getMachineReachableStates();
+      //0x2000000000000000000000000000000000000000000000000000000000000000
+      setMachineNextState(reachable[0]);
+    }
+
+    function nextStateCallAbuse() public {
+      bytes32[] memory reachable = getMachineReachableStates();
+      //0x1000000000000000000000000000000000000000000000000000000000000000
+      setMachineNextState(reachable[0]);
+      require(address(this).call(abi.encodeWithSignature("test()")));
     }
 
 }

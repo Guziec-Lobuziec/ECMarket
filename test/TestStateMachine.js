@@ -3,7 +3,7 @@ const StateMachine = artifacts.require("StateMachine");
 const StateForTests1 = artifacts.require("./helpers/StateForTests1.sol");
 const StateForTests2 = artifacts.require("./helpers/StateForTests2.sol");
 
-contract.only("StateMachine", async (accounts) => {
+contract.only("StateMachine:", async (accounts) => {
 
   var state1;
   var state2;
@@ -133,15 +133,6 @@ contract.only("StateMachine", async (accounts) => {
     );
   })
 
-  it("Try illegal state transition", async () => {
-    await assertRevert(stateInterface1.transition(true))
-  })
-
-  it("Try transition to unreachable state", async () => {
-
-    await assertRevert(stateInterface2.illegalTransition())
-  })
-
   it("Step to next state", async () => {
     await stateInterface2.backToStart();
     assert.equal(
@@ -151,9 +142,53 @@ contract.only("StateMachine", async (accounts) => {
     );
   })
 
+})
+
+contract.only("StateMachine constraints:", async (accounts) => {
+
+  var state1;
+  var state2;
+  var machine;
+  var stateInterface1;
+  var stateInterface2;
+
+  before(async () => {
+    state1 = await StateForTests1.new();
+    state2 = await StateForTests2.new();
+
+    machine = await StateMachine.new(
+      [state1.address, state1.address, state2.address],
+      [web3.toBigNumber(1),web3.toBigNumber(2), web3.toBigNumber(3)],
+      [1,2,1],
+      [web3.toBigNumber(2),web3.toBigNumber(1),web3.toBigNumber(3),web3.toBigNumber(1)],
+      web3.toBigNumber(1)
+    );
+    stateInterface1 = await StateForTests1.at(machine.address);
+    stateInterface2 = await StateForTests2.at(machine.address);
+
+    await stateInterface1.transition(true);
+    await stateInterface1.differentCode();
+  })
+
+  it("Try illegal state transition", async () => {
+    await assertRevert(stateInterface1.transition(true))
+  })
+
+  it("Try transition to unreachable state", async () => {
+    await assertRevert(stateInterface2.illegalTransition())
+  })
+
+  it("State, after performing transition, cannot call state transition again", async () => {
+    await assertRevert(stateInterface2.machineTransitionMechanismAbuse());
+  })
+
+  it("State, after performing transition, cannot make external calls on machine", async () => {
+    await assertRevert(stateInterface2.nextStateCallAbuse());
+  })
+
   it("Only state code can alter machine", async () => {
     await assertRevert(
-      machine.setNewState('0x3000000000000000000000000000000000000000000000000000000000000000')
+      machine.setNewState('0x1000000000000000000000000000000000000000000000000000000000000000')
     );
   })
 

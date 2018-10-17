@@ -15,6 +15,7 @@ contract StateMachine is IStateMachine {
 
   mapping(bytes32 => State) private machineStates;
   bytes32 private currentState;
+  bool private hasBeenRegisteredForStateTransition;
 
   modifier self {
       require(msg.sender == address(this));
@@ -48,6 +49,8 @@ contract StateMachine is IStateMachine {
 
     function setNewState(bytes32 next) public self returns (bool) {
 
+      assert(!hasBeenRegisteredForStateTransition);
+
       bytes32[] storage reachable = machineStates[currentState].reachableStates;
       bool found = false;
       for(uint i = 0; i < reachable.length; i++)
@@ -56,6 +59,7 @@ contract StateMachine is IStateMachine {
 
       require(found, "Illegal state transition");
       currentState = next;
+      hasBeenRegisteredForStateTransition = true;
     }
 
     function getCurrentState() public view returns (bytes32) {
@@ -72,10 +76,15 @@ contract StateMachine is IStateMachine {
 
     function() external {
 
+      assert(!hasBeenRegisteredForStateTransition);
+
       require(gasleft() > FORWARD_GAS_LIMIT);
 
       uint _limit = FORWARD_GAS_LIMIT;
       address _mutator = address(machineStates[currentState].mutator);
+
+      bool _result;
+      bytes[] memory _returndata;
 
       assembly {
 
@@ -89,21 +98,26 @@ contract StateMachine is IStateMachine {
         calldatacopy(_calldata, 0x0, _callsize)
 
         //execute delegatecall on state mutator
-        let _result := delegatecall(sub(gas,_limit), _mutator, _calldata, _callsize, 0, 0)
+        _result := delegatecall(sub(gas,_limit), _mutator, _calldata, _callsize, 0, 0)
 
         //returndata size
         let _returnsize := returndatasize
-        //get free memory pointer
-        let _returndata := mload(0x40)
-        //allocate memory
-        mstore(0x40,add(_returndata,_returnsize))
+        //store as _returndata array size
+        mstore(_returndata, _returnsize)
         //copy returndata
-        returndatacopy(_returndata, 0x0,_returnsize)
+        returndatacopy(add(_returndata, 0x20), 0x0,_returnsize)
 
+      }
+
+      hasBeenRegisteredForStateTransition = false;
+
+      assembly {
+        //get _returndata array size
+        let _returnsize := mload(_returndata)
         //if delegatecall was succesful return returndata otherwise revert
         switch _result
-        case 0 { revert(_returndata, _returnsize) }
-        default { return(_returndata, _returnsize) }
+        case 0 { revert(add(_returndata, 0x20), _returnsize) }
+        default { return(add(_returndata, 0x20), _returnsize) }
 
       }
 

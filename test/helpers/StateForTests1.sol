@@ -15,6 +15,7 @@ contract StateForTests1 is AbstractState {
       if(flip) {
         emit Executed("transition(bool) true");
         bytes32[] memory reachable = getMachineReachableStates();
+        //0x2000000000000000000000000000000000000000000000000000000000000000
         setMachineNextState(reachable[0]);
 
       } else {
@@ -25,6 +26,7 @@ contract StateForTests1 is AbstractState {
     function differentCode() public {
       emit Executed("differentCode()");
       bytes32[] memory reachable = getMachineReachableStates();
+      //0x3000000000000000000000000000000000000000000000000000000000000000
       setMachineNextState(reachable[1]);
     }
 
