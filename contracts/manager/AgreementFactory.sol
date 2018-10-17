@@ -3,7 +3,7 @@ pragma solidity 0.4.24;
 import "bytes/BytesLib.sol";
 
 import "./IAgreementFactory.sol";
-import "./Agreement.sol";
+import "../agreements/Agreement.sol";
 
 
 contract AgreementFactory is IAgreementFactory {

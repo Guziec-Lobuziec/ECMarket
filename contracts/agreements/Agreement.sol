@@ -1,7 +1,7 @@
 pragma solidity 0.4.24;
 
-import "./IAgreementManager.sol";
-import "./IEIP20.sol";
+import "../manager/IAgreementManager.sol";
+import "../IEIP20.sol";
 
 
 contract Agreement {

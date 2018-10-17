@@ -78,7 +78,7 @@ contract StateMachineWithStorage is StateMachine, IArbitraryStorage {
       return _returnArray;
   }
 
-  function storageSize() public view returns(uint) {
+  function storageSize() public view self returns(uint) {
       return machineStorage.length;
   }
 

@@ -3,8 +3,8 @@ pragma solidity 0.4.24;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 
-import "../contracts/AgreementManager.sol";
-import "../contracts/Agreement.sol";
+import "../contracts/manager/AgreementManager.sol";
+import "../contracts/agreements/Agreement.sol";
 
 
 contract TestAgreement {

@@ -1,6 +1,6 @@
 pragma solidity 0.4.24;
 
-import "../../contracts/AbstractState.sol";
+import "../../contracts/machine/AbstractState.sol";
 
 contract StateForTests2 is AbstractState {
 
