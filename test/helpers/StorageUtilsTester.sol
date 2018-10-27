@@ -44,7 +44,7 @@ contract StorageUtilsTester {
 
     }
 
-    function getManyUintAt(uint at, uint size) public returns(uint[]) {
+    function getManyUintAt(uint at, uint size) public view returns(uint[]) {
 
       StorageUtils.Position memory pos;
       pos.setPositionAt(at);
@@ -56,6 +56,24 @@ contract StorageUtilsTester {
       }
 
       return ret;
+
+    }
+
+    function setBytesAt(uint at, bytes vals) public {
+
+      StorageUtils.Position memory pos;
+      pos.setPositionAt(at);
+
+      pos.setBytes(vals);
+
+    }
+
+    function getBytesAt(uint at) public view returns(bytes) {
+
+      StorageUtils.Position memory pos;
+      pos.setPositionAt(at);
+
+      return pos.getBytes();
 
     }
 

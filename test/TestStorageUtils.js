@@ -1,7 +1,7 @@
 const {assertRevert} = require('./helpers/assertThrow');
 const StorageTester = artifacts.require("./helpers/StorageUtilsTester.sol");
 
-contract.only("StorageUtils:", async (accounts) => {
+contract.only("StorageUtils - basic:", async (accounts) => {
 
   var storage;
 
@@ -58,6 +58,38 @@ contract.only("StorageUtils:", async (accounts) => {
       values1.forEach( (v,i) => {
         assert.equal(got[i], v, "Should be equal");
       });
+    })
+
+  })
+
+})
+
+contract.only("StorageUtils - helpers:", async (accounts) => {
+
+  var storage;
+
+  before(async () => {
+    storage = await StorageTester.new();
+  })
+
+  context("Bytes type write and read", () => {
+    let vals1 = "0x010203";
+    let at1 = 1;
+    let vals2 = "0x0a0b0c";
+    let at2 = 2;
+
+    it("Write first bytes array and read", async () => {
+      await storage.setBytesAt(at1, vals1);
+      assert.equal((await storage.getBytesAt.call(at1)), vals1, "Should be equal");
+    })
+
+    it("Write second bytes array and read", async () => {
+      await storage.setBytesAt(at2, vals2);
+      assert.equal((await storage.getBytesAt.call(at2)), vals2, "Should be equal");
+    })
+
+    it("Assert that simulated bytes array are stored in the same manner as 'classical'", async () => {
+      assert.equal((await storage.getBytesAt.call(at1)), vals1, "Should be equal");
     })
 
   })
