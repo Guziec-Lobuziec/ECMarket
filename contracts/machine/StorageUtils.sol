@@ -4,12 +4,16 @@ pragma solidity 0.4.24;
 library StorageUtils {
 
     struct Position{
-      uint _at;
+      uint256 _start;
+      uint256 _length;
+      uint256 _at;
     }
 
     function setSlots(Position memory position, bytes32[] memory _value) internal {
       uint256 _valueSize = _value.length;
       uint256 _position = position._at;
+
+      require(_position + _valueSize - 1 < position._length);
 
       assembly {
         //fast, unsafe memory to storage copy
@@ -28,6 +32,8 @@ library StorageUtils {
 
       bytes32[] memory _returnArray = new bytes32[](_size);
       uint256 _position = position._at;
+
+      require(_position + _size - 1 < position._length);
 
       assembly {
         //fast, unsafe storage to memory copy
@@ -67,6 +73,8 @@ library StorageUtils {
       setSlots(position,_valueSize);
 
       Position memory dataLocation = Position({
+        _start: 0,
+        _length: uint(-1),
         _at: uint(keccak256(abi.encodePacked(position._at)))
       });
 
@@ -75,18 +83,20 @@ library StorageUtils {
 
   function getBytes(Position position) internal view returns(bytes memory) {
 
-      bytes32[] memory _outputSize = getSlots(position, 1);
+      bytes32[] memory retSize = getSlots(position, 1);
 
       Position memory dataLocation = Position({
+        _start: 0,
+        _length: uint(-1),
         _at: uint(keccak256(abi.encodePacked(position._at)))
       });
 
       bytes32[] memory _outputVal = getSlots(
         dataLocation,
-        (uint(_outputSize[0])+31)/32
+        (uint(retSize[0])+31)/32
       );
 
-      bytes memory _retVal = new bytes(uint(_outputSize[0]));
+      bytes memory _retVal = new bytes(uint(retSize[0]));
 
       assembly {
         let _outputSize := mload(_outputVal)
