@@ -5,10 +5,10 @@ import "../../contracts/machine/StorageUtils.sol";
 
 contract StorageUtilsTester {
 
-    using StorageUtils for StorageUtils.Position;
+    using StorageUtils for StorageUtils.SPointer;
 
-    function position() internal pure returns(StorageUtils.Position memory) {
-      return StorageUtils.Position({
+    function position() internal pure returns(StorageUtils.SPointer memory) {
+      return StorageUtils.SPointer({
         _start: 0,
         _length: uint(-1),
         _at: 0
@@ -17,7 +17,7 @@ contract StorageUtilsTester {
 
     function setUintAt(uint at ,uint val) public {
 
-      StorageUtils.Position memory pos = position();
+      StorageUtils.SPointer memory pos = position();
       pos.setPositionAt(at);
 
       bytes32[] memory slots = new bytes32[](1);
@@ -29,7 +29,7 @@ contract StorageUtilsTester {
 
     function getUintAt(uint at) public view returns (uint) {
 
-      StorageUtils.Position memory pos = position();
+      StorageUtils.SPointer memory pos = position();
       pos.setPositionAt(at);
 
       bytes32[] memory slots = pos.getSlots(1);
@@ -39,7 +39,7 @@ contract StorageUtilsTester {
     }
 
     function setByte32At(uint p, bytes32 val) public {
-        StorageUtils.Position memory ptr = position();
+        StorageUtils.SPointer memory ptr = position();
         bytes32[] memory tmp = new bytes32[](1);
 
         tmp[0] = val;
@@ -49,7 +49,7 @@ contract StorageUtilsTester {
     }
 
     function getByte32At(uint p) public view returns(bytes32) {
-        StorageUtils.Position memory ptr = position();
+        StorageUtils.SPointer memory ptr = position();
         ptr.setPositionAt(p);
 
         return ptr.getSlots(1)[0];
@@ -57,7 +57,7 @@ contract StorageUtilsTester {
 
     function setManytUintAt(uint at, uint[] vals) public {
 
-      StorageUtils.Position memory pos = position();
+      StorageUtils.SPointer memory pos = position();
       pos.setPositionAt(at);
 
       bytes32[] memory slots = new bytes32[](vals.length);
@@ -71,7 +71,7 @@ contract StorageUtilsTester {
 
     function getManyUintAt(uint at, uint size) public view returns(uint[]) {
 
-      StorageUtils.Position memory pos = position();
+      StorageUtils.SPointer memory pos = position();
       pos.setPositionAt(at);
 
       bytes32[] memory slots = pos.getSlots(size);
@@ -86,7 +86,7 @@ contract StorageUtilsTester {
 
     function setBytesAt(uint at, bytes vals) public {
 
-      StorageUtils.Position memory pos = position();
+      StorageUtils.SPointer memory pos = position();
       pos.setPositionAt(at);
 
       pos.setBytes(vals);
@@ -95,7 +95,7 @@ contract StorageUtilsTester {
 
     function getBytesAt(uint at) public view returns(bytes) {
 
-      StorageUtils.Position memory pos = position();
+      StorageUtils.SPointer memory pos = position();
       pos.setPositionAt(at);
 
       return pos.getBytes();

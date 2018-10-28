@@ -5,8 +5,8 @@ import "./StorageUtilsTester.sol";
 
 contract StorageRangeTester is StorageUtilsTester {
 
-  function position() internal pure returns(StorageUtils.Position memory) {
-    return StorageUtils.Position({
+  function position() internal pure returns(StorageUtils.SPointer memory) {
+    return StorageUtils.SPointer({
       _start: 8,
       _length: 16,
       _at: 0
@@ -14,7 +14,7 @@ contract StorageRangeTester is StorageUtilsTester {
   }
 
   function setByte32AtDifferentRange(uint p, bytes32 val) public {
-      StorageUtils.Position memory ptr = StorageUtils.Position({
+      StorageUtils.SPointer memory ptr = StorageUtils.SPointer({
         _start: 32,
         _length: 16,
         _at: 0
@@ -28,7 +28,7 @@ contract StorageRangeTester is StorageUtilsTester {
   }
 
   function getByte32AtDifferentRange(uint p) public view returns(bytes32) {
-      StorageUtils.Position memory ptr = StorageUtils.Position({
+      StorageUtils.SPointer memory ptr = StorageUtils.SPointer({
         _start: 32,
         _length: 16,
         _at: 0

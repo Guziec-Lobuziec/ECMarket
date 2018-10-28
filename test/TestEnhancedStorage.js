@@ -26,6 +26,11 @@ contract.only("Enhanced Storage - storage pointer constraints:", async (accounts
     await assertRevert(enhanced.getByte32At.call(at));
   })
 
+  it("Part of static array is out of range", async () => {
+    let at = 15;
+    await assertRevert(enhanced.setManytUintAt(at,[1,2]));
+  })
+
   it("Test if writes and reads range does not apply for dynamic arrays", async () => {
     //bytes data location will be keccak256(1) = 0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6
     let at = 1;

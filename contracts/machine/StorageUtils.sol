@@ -3,17 +3,17 @@ pragma solidity 0.4.24;
 
 library StorageUtils {
 
-    struct Position{
+    struct SPointer{
       uint256 _start;
       uint256 _length;
       uint256 _at;
     }
 
-    function setSlots(Position memory position, bytes32[] memory _value) internal {
+    function setSlots(SPointer memory pointer, bytes32[] memory _value) internal {
       uint256 _valueSize = _value.length;
-      uint256 _position = position._at;
+      uint256 _position = pointer._at + pointer._start;
 
-      require(_position + _valueSize - 1 < position._length);
+      require(pointer._at + _valueSize - 1 < pointer._length);
 
       assembly {
         //fast, unsafe memory to storage copy
@@ -26,14 +26,14 @@ library StorageUtils {
   }
 
   function getSlots(
-    Position memory position,
+    SPointer memory pointer,
     uint256 _size
   ) internal view returns(bytes32[] memory) {
 
       bytes32[] memory _returnArray = new bytes32[](_size);
-      uint256 _position = position._at;
+      uint256 _position = pointer._at + pointer._start;
 
-      require(_position + _size - 1 < position._length);
+      require(pointer._at + _size - 1 < pointer._length);
 
       assembly {
         //fast, unsafe storage to memory copy
@@ -46,7 +46,7 @@ library StorageUtils {
       return _returnArray;
   }
 
-  function setBytes(Position memory position, bytes memory _value) internal {
+  function setBytes(SPointer memory pointer, bytes memory _value) internal {
 
       //can be optimised to pack bytes to same slot as size if size <= 31
       bytes32[] memory _valueSize = new bytes32[](1);
@@ -70,25 +70,25 @@ library StorageUtils {
           mstore(add(_valueSize, 0x20), mload(_value))
       }
 
-      setSlots(position,_valueSize);
+      setSlots(pointer,_valueSize);
 
-      Position memory dataLocation = Position({
+      SPointer memory dataLocation = SPointer({
         _start: 0,
         _length: uint(-1),
-        _at: uint(keccak256(abi.encodePacked(position._at)))
+        _at: uint(keccak256(abi.encodePacked(pointer._at)))
       });
 
       setSlots(dataLocation,_valToStore);
   }
 
-  function getBytes(Position position) internal view returns(bytes memory) {
+  function getBytes(SPointer pointer) internal view returns(bytes memory) {
 
-      bytes32[] memory retSize = getSlots(position, 1);
+      bytes32[] memory retSize = getSlots(pointer, 1);
 
-      Position memory dataLocation = Position({
+      SPointer memory dataLocation = SPointer({
         _start: 0,
         _length: uint(-1),
-        _at: uint(keccak256(abi.encodePacked(position._at)))
+        _at: uint(keccak256(abi.encodePacked(pointer._at)))
       });
 
       bytes32[] memory _outputVal = getSlots(
@@ -109,8 +109,8 @@ library StorageUtils {
       return _retVal;
   }
 
-  function setPositionAt(Position memory position, uint at) internal view {
-      position._at = at;
+  function setPositionAt(SPointer memory pointer, uint at) internal view {
+      pointer._at = at;
   }
 
 }
