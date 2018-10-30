@@ -14,14 +14,20 @@ contract StorageManagementTester {
 
 
     function initStorageManagement() public {
-      start.initialze(object);
+        start.initialze(object);
     }
 
     function tryToGetStorageObject() public {
+        StorageManagement.StorageObject memory obj;
+        obj.loadStorageObject();
+    }
 
-      StorageManagement.StorageObject memory obj;
-      obj.loadStorageObject();
+    function getStorageObjectLocation() public view returns(uint) {
+        return start._storageObjectLocation;
+    }
 
+    function getMagicNumberInStorageObject() public view returns(bytes32) {
+        return object._magicNumber;
     }
 
 

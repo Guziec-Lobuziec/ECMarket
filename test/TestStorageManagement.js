@@ -3,6 +3,8 @@ const StorageManagementTester = artifacts.require("./helpers/StorageManagementTe
 
 contract.only("Storage Object", async (accounts) => {
 
+  const magicNumber = '0xcafefeed000011110000111100001111000011110000111100001111cafefeed';
+
   context("StorageObject initialization", () => {
 
     var manager;
@@ -14,9 +16,23 @@ contract.only("Storage Object", async (accounts) => {
       await assertInvalidOpcode(manager.tryToGetStorageObject());
     })
 
-    it("After initialization", async () => {
-      await manager.initStorageManagement();
-      await manager.tryToGetStorageObject();
+    context("After initialization", () => {
+
+      before(async () => {
+        await manager.initStorageManagement();
+      })
+
+      it("Get StorageObject location", async () => {
+        assert.equal((await manager.getStorageObjectLocation.call()), 2, "Should be in slot number 2");
+      })
+
+      it("Get StorageObject magic number", async () => {
+        assert.equal(
+          (await manager.getMagicNumberInStorageObject.call()),
+          magicNumber,
+          "Magic number should be present"
+        );
+      })
     })
 
   })
