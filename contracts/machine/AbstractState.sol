@@ -2,9 +2,10 @@ pragma solidity 0.4.24;
 
 import "./IState.sol";
 import "./IStateMachine.sol";
+import "./StorageClient.sol";
 
 
-contract AbstractState is IState {
+contract AbstractState is StorageClient, IState {
 
   modifier isMachine {
       require(amIMachine());

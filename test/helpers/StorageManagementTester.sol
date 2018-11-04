@@ -30,6 +30,10 @@ contract StorageManagementTester {
         return object._magicNumber;
     }
 
+    function setInvalidStorageObjectLocation() public {
+        start._storageObjectLocation = 1;
+    }
+
 
 
 }

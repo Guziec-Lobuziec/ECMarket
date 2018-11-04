@@ -16,6 +16,11 @@ contract.only("Storage Object", async (accounts) => {
       await assertInvalidOpcode(manager.tryToGetStorageObject());
     })
 
+    it("Setting invalid object location and trying to load", async () => {
+      await manager.setInvalidStorageObjectLocation();
+      await assertInvalidOpcode(manager.tryToGetStorageObject());
+    })
+
     context("After initialization", () => {
 
       before(async () => {

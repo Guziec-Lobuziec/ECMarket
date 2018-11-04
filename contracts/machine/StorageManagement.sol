@@ -17,6 +17,8 @@ library StorageManagement {
 
     struct StorageObject {
       bytes32 _magicNumber;
+      bytes32 currentContext;
+      mapping(bytes32 => StorageUtils.SPointer) storagePointers;
     }
 
     function initialze(
@@ -32,7 +34,7 @@ library StorageManagement {
         _object._magicNumber = MAGIC;
     }
 
-    function loadStorageObject(StorageObject memory object) internal {
+    function loadStorageObject(StorageObject memory object) internal view {
 
         StorageUtils.SPointer memory ptr = StorageUtils.SPointer({
           _start: 0,
