@@ -102,4 +102,22 @@ contract StorageUtilsTester {
 
     }
 
+    function setGenericMapping(uint at, bytes32 key, bytes32[] val) public {
+
+      StorageUtils.SPointer memory pos = position();
+      pos.setPositionAt(at);
+
+      //pos.setMapping(key, val);
+
+    }
+
+    function getGenericMapping(uint at, bytes32 key) public view returns(bytes32[]) {
+
+      StorageUtils.SPointer memory pos = position();
+      pos.setPositionAt(at);
+
+      //return pos.setMapping(key);
+
+    }
+
 }

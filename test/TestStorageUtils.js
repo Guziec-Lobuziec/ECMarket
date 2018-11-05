@@ -94,4 +94,88 @@ contract.only("StorageUtils - helpers:", async (accounts) => {
 
   })
 
+  context("Generic mapping write and read", () => {
+
+    let mappings = [
+      {
+        at: 3,
+        vals: [
+          '0x000000000000000000000000000000000000000000000000000000000000000a',
+          '0x000000000000000000000000000000000000000000000000000000000000000b'
+        ],
+        key: '0x0000000000000000000000000000000000000000000000000000000000000001'
+      },
+      {
+        at: 4,
+        vals: [
+          '0x000000000000000000000000000000000000000000000000000000000000001a',
+          '0x000000000000000000000000000000000000000000000000000000000000001b'
+        ],
+        key: '0x0000000000000000000000000000000000000000000000000000000000000001'
+      },
+      {
+        at: 3,
+        vals: [
+          '0x0000000000000000000000000000000000000000000000000000000000000011',
+          '0x0000000000000000000000000000000000000000000000000000000000000012'
+        ],
+        key: '0x0000000000000000000000000000000000000000000000000000000000000002'
+      },
+      {
+        at: 4,
+        vals: [
+          '0x0000000000000000000000000000000000000000000000000000000000000017',
+          '0x0000000000000000000000000000000000000000000000000000000000000018',
+          '0x0000000000000000000000000000000000000000000000000000000000000019'
+        ],
+        key: '0x0000000000000000000000000000000000000000000000000000000000000002'
+      }
+    ];
+
+    let reducer = (out, first, index, arr) => {
+      return out.concat(
+        arr.slice(index+1).map(second => {
+          return {
+            st: first,
+            nd: second
+          }
+        })
+      );
+    };
+
+    mappings.reduce(reducer,[])
+    .forEach(testSet => {
+
+      it(
+        "Write to mapping at slot: "+testSet.st.at+", with key "+testSet.st.key+" and read (st)",
+        async () => {
+          await storage.setGenericMapping(testSet.st.at, testSet.st.key, testSet.st.vals);
+          let got = await storage.getGenericMapping.call(testSet.st.at,testSet.st.key);
+          testSet.st.vals.forEach( (v,i) => {
+            assert.equal(got[i], v, "Should be equal ("+i+")");
+          });
+        })
+
+      it(
+        "Write to mapping at slot: "+testSet.nd.at+", with key "+testSet.nd.key+" and read (nd)",
+        async () => {
+          await storage.setGenericMapping(testSet.nd.at, testSet.nd.key, testSet.nd.vals);
+          let got = await storage.getGenericMapping.call(testSet.nd.at,testSet.nd.key);
+          testSet.nd.vals.forEach( (v,i) => {
+            assert.equal(got[i], v, "Should be equal ("+i+")");
+          });
+        })
+
+      it(
+        "Read again from "+testSet.st.at+", with key "+testSet.st.key,
+        async () => {
+          let got = await storage.getGenericMapping.call(testSet.st.at,testSet.st.key);
+          testSet.st.vals.forEach( (v,i) => {
+            assert.equal(got[i], v, "Should be equal ("+i+")");
+          });
+        })
+    })
+
+  })
+
 })
