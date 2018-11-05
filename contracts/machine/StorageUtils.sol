@@ -81,7 +81,7 @@ library StorageUtils {
       setSlots(dataLocation,_valToStore);
   }
 
-  function getBytes(SPointer pointer) internal view returns(bytes memory) {
+  function getBytes(SPointer memory pointer) internal view returns(bytes memory) {
 
       bytes32[] memory retSize = getSlots(pointer, 1);
 
@@ -107,6 +107,34 @@ library StorageUtils {
       }
 
       return _retVal;
+  }
+
+  function setMapping(SPointer memory pointer, bytes32 key, bytes32[] value) internal {
+
+      SPointer memory dataLocation = SPointer({
+        _start: 0,
+        _length: uint(-1),
+        _at: uint(keccak256(abi.encodePacked(key,pointer._at)))
+      });
+
+      setSlots(dataLocation,value);
+
+  }
+
+  function getMapping(
+    SPointer memory pointer,
+    bytes32 key,
+    uint size
+  ) internal view returns(bytes32[] memory) {
+
+      SPointer memory dataLocation = SPointer({
+        _start: 0,
+        _length: uint(-1),
+        _at: uint(keccak256(abi.encodePacked(key,pointer._at)))
+      });
+
+      return getSlots(dataLocation,size);
+
   }
 
   function setPositionAt(SPointer memory pointer, uint at) internal view {

@@ -107,7 +107,7 @@ contract StorageUtilsTester {
       StorageUtils.SPointer memory pos = position();
       pos.setPositionAt(at);
 
-      //pos.setMapping(key, val);
+      pos.setMapping(key, val);
 
     }
 
@@ -116,7 +116,7 @@ contract StorageUtilsTester {
       StorageUtils.SPointer memory pos = position();
       pos.setPositionAt(at);
 
-      //return pos.setMapping(key);
+      return pos.getMapping(key, 2);
 
     }
 
