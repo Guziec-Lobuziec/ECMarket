@@ -3,6 +3,8 @@ pragma solidity 0.4.24;
 
 library StorageUtils {
 
+    uint256 constant internal SPOINTER_SIZE = 3;
+
     struct SPointer{
       uint256 _start;
       uint256 _length;
@@ -134,6 +136,22 @@ library StorageUtils {
       });
 
       return getSlots(dataLocation,size);
+
+  }
+
+  function getStoragePointerMapping(
+    SPointer memory pointer,
+    bytes32 key
+  ) internal view returns(SPointer memory) {
+
+    bytes32[] memory rawOutput = getMapping(pointer, key, SPOINTER_SIZE);
+    SPointer memory outputPtr = SPointer({
+      _start: uint(rawOutput[0]),
+      _length: uint(rawOutput[1]),
+      _at: uint(rawOutput[2])
+    });
+
+    return outputPtr;
 
   }
 

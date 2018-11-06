@@ -6,7 +6,7 @@ import "../../contracts/machine/StorageManagement.sol";
 contract StorageManagementTester {
 
     using StorageManagement for StorageManagement.StorageStart;
-    using StorageManagement for StorageManagement.StorageObject;
+    using StorageManagement for StorageManagement.StorageObjectRef;
 
     StorageManagement.StorageStart private start;
     bytes32 private zero;
@@ -18,7 +18,7 @@ contract StorageManagementTester {
     }
 
     function tryToGetStorageObject() public {
-        StorageManagement.StorageObject memory obj;
+        StorageManagement.StorageObjectRef memory obj;
         obj.loadStorageObject();
     }
 

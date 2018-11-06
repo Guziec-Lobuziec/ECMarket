@@ -5,10 +5,13 @@ import "./StorageManagement.sol";
 
 contract StorageClient {
 
-  using StorageManagement for StorageManagement.StorageObject;
+  using StorageManagement for StorageManagement.StorageObjectRef;
+  using StorageUtils for StorageUtils.SPointer;
 
-  /* function getStoragePointer(bytes32 id) internal view returns(StorageUtils.SPointer memory) {
-
-  } */
+  function getStoragePointer(bytes32 id) internal view returns(StorageUtils.SPointer memory) {
+      StorageManagement.StorageObjectRef memory object;
+      object.loadStorageObject();
+      return object.storagePointersMapping.getStoragePointerMapping(object.currentContext);
+  }
 
 }

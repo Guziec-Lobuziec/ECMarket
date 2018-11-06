@@ -1,7 +1,7 @@
 const {assertRevert} = require('./helpers/assertThrow');
 const StorageTester = artifacts.require("./helpers/StorageUtilsTester.sol");
 
-contract.only("StorageUtils - basic:", async (accounts) => {
+contract("StorageUtils - basic:", async (accounts) => {
 
   var storage;
 

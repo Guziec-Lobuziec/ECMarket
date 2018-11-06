@@ -5,9 +5,12 @@ import "./StorageUtils.sol";
 
 library StorageManagement {
 
+    //Magic number identifying valid StorageObject
     bytes32 constant private MAGIC = 0xcafefeed000011110000111100001111000011110000111100001111cafefeed;
+    //StorageStart size without mappings and dynamic arrays
     uint256 constant private SSTART_SIZE = 1;
-    uint256 constant private SOBJECT_SIZE = 1;
+    //StorageObject size without mappings and dynamic arrays
+    uint256 constant private SOBJECT_SIZE = 2;
 
     using StorageUtils for StorageUtils.SPointer;
 
@@ -19,6 +22,11 @@ library StorageManagement {
       bytes32 _magicNumber;
       bytes32 currentContext;
       mapping(bytes32 => StorageUtils.SPointer) storagePointers;
+    }
+
+    struct StorageObjectRef {
+      bytes32 currentContext;
+      StorageUtils.SPointer storagePointersMapping;
     }
 
     function initialze(
@@ -34,7 +42,7 @@ library StorageManagement {
         _object._magicNumber = MAGIC;
     }
 
-    function loadStorageObject(StorageObject memory object) internal view {
+    function loadStorageObject(StorageObjectRef memory object) internal view {
 
         StorageUtils.SPointer memory ptr = StorageUtils.SPointer({
           _start: 0,
@@ -48,8 +56,17 @@ library StorageManagement {
         ptr.setPositionAt(location);
 
         bytes32[] memory rawStorageObject = ptr.getSlots(SOBJECT_SIZE);
-        object._magicNumber = rawStorageObject[0];
-        assert(object._magicNumber == MAGIC);
+        assert(rawStorageObject[0] == MAGIC);
+
+        //currentContext
+        object.currentContext = rawStorageObject[1];
+
+        //starting slot for storagePointers mapping
+        object.storagePointersMapping = StorageUtils.SPointer({
+          _start: location + 2,
+          _length: 1,
+          _at: 0
+        });
 
 
     }
