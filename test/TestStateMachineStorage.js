@@ -2,7 +2,7 @@ const {assertRevert} = require('./helpers/assertThrow');
 const StateMachine = artifacts.require("StateMachine");
 const StateWithStorage = artifacts.require("./helpers/StateWithStorageTest.sol");
 
-contract.only("StateMachine with storage:", async (accounts) => {
+contract("StateMachine with storage:", async (accounts) => {
 
   var state;
   var machine;
