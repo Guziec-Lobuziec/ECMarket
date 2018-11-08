@@ -77,7 +77,7 @@ library StorageUtils {
       SPointer memory dataLocation = SPointer({
         _start: 0,
         _length: uint(-1),
-        _at: uint(keccak256(abi.encodePacked(pointer._at)))
+        _at: uint(keccak256(abi.encodePacked(pointer._at + pointer._start)))
       });
 
       setSlots(dataLocation,_valToStore);
@@ -90,7 +90,7 @@ library StorageUtils {
       SPointer memory dataLocation = SPointer({
         _start: 0,
         _length: uint(-1),
-        _at: uint(keccak256(abi.encodePacked(pointer._at)))
+        _at: uint(keccak256(abi.encodePacked(pointer._at + pointer._start)))
       });
 
       bytes32[] memory _outputVal = getSlots(
@@ -116,7 +116,7 @@ library StorageUtils {
       SPointer memory dataLocation = SPointer({
         _start: 0,
         _length: uint(-1),
-        _at: uint(keccak256(abi.encodePacked(key,pointer._at)))
+        _at: uint(keccak256(abi.encodePacked(key,pointer._at + pointer._start)))
       });
 
       setSlots(dataLocation,value);
@@ -132,7 +132,7 @@ library StorageUtils {
       SPointer memory dataLocation = SPointer({
         _start: 0,
         _length: uint(-1),
-        _at: uint(keccak256(abi.encodePacked(key,pointer._at)))
+        _at: uint(keccak256(abi.encodePacked(key,pointer._at + pointer._start)))
       });
 
       return getSlots(dataLocation,size);
@@ -157,6 +157,12 @@ library StorageUtils {
 
   function setPositionAt(SPointer memory pointer, uint at) internal view {
       pointer._at = at;
+  }
+
+  function getAbsolutSlotLocation(
+    SPointer memory pointer
+  ) internal view returns(uint256) {
+    return pointer._at + pointer._start;
   }
 
 }

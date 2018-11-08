@@ -9,9 +9,9 @@ contract StateMachine is StorageController, IStateMachine {
 
   using StorageManagement for StorageManagement.StorageObject;
 
-  //need justification
+  //needs justification
   uint256 constant FORWARD_GAS_LIMIT = 10000;
-  //need justification
+  //needs justification
   uint256 constant private STATE_STORAGE_SIZE = 256;
 
   struct State {
@@ -47,7 +47,7 @@ contract StateMachine is StorageController, IStateMachine {
         current = machineStates[states[i]];
 
         object.storagePointers[states[i]] = StorageUtils.SPointer({
-          _start: i*STATE_STORAGE_SIZE,
+          _start: i*STATE_STORAGE_SIZE + StorageManagement.getFreeStorageSlot(),
           _length: STATE_STORAGE_SIZE,
           _at: 0
         });
@@ -76,6 +76,7 @@ contract StateMachine is StorageController, IStateMachine {
 
       require(found, "Illegal state transition");
       currentState = next;
+      object.currentContext = next;
       hasBeenRegisteredForStateTransition = true;
     }
 

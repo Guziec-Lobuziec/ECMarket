@@ -1,7 +1,7 @@
 const {assertRevert} = require('./helpers/assertThrow');
 const StorageRangeTester = artifacts.require("./helpers/StorageRangeTester.sol");
 
-contract.only("Storage range - storage pointer constraints:", async (accounts) => {
+contract("Storage range - storage pointer constraints:", async (accounts) => {
 
   var enhanced;
   before(async () => {

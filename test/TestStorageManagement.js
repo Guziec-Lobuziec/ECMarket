@@ -1,7 +1,7 @@
 const {assertInvalidOpcode} = require('./helpers/assertThrow');
 const StorageManagementTester = artifacts.require("./helpers/StorageManagementTester.sol");
 
-contract.only("Storage Object", async (accounts) => {
+contract("Storage Object", async (accounts) => {
 
   const magicNumber = '0xcafefeed000011110000111100001111000011110000111100001111cafefeed';
 

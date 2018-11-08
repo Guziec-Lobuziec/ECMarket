@@ -4,8 +4,11 @@ import "../../contracts/machine/AbstractState.sol";
 
 contract StateWithStorageTest is AbstractState {
 
+    event Debug(uint start, uint length, uint at);
+
     function setBytes32(bytes32 val) public {
         StorageUtils.SPointer memory ptr = getStoragePointer(0x0);
+        emit Debug(ptr._start,ptr._length, ptr._at);
         bytes32[] memory tmp = new bytes32[](1);
         tmp[0] = val;
         ptr.setSlots(tmp);

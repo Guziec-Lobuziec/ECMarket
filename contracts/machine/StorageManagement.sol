@@ -9,8 +9,10 @@ library StorageManagement {
     bytes32 constant private MAGIC = 0xcafefeed000011110000111100001111000011110000111100001111cafefeed;
     //StorageStart size without mappings and dynamic arrays
     uint256 constant private SSTART_SIZE = 1;
-    //StorageObject size without mappings and dynamic arrays
-    uint256 constant private SOBJECT_SIZE = 2;
+    //StorageObjectRef size without mappings and dynamic arrays
+    uint256 constant private SOBJECT_REF_SIZE = 2;
+    //StorageObject size
+    uint256 constant private SOBJECT_SIZE = 3;
 
     using StorageUtils for StorageUtils.SPointer;
 
@@ -42,8 +44,12 @@ library StorageManagement {
         _object._magicNumber = MAGIC;
     }
 
-    function loadStorageObject(StorageObjectRef memory object) internal view {
+    function getFreeStorageSlot() internal view returns(uint256) {
+        StorageUtils.SPointer memory ptr = getStorageObjectSPointer();
+        return ptr.getAbsolutSlotLocation() + SOBJECT_SIZE;
+    }
 
+    function getStorageObjectSPointer() internal view returns(StorageUtils.SPointer memory) {
         StorageUtils.SPointer memory ptr = StorageUtils.SPointer({
           _start: 0,
           _length: uint256(-1),
@@ -55,7 +61,14 @@ library StorageManagement {
         assert(location != 0);
         ptr.setPositionAt(location);
 
-        bytes32[] memory rawStorageObject = ptr.getSlots(SOBJECT_SIZE);
+        return ptr;
+    }
+
+    function loadStorageObject(StorageObjectRef memory object) internal view {
+
+        StorageUtils.SPointer memory ptr = getStorageObjectSPointer();
+
+        bytes32[] memory rawStorageObject = ptr.getSlots(SOBJECT_REF_SIZE);
         assert(rawStorageObject[0] == MAGIC);
 
         //currentContext
@@ -63,7 +76,7 @@ library StorageManagement {
 
         //starting slot for storagePointers mapping
         object.storagePointersMapping = StorageUtils.SPointer({
-          _start: location + 2,
+          _start: ptr.getAbsolutSlotLocation() + 2,
           _length: 1,
           _at: 0
         });
