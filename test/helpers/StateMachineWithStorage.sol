@@ -1,7 +1,7 @@
 pragma solidity 0.4.24;
 
 import "../../contracts/machine/StateMachine.sol";
-import "../../contracts/machine/StorageController.sol";
+import "../../contracts/utils/StorageController.sol";
 
 
 contract StateMachineWithStorage is StorageController, StateMachine {

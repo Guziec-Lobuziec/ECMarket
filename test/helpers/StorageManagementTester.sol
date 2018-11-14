@@ -1,6 +1,6 @@
 pragma solidity 0.4.24;
 
-import "../../contracts/machine/StorageManagement.sol";
+import "../../contracts/utils/StorageManagement.sol";
 
 
 contract StorageManagementTester {
