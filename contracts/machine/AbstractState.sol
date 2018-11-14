@@ -5,7 +5,7 @@ import "./IStateMachine.sol";
 import "./StorageClient.sol";
 
 
-contract AbstractState is StorageClient, IState {
+contract AbstractState is IState {
 
   modifier isMachine {
       require(amIMachine());

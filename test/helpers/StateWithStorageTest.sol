@@ -1,8 +1,9 @@
 pragma solidity 0.4.24;
 
 import "../../contracts/machine/AbstractState.sol";
+import "../../contracts/machine/StorageClient.sol";
 
-contract StateWithStorageTest is AbstractState {
+contract StateWithStorageTest is StorageClient, AbstractState {
 
     event Debug(uint start, uint length, uint at);
 

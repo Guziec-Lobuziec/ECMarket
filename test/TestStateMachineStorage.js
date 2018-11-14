@@ -1,5 +1,5 @@
 const {assertRevert} = require('./helpers/assertThrow');
-const StateMachine = artifacts.require("StateMachine");
+const StateMachineWithStorage = artifacts.require("./helpers/StateMachineWithStorage.sol");
 const StateWithStorage = artifacts.require("./helpers/StateWithStorageTest.sol");
 
 contract("StateMachine with storage:", async (accounts) => {
@@ -10,7 +10,7 @@ contract("StateMachine with storage:", async (accounts) => {
 
   before(async () => {
     state = await StateWithStorage.new();
-    machine = await StateMachine.new(
+    machine = await StateMachineWithStorage.new(
       [state.address, state.address],
       [web3.toBigNumber(1),web3.toBigNumber(2)],
       [1,1],

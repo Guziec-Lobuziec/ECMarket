@@ -5,14 +5,10 @@ import "./IStateMachine.sol";
 import "./StorageController.sol";
 
 
-contract StateMachine is StorageController, IStateMachine {
-
-  using StorageManagement for StorageManagement.StorageObject;
+contract StateMachine is IStateMachine {
 
   //needs justification
   uint256 constant FORWARD_GAS_LIMIT = 10000;
-  //needs justification
-  uint256 constant private STATE_STORAGE_SIZE = 256;
 
   struct State {
       bytes32[] reachableStates;
@@ -22,8 +18,6 @@ contract StateMachine is StorageController, IStateMachine {
   mapping(bytes32 => State) private machineStates;
   bytes32 private currentState;
   bool private hasBeenRegisteredForStateTransition;
-  //should occupy slot after other storage variables
-  StorageManagement.StorageObject private object;
 
   modifier self {
       require(msg.sender == address(this));
@@ -38,19 +32,11 @@ contract StateMachine is StorageController, IStateMachine {
     bytes32 entryState
     ) {
 
-      start.initialze(object);
-
       State storage current = machineStates[0x0];
       uint offset;
 
       for(uint i = 0; i < states.length; i++) {
         current = machineStates[states[i]];
-
-        object.storagePointers[states[i]] = StorageUtils.SPointer({
-          _start: i*STATE_STORAGE_SIZE + StorageManagement.getFreeStorageSlot(),
-          _length: STATE_STORAGE_SIZE,
-          _at: 0
-        });
 
         for(uint j = 0; j < lengthOfReachableStates[i]; j++) {
           current.reachableStates.push(arrayOfArraysOfReachableStates[offset+j]);
@@ -61,7 +47,6 @@ contract StateMachine is StorageController, IStateMachine {
       }
 
       currentState = entryState;
-      object.currentContext = entryState;
     }
 
     function setNewState(bytes32 next) public self returns (bool) {
@@ -76,7 +61,6 @@ contract StateMachine is StorageController, IStateMachine {
 
       require(found, "Illegal state transition");
       currentState = next;
-      object.currentContext = next;
       hasBeenRegisteredForStateTransition = true;
     }
 
