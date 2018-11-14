@@ -22,8 +22,8 @@ library StorageManagement {
 
     struct StorageObject {
       bytes32 _magicNumber;
-      bytes32 currentContext;
-      mapping(bytes32 => StorageUtils.SPointer) storagePointers;
+      bytes32 _currentContext;
+      mapping(bytes32 => StorageUtils.SPointer) _storagePointers;
     }
 
     struct StorageObjectRef {
@@ -42,6 +42,34 @@ library StorageManagement {
         }
         start._storageObjectLocation = _location;
         _object._magicNumber = MAGIC;
+    }
+
+    function setCurrentContext(
+      StorageObject storage object,
+      bytes32 context
+    ) internal {
+      object._currentContext = context;
+    }
+
+    function setSPointerFor(
+      StorageObject storage object,
+      bytes32 context,
+      StorageUtils.SPointer pointer
+    ) internal {
+      object._storagePointers[context] = pointer;
+    }
+
+    function getCurrentContext(
+      StorageObject storage object
+    ) internal view returns(bytes32) {
+      return object._currentContext;
+    }
+
+    function getSPointerFor(
+      StorageObject storage object,
+      bytes32 context
+    ) internal view returns(StorageUtils.SPointer) {
+      return object._storagePointers[context];
     }
 
     function getFreeStorageSlot() internal view returns(uint256) {
