@@ -8,6 +8,8 @@ import "../utils/StorageController.sol";
 
 contract Agreement is StorageController, StateMachine {
 
+    event _debug(uint start, uint length, uint at);
+
     using StorageManagement for StorageManagement.StorageObject;
     using StorageUtils for StorageUtils.SPointer;
 
@@ -94,10 +96,13 @@ contract Agreement is StorageController, StateMachine {
       require(!isInitialzed);
       isInitialzed = true;
 
-      for(uint i = 0; i<NAME_SIZE; i++)
-        name[i] = _name[i];
-      for(uint j = 0; j<DESCRIPTION_SIZE; i++)
-        description[j] = _description[j];
+      for(uint i = 0; i<_name.length; i++) {
+        name.push(_name[i]);
+      }
+
+      for(uint j = 0; j<_description.length; j++) {
+        description.push(_description[j]);
+      }
 
       StorageUtils.SPointer memory sharedStorage =
         object.getSPointerFor(object.getCurrentContext());

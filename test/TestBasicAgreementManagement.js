@@ -4,7 +4,7 @@ const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract('Agreement basic management - creation, removal', async (accounts) => {
+contract.only('Agreement basic management - creation', async (accounts) => {
 
   const creator = accounts[0];
   const advancePayment = 250;
@@ -19,50 +19,82 @@ contract('Agreement basic management - creation, removal', async (accounts) => {
     }
   ];
 
-  tests.forEach(function(test) {
+  var testManager;
 
-    let testManager;
-    let createTransactions = [];
-    let agreementAddress = {};
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+  })
 
-    before(async () => {
-      testManager = await AgreementManager.deployed();
+  it('AgreementManager state before agreement creation' , async () => {
+    let before = await testManager.search.call();
+    assert.isTrue(before.every((e) => {return e == 0;}),'expected to be zeros before');
+  })
+
+  context('Agreement creation basic side-effects', () => {
+    tests.forEach((test, index) => {
+
+        let createTransactions = [];
+
+        it('Agreement creation events '+test.title, async () => {
+
+          createTransactions = await createManyAgreements(
+            testManager,
+            [{
+              address: creator,
+              count: 1,
+              name: ["0x0","0x0"],
+              description: ["0x0","0x0","0x0","0x0","0x0","0x0","0x0","0x0"],
+              price: test.price,
+              extra: test.extra
+            }]
+          );
+
+          assert.equal(createTransactions[0].logs.length, 1, 'one event generated');
+          assert.equal(createTransactions[0].logs[0].event, 'AgreementCreation', 'event name', 'event desciption');
+
+        })
+
+        it('Checking if contract exists under given address '+test.title, async () => {
+
+          let agreementAddress = createTransactions[0].logs[0].args.created;
+
+          assert.notEqual(agreementAddress, 0, 'should have valid address');
+
+          let codeOfAgreementBefore = await web3.eth.getCode(agreementAddress);
+          assert.notEqual(codeOfAgreementBefore, '0x0', 'should have some code');
+
+        })
+      })
     })
 
-    it('Agreement creation events '+test.title, async () => {
+})
 
-      let before = await testManager.search.call();
-      assert.isTrue(before.every((e) => {return e == 0;}),'expected to be zeros before');
+contract.only('Agreement basic management - search properties', async (accounts) => {
+  const creator = accounts[0];
+  const advancePayment = 250;
+  const timeToFallback = 50;
 
-      createTransactions = await createManyAgreements(
-        testManager,
-        [{
-          address: creator,
-          count: 1,
-          name: ["0","0"],
-          description: ["0","0","0","0","0","0","0","0"],
-          price: test.price,
-          extra: test.extra
-        }]
-      );
 
-      assert.equal(createTransactions[0].logs.length, 1, 'one event generated');
-      assert.equal(createTransactions[0].logs[0].event, 'AgreementCreation', 'event name', 'event desciption');
+  var testManager;
+  var agreementAddress;
 
-    })
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    let createTransactions = await createManyAgreements(
+      testManager,
+      [{
+        address: creator,
+        count: 1,
+        name: ["0x0","0x0"],
+        description: ["0x0","0x0","0x0","0x0","0x0","0x0","0x0","0x0"],
+        price: 0,
+        extra: []
+      }]
+    );
+    agreementAddress = createTransactions[0].logs[0].args.created;
+  })
 
-    it('Checking if contract exists under given address '+test.title, async () => {
-
-      agreementAddress = createTransactions[0].logs[0].args.created;
-
-      assert.notEqual(agreementAddress, 0, 'should have valid address');
-
-      let codeOfAgreementBefore = await web3.eth.getCode(agreementAddress);
-      assert.notEqual(codeOfAgreementBefore, '0x0', 'should have some code');
-
-    })
-
-    it('Checking if search results match events logs '+test.title, async () => {
+    it('Checking if search results match events logs', async () => {
 
       let one = (await testManager.search.call()).filter((e) => {return e != 0;});
       assert.lengthOf(one, 1,'exactly one non zero');
@@ -70,7 +102,7 @@ contract('Agreement basic management - creation, removal', async (accounts) => {
 
     })
 
-    it('Test if agreement did selfdestruction '+test.title, async () => {
+    it('Test if agreement did selfdestruction', async () => {
       let agreement = await Agreement.at(agreementAddress);
       await agreement.remove({from: creator});
 
@@ -81,8 +113,6 @@ contract('Agreement basic management - creation, removal', async (accounts) => {
       assert.isTrue(after.every((e) => {return e == 0;}),'expected to be zeros after');
 
     })
-  })
-
 })
 
 contract('Agreement basic management - remove selected', async (accounts) => {
