@@ -5,8 +5,8 @@ contract IAgreementManager {
     event AgreementCreation(address created);
     function setAgreementFactory(address _factory) public;
     function create(
-      bytes32[2] name,
-      bytes32[8] description,
+      bytes32[] name,
+      bytes32[] description,
       uint blocksToExpiration,
       uint price,
       bytes extra

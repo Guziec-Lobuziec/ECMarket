@@ -3,7 +3,7 @@ pragma solidity 0.4.24;
 
 library StorageUtils {
 
-    uint256 constant internal SPOINTER_SIZE = 3;
+    uint256 constant public SPOINTER_SIZE = 3;
 
     struct SPointer{
       uint256 _start;
@@ -46,6 +46,16 @@ library StorageUtils {
       }
 
       return _returnArray;
+  }
+
+  function setBytes32(SPointer memory pointer, bytes32 value) internal {
+      bytes32[] memory tmp = new bytes32[](1);
+      tmp[0] = value;
+      setSlots(pointer,tmp);
+  }
+
+  function getBytes32(SPointer memory pointer) internal view returns(bytes32) {
+    return getSlots(pointer,1)[0];
   }
 
   function setBytes(SPointer memory pointer, bytes memory _value) internal {
@@ -139,6 +149,26 @@ library StorageUtils {
 
   }
 
+  function setStoragePointer(SPointer memory pointer, SPointer memory value) internal {
+
+      bytes32[] memory tmp = new bytes32[](SPOINTER_SIZE);
+      tmp[0] = bytes32(value._start);
+      tmp[1] = bytes32(value._length);
+      tmp[2] = bytes32(value._at);
+      setSlots(pointer, tmp);
+  }
+
+  function getStoragePointer(SPointer memory pointer) internal view returns(SPointer memory) {
+
+      SPointer memory ret;
+      bytes32[] memory tmp = getSlots(pointer, SPOINTER_SIZE);
+      ret._start = uint256(tmp[0]);
+      ret._length = uint256(tmp[1]);
+      ret._at = uint256(tmp[2]);
+
+      return ret;
+  }
+
   function getStoragePointerMapping(
     SPointer memory pointer,
     bytes32 key
@@ -155,13 +185,38 @@ library StorageUtils {
 
   }
 
-  function setPositionAt(SPointer memory pointer, uint at) internal view {
+  function setPositionAt(SPointer memory pointer, uint at) internal pure {
       pointer._at = at;
+  }
+
+  function mapSPointerTo(
+    SPointer memory pointer,
+    bytes memory key
+  ) internal pure returns(SPointer memory)  {
+
+    SPointer memory ret = SPointer({
+      _start: 0,
+      _length: uint(-1),
+      _at: uint(keccak256(abi.encodePacked(key,getAbsolutSlotLocation(pointer))))
+    });
+
+    return ret;
+
+  }
+
+  function relativeMove(SPointer memory pointer, int move) internal pure returns(SPointer memory) {
+      SPointer memory ret = SPointer({
+        _start: pointer._start,
+        _length: pointer._length,
+        _at: pointer._at + uint(move)
+      });
+
+      return ret;
   }
 
   function getAbsolutSlotLocation(
     SPointer memory pointer
-  ) internal view returns(uint256) {
+  ) internal pure returns(uint256) {
     return pointer._at + pointer._start;
   }
 
