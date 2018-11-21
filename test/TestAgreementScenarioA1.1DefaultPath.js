@@ -4,8 +4,9 @@ const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
+var AgreementStates = [artifacts.require("EntryState")];
 
-contract('Agreement 1.1 - default path', async (accounts) => {
+contract.only('Agreement 1.1 - default path', async (accounts) => {
 
   const creator = accounts[0];
   const buyer = accounts[1];
@@ -16,6 +17,7 @@ contract('Agreement 1.1 - default path', async (accounts) => {
   let testManager;
   let testWallet;
   let agreement;
+  let agreementInterfaces = [];
 
   before(async () => {
     testManager = await AgreementManager.deployed();
@@ -32,6 +34,10 @@ contract('Agreement 1.1 - default path', async (accounts) => {
     testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant1, value: suplicantBalance});
+
+    agreementInterfaces = await Promise.all(
+      AgreementStates.map(stateI => stateI.at(agreement.address))
+    );
   })
 
   it('test price', async () => {
@@ -55,14 +61,14 @@ contract('Agreement 1.1 - default path', async (accounts) => {
     );
 
     await testWallet.approve(agreement.address, price, {from: buyer});
-    await agreement.join({from: buyer});
+    await agreementInterfaces[0].join({from: buyer});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price, "Agreement 1.1 should have "+price+" (2)"
     );
 
     await testWallet.approve(agreement.address, price, {from: suplicant1});
-    await agreement.join({from: suplicant1});
+    await agreementInterfaces[0].join({from: suplicant1});
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
       price*2, "Agreement 1.1 should have "+price*2+" (3)"

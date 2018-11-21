@@ -4,11 +4,13 @@ const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
+var AgreementStates = [artifacts.require("EntryState")];
 
-contract('Agreement 1.1 flow - joining properties', async (accounts) => {
+contract.only('Agreement 1.1 flow - joining properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
+  let agreementInterfaces = [];
 
   before(async () => {
     testManager = await AgreementManager.deployed();
@@ -19,6 +21,9 @@ contract('Agreement 1.1 flow - joining properties', async (accounts) => {
       description: ["0","0","0","0","0","0","0","0"]
     }]);
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+    agreementInterfaces = await Promise.all(
+      AgreementStates.map(stateI => stateI.at(agreement.address))
+    );
   })
 
   it('Test joining agreement', async () => {
@@ -26,7 +31,7 @@ contract('Agreement 1.1 flow - joining properties', async (accounts) => {
     let participantsBefore = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
     assert.lengthOf(participantsBefore, 1, "should have one participant");
 
-    await agreement.join({from: accounts[1]});
+    await agreementInterfaces[0].join({from: accounts[1]});
 
     let participants = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
     assert.lengthOf(participants, 2, "should have two participants");
@@ -39,7 +44,7 @@ contract('Agreement 1.1 flow - joining properties', async (accounts) => {
   })
 
   it('Test joining agreement - multiple suplicants', async () => {
-    await agreement.join({from: accounts[2]});
+    await agreementInterfaces[0].join({from: accounts[2]});
 
     let participants = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
     assert.lengthOf(participants, 3, "should have three participants");
@@ -51,49 +56,58 @@ contract('Agreement 1.1 flow - joining properties', async (accounts) => {
     );
   })
 
-  it('Test if suplicant or creator cannot double-join', async () => {
-    let before = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
+  context('Double-join protection', () => {
+    let beforeList;
+    let tests = [
+      {user: creator, title: 'Test if creator cannot double-join'},
+      {user: accounts[2], title: 'Test if suplicant cannot double-join'},
+    ];
 
-    await agreement.join({from: creator});
+    before(async () => {
+      beforeList = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
+    })
 
-    let afterCreatorJoin = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
-    assert.lengthOf(afterCreatorJoin, 3, "should have three participants");
-    assert.include(
-      afterCreatorJoin.toString(),
-      [creator, accounts[1], accounts[2]],
-      "Creator or suplicant missing"
-    );
+    tests.forEach( test => {
+      context(test.title,() => {
 
-    let i;
+        let afterCreatorJoin;
+        before(async () => {
+          await agreementInterfaces[0].join({from: test.user});
+          afterCreatorJoin = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
+          console.log(beforeList);
+          console.log(afterCreatorJoin);
+        })
 
-    for(i = 0; i < afterCreatorJoin.length; i++) {
-      assert.equal(afterCreatorJoin[i], before[i], "Should be in same order");
-    }
+        it('Data content', async () => {
+          assert.lengthOf(afterCreatorJoin, 3, "should have three participants");
+          assert.include(
+            afterCreatorJoin.toString(),
+            beforeList,
+            "Creator or suplicant missing"
+          );
+        })
 
-    await agreement.join({from: accounts[2]});
+        it('Data ordering', async () => {
+          let i;
+          for(i = 0; i < afterCreatorJoin.length; i++) {
+            assert.equal(afterCreatorJoin[i], beforeList[i], "Should be in same order");
+          }
+        })
+      })
+    })
 
-    let afterSuplicantJoin = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
-    assert.lengthOf(afterSuplicantJoin, 3, "should have three participants");
-    assert.include(
-      afterSuplicantJoin.toString(),
-      [creator, accounts[1], accounts[2]],
-      "Creator or suplicant missing"
-    );
-
-    for(i = 0; i < afterSuplicantJoin.length; i++) {
-      assert.equal(afterSuplicantJoin[i], before[i], "Should be in same order");
-    }
   })
+
 
   it('Cannot join if agreement is Running', async () => {
     await agreement.accept(accounts[1], {from: creator});
-    await assertRevert(agreement.join({from: accounts[3]}));
+    await assertRevert(agreementInterfaces[0].join({from: accounts[3]}));
   })
 
   it('Cannot join if agreement is Done', async () => {
     await agreement.conclude({from: creator});
     await agreement.conclude({from: accounts[1]});
-    await assertRevert(agreement.join({from: accounts[3]}));
+    await assertRevert(agreementInterfaces[0].join({from: accounts[3]}));
   })
 
 })
@@ -131,7 +145,7 @@ contract('Agreement 1.1 flow - accept permissions related properties', async (ac
     await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (1)');
     await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (2)');
 
-    await agreement.join({from: accounts[2]});
+    await agreementInterfaces[0].join({from: accounts[2]});
     await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (3)');
     await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (4)');
   })

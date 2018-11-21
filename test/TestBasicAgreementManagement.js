@@ -4,7 +4,7 @@ const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract.only('Agreement basic management - creation', async (accounts) => {
+contract('Agreement basic management - creation', async (accounts) => {
 
   const creator = accounts[0];
   const advancePayment = 250;
@@ -69,7 +69,7 @@ contract.only('Agreement basic management - creation', async (accounts) => {
 
 })
 
-contract.only('Agreement basic management - search properties', async (accounts) => {
+contract('Agreement basic management - search properties', async (accounts) => {
   const creator = accounts[0];
   const advancePayment = 250;
   const timeToFallback = 50;

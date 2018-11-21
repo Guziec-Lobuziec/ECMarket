@@ -1,12 +1,11 @@
 pragma solidity 0.4.24;
 
-import "../manager/IAgreementManager.sol";
-import "../IEIP20.sol";
 import "../machine/StateMachine.sol";
 import "../utils/StorageController.sol";
+import "./AgreementCommons.sol";
 
 
-contract Agreement is StorageController, StateMachine {
+contract Agreement is StorageController, StateMachine, AgreementCommons {
 
     event _debug(uint start, uint length, uint at);
 
@@ -17,42 +16,12 @@ contract Agreement is StorageController, StateMachine {
     uint constant public DESCRIPTION_SIZE = 8;
 
     uint constant private SHARED_STORAGE_SIZE = 256;
-    uint constant private SHARED_VALUES_SIZE = 7;
-    uint constant private ADDRESS_LIST_ELEMENT_SIZE = 2;
-
-    bytes32 constant private HEAD = 0x0;
-    bool constant private NEXT = true;
-    bool constant private PREV = false;
-
-    enum Status { New, Running, Done}
-
-    struct Participant {
-        bool joined;
-        bool accepted;
-        bool creator;
-        bool hasConcluded;
-    }
-
-    struct AddressList {
-        address data;
-        mapping(bool => uint) pointers;
-    }
 
     /* mapping (uint => AddressList) private list;
 
     mapping(address => Participant) private participantsSet;
-    address[] private accepted;
-
-    uint private creationBlock;
-    uint private creationTimestamp;
-    IAgreementManager private agreementManager;
-    IEIP20 private tokenContract;
-
-    uint private price;
-    uint private blocksToExpiration; */
+    address[] private accepted;*/
     bool private isInitialzed;
-    bytes32[] private name;
-    bytes32[] private description;
 
     StorageManagement.StorageObject object;
 
@@ -105,38 +74,38 @@ contract Agreement is StorageController, StateMachine {
       }
 
       StorageUtils.SPointer memory sharedStorage =
-        object.getSPointerFor(object.getCurrentContext());
+        getSharedStoragePointer();
 
-      bytes32[] memory valuesToSave = new bytes32[](SHARED_VALUES_SIZE);
-      valuesToSave[0] = bytes32(agreementManager);
-      valuesToSave[1] = bytes32(tokenContract);
-      valuesToSave[2] = bytes32(creator);
+      bytes32[] memory valuesToSave = new bytes32[](SHARED_BASIC_TYPE_VALUES_SIZE);
+      valuesToSave[LOCATION_OF_AGREEMENT_MANAGER] = bytes32(agreementManager);
+      valuesToSave[LOCATION_OF_TOKEN_CONTRACT] = bytes32(tokenContract);
+      valuesToSave[LOCATION_OF_CREATOR] = bytes32(creator);
 
-      valuesToSave[3] = bytes32(block.timestamp);
-      valuesToSave[4] = bytes32(block.number);
-      valuesToSave[5] = bytes32(blocksToExpiration);
+      valuesToSave[LOCATION_OF_CREATION_TIMESTAMP] = bytes32(block.timestamp);
+      valuesToSave[LOCATION_OF_CREATION_BLOCK] = bytes32(block.number);
+      valuesToSave[LOCATION_OF_BLOCKS_TO_EXPIRATION] = bytes32(blocksToExpiration);
 
-      valuesToSave[6] = bytes32(price);
+      valuesToSave[LOCATION_OF_PRICE] = bytes32(price);
       //7 - AddressList
       //8 - acceptedMapping
       //9 - acceptArray
 
       sharedStorage.setSlots(valuesToSave);
 
-      sharedStorage.setPositionAt(SHARED_VALUES_SIZE);
-      addParticipant(sharedStorage,creator);
+      sharedStorage.setPositionAt(LOCATION_OF_PARTICIPANT_LIST);
+      addParticipant(creator);
 
-      sharedStorage.setPositionAt(SHARED_VALUES_SIZE+1);
+      sharedStorage.setPositionAt(LOCATION_OF_PARTICIPANT_LIST+1);
 
-      /* Participant memory toAdd = Participant({
+      Participant memory toAdd = Participant({
           joined: true,
           accepted: true,
           creator: true,
           hasConcluded: false
       });
 
-      participantsSet[creator] = toAdd;
-      accepted.push(creator); */
+      setParticipantProperties(creator,toAdd);
+      addAcceptedParticipants(creator);
 
     }
 
@@ -235,124 +204,8 @@ contract Agreement is StorageController, StateMachine {
         selfdestruct(address(agreementManager));
     } */
 
-    function getParticipants() public view returns(address[64]) {
-        StorageUtils.SPointer memory sharedStorage =
-          object.getSPointerFor(object.getCurrentContext());
-        sharedStorage.setPositionAt(SHARED_VALUES_SIZE);
-
-        address[64] memory page;
-        bytes32 current = HEAD;
-        uint i = 0;
-        while (
-          (
-            sharedStorage
-              .mapSPointerTo(abi.encodePacked(current))
-              .relativeMove(1)
-              .mapSPointerTo(abi.encodePacked(NEXT))
-              .getBytes32() != HEAD
-          ) && (i < 64)
-        ) {
-            current = sharedStorage
-              .mapSPointerTo(abi.encodePacked(current))
-              .relativeMove(1)
-              .mapSPointerTo(abi.encodePacked(NEXT))
-              .getBytes32();
-
-            page[i] = address(sharedStorage
-              .mapSPointerTo(abi.encodePacked(current))
-              .getBytes32());
-            i++;
-        }
-        return page;
-    }
-
-    function getCreationBlock() public view returns(uint) {
-        StorageUtils.SPointer memory sharedStorage =
-          object.getSPointerFor(object.getCurrentContext());
-        sharedStorage.setPositionAt(4);
-        return uint(sharedStorage.getBytes32());
-    }
-
-    function getCreationTimestamp() public view returns(uint) {
-        StorageUtils.SPointer memory sharedStorage =
-          object.getSPointerFor(object.getCurrentContext());
-        sharedStorage.setPositionAt(3);
-        return uint(sharedStorage.getBytes32());
-    }
-
-    function getStatus() public view returns(Status) {
-        return Status.New;
-    }
-
-    function getName() public view returns(bytes32[]) {
-        bytes32[] memory ret = new bytes32[](NAME_SIZE);
-        for(uint i = 0; i<NAME_SIZE; i++)
-          ret[i] = name[i];
-        return ret;
-    }
-
-    function getDescription() public view returns(bytes32[]) {
-        bytes32[] memory ret = new bytes32[](DESCRIPTION_SIZE);
-        for(uint i = 0; i<DESCRIPTION_SIZE; i++)
-          ret[i] = description[i];
-        return ret;
-    }
-
-    function getBlocksToExpiration() public view returns(uint) {
-        StorageUtils.SPointer memory sharedStorage =
-          object.getSPointerFor(object.getCurrentContext());
-        sharedStorage.setPositionAt(5);
-        return uint(sharedStorage.getBytes32());
-    }
-
-    function getPrice() public view returns(uint) {
-        StorageUtils.SPointer memory sharedStorage =
-          object.getSPointerFor(object.getCurrentContext());
-        sharedStorage.setPositionAt(6);
-        return uint(sharedStorage.getBytes32());
-    }
-
-    function getAPIJSON() public view returns(string) {
-        return "[{\"name\": \"join\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"accept\",\"type\": \"function\",\"inputs\": [{\"name\": \"suplicant\",\"type\": \"address[64]\"}],\"outputs\": []},{\"name\": \"getParticipants\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"address[64]\"}]},{\"name\": \"getCreationBlock\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"uint256\"}]},{\"name\": \"getCreationTimestamp\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"uint256\"}]},{\"name\": \"getStatus\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"Status\"}]},{\"name\": \"conclude\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"remove\",\"type\": \"function\",\"inputs\": [],\"outputs\": []},{\"name\": \"getName\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"bytes32[2]\"}]},{\"name\": \"getDescription\",\"type\": \"function\",\"inputs\": [],\"outputs\": [{\"type\": \"bytes32[8]\"}]},{\"name\": \"getPrice\",\"type\": \"function\",\"inputs\":[],\"outputs\": [{\"type\": \"uint256\"}]}]";
-    }
-
-    function addParticipant(StorageUtils.SPointer memory pointer, address participant) private {
-
-        bytes32 previous = pointer
-            .mapSPointerTo(abi.encodePacked(HEAD))
-            .relativeMove(1)
-            .mapSPointerTo(abi.encodePacked(PREV))
-            .getBytes32();
-
-        bytes32 newNode = keccak256(abi.encodePacked(previous, block.number));
-
-        pointer
-          .mapSPointerTo(abi.encodePacked(previous))
-          .relativeMove(1)
-          .mapSPointerTo(abi.encodePacked(NEXT))
-          .setBytes32(newNode);
-
-        pointer
-          .mapSPointerTo(abi.encodePacked(HEAD))
-          .relativeMove(1)
-          .mapSPointerTo(abi.encodePacked(PREV))
-          .setBytes32(newNode);
-
-        pointer
-          .mapSPointerTo(abi.encodePacked(newNode))
-          .setBytes32(bytes32(participant));
-
-        pointer
-          .mapSPointerTo(abi.encodePacked(newNode))
-          .relativeMove(1)
-          .mapSPointerTo(abi.encodePacked(NEXT))
-          .setBytes32(HEAD);
-
-        pointer
-          .mapSPointerTo(abi.encodePacked(newNode))
-          .relativeMove(1)
-          .mapSPointerTo(abi.encodePacked(PREV))
-          .setBytes32(previous);
+    function getSharedStoragePointer() internal view returns(StorageUtils.SPointer memory) {
+      return object.getSPointerFor(object.getCurrentContext());
     }
 
 }

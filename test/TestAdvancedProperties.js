@@ -3,7 +3,7 @@ const {assertRevert} = require('./helpers/assertThrow');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 
-contract.only('Test Advanced Properties', async (accounts) => {
+contract('Test Advanced Properties', async (accounts) => {
     let testManager;
     let agreement;
 

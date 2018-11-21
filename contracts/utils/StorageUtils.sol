@@ -189,6 +189,18 @@ library StorageUtils {
       pointer._at = at;
   }
 
+  function mapSPointerTo(SPointer memory pointer) internal pure returns(SPointer memory) {
+
+    SPointer memory ret = SPointer({
+      _start: 0,
+      _length: uint(-1),
+      _at: uint(keccak256(abi.encodePacked(getAbsolutSlotLocation(pointer))))
+    });
+
+    return ret;
+
+  }
+
   function mapSPointerTo(
     SPointer memory pointer,
     bytes memory key
