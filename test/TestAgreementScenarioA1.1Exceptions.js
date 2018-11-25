@@ -74,8 +74,6 @@ contract.only('Agreement 1.1 flow - joining properties', async (accounts) => {
         before(async () => {
           await agreementInterfaces[0].join({from: test.user});
           afterCreatorJoin = (await agreement.getParticipants.call()).filter((e) => {return e != 0;});
-          console.log(beforeList);
-          console.log(afterCreatorJoin);
         })
 
         it('Data content', async () => {

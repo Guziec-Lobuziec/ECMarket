@@ -232,4 +232,100 @@ contract AgreementCommons {
         .setBytes32(previous);
   }
 
+  function removeParticipant(address participant) internal {
+
+      StorageUtils.SPointer memory sharedStorage =
+        getSharedStoragePointer();
+      sharedStorage.setPositionAt(LOCATION_OF_PARTICIPANT_LIST);
+
+      bytes32 current = HEAD;
+      //Insecure loop!
+      while (
+        (sharedStorage
+          .mapSPointerTo(abi.encodePacked(current))
+          .relativeMove(1)
+          .mapSPointerTo(abi.encodePacked(NEXT))
+          .getBytes32() != HEAD)
+        ) {
+          current = sharedStorage
+            .mapSPointerTo(abi.encodePacked(current))
+            .relativeMove(1)
+            .mapSPointerTo(abi.encodePacked(NEXT))
+            .getBytes32();
+
+          if (
+            sharedStorage
+            .mapSPointerTo(abi.encodePacked(current)).getBytes32() == bytes32(participant)
+            ) {
+
+              sharedStorage
+                .mapSPointerTo(
+                  abi.encodePacked(
+                    sharedStorage
+                      .mapSPointerTo(abi.encodePacked(current))
+                      .relativeMove(1)
+                      .mapSPointerTo(abi.encodePacked(PREV))
+                      .getBytes32()
+                    )
+                )
+                .relativeMove(1)
+                .mapSPointerTo(abi.encodePacked(NEXT))
+                .setBytes32(
+                  sharedStorage
+                    .mapSPointerTo(abi.encodePacked(current))
+                    .relativeMove(1)
+                    .mapSPointerTo(abi.encodePacked(NEXT))
+                    .getBytes32()
+                );
+
+                sharedStorage
+                  .mapSPointerTo(
+                    abi.encodePacked(
+                      sharedStorage
+                        .mapSPointerTo(abi.encodePacked(current))
+                        .relativeMove(1)
+                        .mapSPointerTo(abi.encodePacked(NEXT))
+                        .getBytes32()
+                      )
+                  )
+                  .relativeMove(1)
+                  .mapSPointerTo(abi.encodePacked(PREV))
+                  .setBytes32(
+                    sharedStorage
+                      .mapSPointerTo(abi.encodePacked(current))
+                      .relativeMove(1)
+                      .mapSPointerTo(abi.encodePacked(PREV))
+                      .getBytes32()
+                  );
+
+              /* list[list[current].pointers[PREV]].pointers[NEXT]
+              = list[current].pointers[NEXT]; */
+
+              /* list[list[current].pointers[NEXT]].pointers[PREV]
+              = list[current].pointers[PREV]; */
+
+              sharedStorage
+                .mapSPointerTo(abi.encodePacked(current))
+                .relativeMove(1)
+                .mapSPointerTo(abi.encodePacked(NEXT))
+                .setBytes32(0x0);
+              sharedStorage
+                .mapSPointerTo(abi.encodePacked(current))
+                .relativeMove(1)
+                .mapSPointerTo(abi.encodePacked(PREV))
+                .setBytes32(0x0);
+              sharedStorage
+                .mapSPointerTo(abi.encodePacked(current))
+                .setBytes32(0x0);
+
+              /* delete list[current].pointers[NEXT];
+              delete list[current].pointers[PREV];
+              delete list[current]; */
+
+              break;
+          }
+      }
+
+  }
+
 }
