@@ -35,11 +35,11 @@ contract AgreementCommons {
   uint constant internal LOCATION_OF_PARTICIPANT_LIST = 7;
   uint constant internal LOCATION_OF_PARTICIPANT_PROP_SET = 8;
   uint constant internal LOCATION_OF_ACCEPTED_ARRAY = 9;
-  uint constant private ADDRESS_LIST_ELEMENT_SIZE = 2;
+  uint constant internal ADDRESS_LIST_ELEMENT_SIZE = 2;
 
-  bytes32 constant private HEAD = 0x0;
-  bool constant private NEXT = true;
-  bool constant private PREV = false;
+  bytes32 constant internal HEAD = 0x0;
+  bool constant internal NEXT = true;
+  bool constant internal PREV = false;
 
   bytes32[] internal name;
   bytes32[] internal description;

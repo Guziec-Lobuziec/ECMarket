@@ -25,6 +25,38 @@ contract EntryState is StorageClient, AbstractState, AgreementCommons {
       require(success);
   }
 
+  function accept(address suplicant) public {
+      require(block.number < getCreationBlock() + getBlocksToExpiration());
+      require(getParticipantProperties(msg.sender).creator);
+      require(getParticipantProperties(suplicant).joined);
+      require(!getParticipantProperties(suplicant).creator);
+
+      Participant memory toBeAccepted = getParticipantProperties(suplicant);
+      toBeAccepted.accepted = true;
+      setParticipantProperties(suplicant, toBeAccepted);
+
+      addAcceptedParticipants(suplicant);
+
+      StorageUtils.SPointer memory sharedStorage =
+        getSharedStoragePointer();
+      sharedStorage.setPositionAt(LOCATION_OF_PARTICIPANT_LIST);
+
+      bool success = getTokenContract().approve(
+        address(sharedStorage
+          .mapSPointerTo(abi.encodePacked(
+          sharedStorage
+            .mapSPointerTo(abi.encodePacked(HEAD))
+            .relativeMove(1)
+            .mapSPointerTo(abi.encodePacked(NEXT))
+            .getBytes32()
+        )).getBytes32()),
+        getPrice()
+      );
+      require(success);
+      
+      setMachineNextState(getMachineReachableStates()[0]);
+  }
+
   function withdraw() public {
       require(getParticipantProperties(msg.sender).joined,"Address isn't part of agreement");
       require(!getParticipantProperties(msg.sender).accepted);

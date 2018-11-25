@@ -96,24 +96,13 @@ contract.only('Agreement 1.1 flow - joining properties', async (accounts) => {
 
   })
 
-
-  it('Cannot join if agreement is Running', async () => {
-    await agreement.accept(accounts[1], {from: creator});
-    await assertRevert(agreementInterfaces[0].join({from: accounts[3]}));
-  })
-
-  it('Cannot join if agreement is Done', async () => {
-    await agreement.conclude({from: creator});
-    await agreement.conclude({from: accounts[1]});
-    await assertRevert(agreementInterfaces[0].join({from: accounts[3]}));
-  })
-
 })
 
-contract('Agreement 1.1 flow - accept permissions related properties', async (accounts) => {
+contract.only('Agreement 1.1 flow - accept permissions related properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
+  let agreementInterfaces = [];
 
   before(async () => {
     testManager = await AgreementManager.deployed();
@@ -124,38 +113,46 @@ contract('Agreement 1.1 flow - accept permissions related properties', async (ac
       description: ["0","0","0","0","0","0","0","0"]
     }]);
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+    agreementInterfaces = await Promise.all(
+      AgreementStates.map(stateI => stateI.at(agreement.address))
+    );
   })
 
   it('Test if creator fails to accept himself', async () => {
 
-    await assertRevert(agreement.accept(creator, {from: creator}));
+    await assertRevert(agreementInterfaces[0].accept(creator, {from: creator}));
 
   })
 
   it('Test if creator fails to accept party, who didn\'t join', async () => {
 
-    await assertRevert(agreement.accept(accounts[1], {from: creator}));
+    await assertRevert(agreementInterfaces[0].accept(accounts[1], {from: creator}));
 
   })
 
   it('Only creator can accept others', async () => {
 
-    await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (1)');
-    await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (2)');
+    await assertRevert(agreementInterfaces[0].accept(accounts[2], {from: accounts[1]}), 'should revert (1)');
+    await assertRevert(agreementInterfaces[0].accept(accounts[2], {from: accounts[2]}), 'should revert (2)');
 
     await agreementInterfaces[0].join({from: accounts[2]});
-    await assertRevert(agreement.accept(accounts[2], {from: accounts[1]}), 'should revert (3)');
-    await assertRevert(agreement.accept(accounts[2], {from: accounts[2]}), 'should revert (4)');
+    await assertRevert(agreementInterfaces[0].accept(accounts[2], {from: accounts[1]}), 'should revert (3)');
+    await assertRevert(agreementInterfaces[0].accept(accounts[2], {from: accounts[2]}), 'should revert (4)');
   })
 
 
+  it('Cannot join if agreement is Running', async () => {
+    await agreementInterfaces[0].accept(accounts[2], {from: creator})
+    await assertRevert(agreementInterfaces[0].join({from: accounts[3]}));
+  })
 
 })
 
-contract('Agreement 1.1 flow - accept state related properties', async (accounts) => {
+contract.only('Agreement 1.1 flow - accept state related properties', async (accounts) => {
   const creator = accounts[0];
   let testManager;
   let agreement;
+  let agreementInterfaces = [];
 
   before(async () => {
     testManager = await AgreementManager.deployed();
@@ -166,13 +163,17 @@ contract('Agreement 1.1 flow - accept state related properties', async (accounts
       description: ["0","0","0","0","0","0","0","0"]
     }]);
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
-    await agreement.join({from: accounts[2]});
-    await agreement.join({from: accounts[3]});
+    agreementInterfaces = await Promise.all(
+      AgreementStates.map(stateI => stateI.at(agreement.address))
+    );
+
+    await agreementInterfaces[0].join({from: accounts[2]});
+    await agreementInterfaces[0].join({from: accounts[3]});
   })
 
   it('Cannot double accept', async () => {
-    await agreement.accept(accounts[2], {from: creator});
-    await assertRevert(agreement.accept(accounts[2], {from: creator}));
+    await agreementInterfaces[0].accept(accounts[2], {from: creator});
+    await assertRevert(agreementInterfaces[0].accept(accounts[2], {from: creator}));
   })
 
   it('Cannot accept if agreement is Done', async () => {
@@ -183,7 +184,11 @@ contract('Agreement 1.1 flow - accept state related properties', async (accounts
     );
     await agreement.conclude({from: creator});
     await agreement.conclude({from: accounts[2]});
-    await assertRevert(agreement.accept(accounts[3], {from: creator}));
+    await assertRevert(agreementInterfaces[0].accept(accounts[3], {from: creator}));
+  })
+
+  it('Cannot join if agreement is Done', async () => {
+    await assertRevert(agreementInterfaces[0].join({from: accounts[3]}));
   })
 })
 
@@ -242,6 +247,7 @@ contract('Funds related tests', async (accounts) => {
   let testManager;
   let testWallet;
   let agreement;
+  let agreementInterfaces = [];
 
   before(async () => {
     testManager = await AgreementManager.deployed();
@@ -255,6 +261,9 @@ contract('Funds related tests', async (accounts) => {
       }]
     );
     agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+    agreementInterfaces = await Promise.all(
+      AgreementStates.map(stateI => stateI.at(agreement.address))
+    );
     testWallet = await StandardECMToken.deployed();
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant, value: suplicantBalance});
@@ -262,7 +271,7 @@ contract('Funds related tests', async (accounts) => {
   })
 
   it('join agreement - insufficient funds', async () => {
-    await assertRevert(agreement.join({from: suplicant}));
+    await assertRevert(agreementInterfaces[0].join({from: suplicant}));
   })
 
 })

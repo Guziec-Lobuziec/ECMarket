@@ -84,7 +84,7 @@ contract.only('Agreement 1.1 withdraw properties', async (accounts) => {
     await testWallet.approve(agreement.address, price, {from: suplicant1});
     await agreementInterfaces[0].join({from: suplicant1});
 
-    await agreement.accept(buyer, {from: creator});
+    await agreementInterfaces[0].accept(buyer, {from: creator});
 
     await assertRevert(agreementInterfaces[0].withdraw({from: buyer}));
   })

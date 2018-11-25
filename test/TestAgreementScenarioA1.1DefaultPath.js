@@ -92,7 +92,7 @@ contract.only('Agreement 1.1 - default path', async (accounts) => {
 
   it('accept buyer - token allowance', async () => {
     let before = await testWallet.balanceOf.call(agreement.address);
-    await agreement.accept(buyer, {from: creator});
+    await agreementInterfaces[0].accept(buyer, {from: creator});
 
     assert.equal(
       (await testWallet.balanceOf.call(agreement.address)).toNumber(),
