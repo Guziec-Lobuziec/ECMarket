@@ -4,9 +4,9 @@ const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
-var AgreementStates = [artifacts.require("EntryState")];
+var AgreementStates = [artifacts.require("EntryState"), artifacts.require("RunningState")];
 
-contract.only('Agreement 1.1 withdraw properties', async (accounts) => {
+contract('Agreement 1.1 withdraw properties', async (accounts) => {
 
   const creator = accounts[0];
   const buyer = accounts[1];

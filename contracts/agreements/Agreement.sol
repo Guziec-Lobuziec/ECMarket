@@ -91,11 +91,7 @@ contract Agreement is StorageController, StateMachine, AgreementCommons {
       //9 - acceptArray
 
       sharedStorage.setSlots(valuesToSave);
-
-      sharedStorage.setPositionAt(LOCATION_OF_PARTICIPANT_LIST);
       addParticipant(creator);
-
-      sharedStorage.setPositionAt(LOCATION_OF_PARTICIPANT_LIST+1);
 
       Participant memory toAdd = Participant({
           joined: true,

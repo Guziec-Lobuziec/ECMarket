@@ -58,17 +58,21 @@ contract AgreementFactory is IAgreementFactory {
     }
 
     function createAgreement() private returns(Agreement) {
-      address[] memory mutators = new address[](2);
+      address[] memory mutators = new address[](3);
       mutators[0] = stateMutators[0];
       mutators[1] = stateMutators[1];
-      bytes32[] memory stateIds = new bytes32[](2);
+      mutators[2] = stateMutators[1];
+      bytes32[] memory stateIds = new bytes32[](3);
       stateIds[0] = 0x00;
       stateIds[1] = 0x01;
-      uint[] memory lengthOfReachableStates = new uint[](2);
+      stateIds[2] = 0x02;
+      uint[] memory lengthOfReachableStates = new uint[](3);
       lengthOfReachableStates[0] = 1;
-      lengthOfReachableStates[1] = 0;
-      bytes32[] memory arrayOfArraysOfReachableStates = new bytes32[](1);
+      lengthOfReachableStates[1] = 1;
+      lengthOfReachableStates[2] = 0;
+      bytes32[] memory arrayOfArraysOfReachableStates = new bytes32[](2);
       arrayOfArraysOfReachableStates[0] = 0x01;
+      arrayOfArraysOfReachableStates[1] = 0x02;
 
       return new Agreement(
         mutators,
