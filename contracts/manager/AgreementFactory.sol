@@ -58,28 +58,42 @@ contract AgreementFactory is IAgreementFactory {
     }
 
     function createAgreement() private returns(Agreement) {
-      address[] memory mutators = new address[](3);
+      address[] memory mutators = new address[](5);
       mutators[0] = stateMutators[0];
       mutators[1] = stateMutators[1];
       mutators[2] = stateMutators[1];
-      bytes32[] memory stateIds = new bytes32[](3);
+      mutators[3] = stateMutators[2];
+      mutators[4] = stateMutators[2];
+      bytes32[] memory stateIds = new bytes32[](5);
       stateIds[0] = 0x00;
       stateIds[1] = 0x01;
       stateIds[2] = 0x02;
-      uint[] memory lengthOfReachableStates = new uint[](3);
-      lengthOfReachableStates[0] = 1;
-      lengthOfReachableStates[1] = 1;
-      lengthOfReachableStates[2] = 0;
-      bytes32[] memory arrayOfArraysOfReachableStates = new bytes32[](2);
+      stateIds[3] = 0x03;
+      stateIds[4] = 0x04;
+      uint[] memory lengthOfReachableStates = new uint[](5);
+      lengthOfReachableStates[0] = 2;
+      lengthOfReachableStates[1] = 2;
+      lengthOfReachableStates[2] = 2;
+      lengthOfReachableStates[3] = 1;
+      lengthOfReachableStates[4] = 0;
+      bytes32[] memory arrayOfArraysOfReachableStates = new bytes32[](7);
       arrayOfArraysOfReachableStates[0] = 0x01;
-      arrayOfArraysOfReachableStates[1] = 0x02;
+      arrayOfArraysOfReachableStates[1] = 0x04;
+
+      arrayOfArraysOfReachableStates[2] = 0x02;
+      arrayOfArraysOfReachableStates[3] = 0x04;
+
+      arrayOfArraysOfReachableStates[4] = 0x03;
+      arrayOfArraysOfReachableStates[5] = 0x04;
+
+      arrayOfArraysOfReachableStates[6] = 0x04;
 
       return new Agreement(
         mutators,
         stateIds,
         lengthOfReachableStates,
         arrayOfArraysOfReachableStates,
-        0x0
+        0x00
       );
     }
 

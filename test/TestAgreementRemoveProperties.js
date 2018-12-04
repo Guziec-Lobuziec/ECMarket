@@ -4,7 +4,7 @@ const {AgreementEnumerations} = require('./helpers/Enumerations');
 const Agreement = artifacts.require('Agreement');
 const {assertRevert} = require('./helpers/assertThrow');
 const StandardECMToken = artifacts.require("StandardECMToken");
-var AgreementStates = [artifacts.require("EntryState")];
+var AgreementStates = [artifacts.require("EntryState"),artifacts.require("RunningState")];
 
 contract('Test agreement flow cross-interactions with remove', async (accounts) => {
   const creator = accounts[0];
@@ -37,8 +37,8 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
   })
 
   it('test if accept does not affect remove', async () => {
-    await agreement.accept(accounts[1], {from: creator});
-    await assertRevert(agreement.remove({from: accounts[1]}));
+    await agreementInterfaces[0].accept(accounts[1], {from: creator});
+    await assertRevert(agreementInterfaces[0].remove({from: accounts[1]}));
   })
 
   it('Agreement 1.1 should set to Running', async () =>
@@ -53,7 +53,7 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
 
   it('Agreement 1.1 cannot be remove if Status is set to running', async () =>
   {
-      await assertRevert(agreement.remove({from: creator}));
+      await assertRevert(agreementInterfaces[0].remove({from: creator}));
   })
 
 })
