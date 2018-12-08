@@ -148,7 +148,7 @@ contract("Expiration Time - upper and lower limit (test env: upper 10000, lower:
       it('testing expiration limit for '+test.expirationLimit, async () =>
       {
           assert.equal(
-            await agreement.getBlocksToExpiration.call(),
+            (await agreement.getBlocksToExpiration.call()).toNumber(),
             test.expirationLimit,
             'Should not pass given limit'
           )

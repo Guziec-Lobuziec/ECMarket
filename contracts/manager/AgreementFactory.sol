@@ -43,6 +43,12 @@ contract AgreementFactory is IAgreementFactory {
 
       Agreement newInstance = createAgreement();
 
+      if(blocksToExpiration < lowerExpirationLimit)
+        blocksToExpiration = lowerExpirationLimit;
+
+      if(blocksToExpiration > upperExpirationLimit)
+        blocksToExpiration = upperExpirationLimit-1;
+
       newInstance.init(
         agreementManager,
         tokenContract,

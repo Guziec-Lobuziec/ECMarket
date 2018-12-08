@@ -5,7 +5,7 @@ const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
 
-contract('Agreement 1.2 - default path', async (accounts) => {
+contract.skip('Agreement 1.2 - default path', async (accounts) => {
   const creator = accounts[0];
   const buyer = accounts[1];
   const suplicant1 = accounts[2];
