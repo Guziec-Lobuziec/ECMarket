@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity 0.4.24;
 
 
 import "./IAgreementManager.sol";
@@ -26,10 +26,11 @@ contract AgreementManager is IAgreementManager {
     }
 
     function create(
-      bytes32[2] name,
-      bytes32[8] description,
+      bytes32[] name,
+      bytes32[] description,
       uint blocksToExpiration,
-      bytes32[] extra
+      uint price,
+      bytes extra
     ) public returns (address) {
 
         address newAgreement = factory.create(
@@ -37,6 +38,7 @@ contract AgreementManager is IAgreementManager {
           name,
           description,
           blocksToExpiration,
+          price,
           extra
         );
 

@@ -1,9 +1,10 @@
 const AgreementManager = artifacts.require('AgreementManager');
 const {createManyAgreements} = require('./helpers/agreementFactory');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
-const Agreement1_1 = artifacts.require('Agreement1_1');
+const Agreement = artifacts.require('Agreement');
 const {assertRevert} = require('./helpers/assertThrow');
 const StandardECMToken = artifacts.require("StandardECMToken");
+var AgreementStates = [artifacts.require("EntryState"),artifacts.require("RunningState"), artifacts.require("RemovingState")];
 
 contract("Expiration Time A1.1 - join, accept, conclude", async(accounts) =>
 {
@@ -45,6 +46,7 @@ contract("Expiration Time A1.1 - join, accept, conclude", async(accounts) =>
 
       let agreement;
       let testManager;
+      let agreementInterfaces = [];
 
       before(async () =>
       {
@@ -53,11 +55,14 @@ contract("Expiration Time A1.1 - join, accept, conclude", async(accounts) =>
             testManager,
             [test.args]
           )
-          agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+          agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+          agreementInterfaces = await Promise.all(
+            AgreementStates.map(stateI => stateI.at(agreement.address))
+          );
 
-          await agreement.join({from: accounts[1]});
-          await agreement.join({from: accounts[2]});
-          await agreement.join({from: accounts[3]});
+          await agreementInterfaces[0].join({from: accounts[1]});
+          await agreementInterfaces[0].join({from: accounts[2]});
+          await agreementInterfaces[0].join({from: accounts[3]});
 
       })
 
@@ -80,15 +85,15 @@ contract("Expiration Time A1.1 - join, accept, conclude", async(accounts) =>
 
       it('User cannot use join to agreement after '+test.blocksCount+' blocks', async () =>
       {
-          await assertRevert(agreement.join({from: accounts[5]}));
+          await assertRevert(agreementInterfaces[0].join({from: accounts[5]}));
       })
 
       it('User cannot accept agreement after '+test.blocksCount+' blocks', async () => {
-          await assertRevert(agreement.accept(accounts[3], {from: creator}));
+          await assertRevert(agreementInterfaces[0].accept(accounts[3], {from: creator}));
       })
 
       it('User cannot conclude agreement after '+test.blocksCount+' blocks', async () => {
-          await assertRevert(agreement.conclude({from: accounts[2]}));
+          await assertRevert(agreementInterfaces[1].conclude({from: accounts[2]}));
       })
     })
 
@@ -124,6 +129,7 @@ contract("Expiration Time - upper and lower limit (test env: upper 10000, lower:
 
       let agreement;
       let testManager;
+      let agreementInterfaces = [];
 
       before(async () =>
       {
@@ -132,14 +138,17 @@ contract("Expiration Time - upper and lower limit (test env: upper 10000, lower:
             testManager,
             [test.args]
           )
-          agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+          agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
+          agreementInterfaces = await Promise.all(
+            AgreementStates.map(stateI => stateI.at(agreement.address))
+          );
 
       })
 
       it('testing expiration limit for '+test.expirationLimit, async () =>
       {
           assert.equal(
-            await agreement.getBlocksToExpiration.call(),
+            (await agreement.getBlocksToExpiration.call()).toNumber(),
             test.expirationLimit,
             'Should not pass given limit'
           )
