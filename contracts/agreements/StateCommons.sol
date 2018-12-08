@@ -15,6 +15,8 @@ contract StateCommons is StorageClient, AbstractState, AgreementCommons {
     _;
   }
 
+  function getStatus() public view returns(Status);
+
   function withdraw() public {
       require(getParticipantProperties(msg.sender).joined,"Address isn't part of agreement");
       require(!getParticipantProperties(msg.sender).accepted);

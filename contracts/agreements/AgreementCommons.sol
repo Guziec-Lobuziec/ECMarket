@@ -91,10 +91,6 @@ contract AgreementCommons {
       return uint(sharedStorage.getBytes32());
   }
 
-  function getStatus() public view returns(Status) {
-      return Status.New;
-  }
-
   function getName() public view returns(bytes32[]) {
       bytes32[] memory ret = new bytes32[](name.length);
       for(uint i = 0; i<name.length; i++)

@@ -178,7 +178,7 @@ contract('Agreement 1.1 flow - accept state related properties', async (accounts
 
   it('Cannot accept if agreement is Done', async () => {
     assert.equal(
-      (await agreement.getStatus.call()),
+      (await agreementInterfaces[0].getStatus.call()),
       AgreementEnumerations.Status.Running,
       "Status should be set to Running"
     );
@@ -224,7 +224,7 @@ contract('Agreement 1.1 flow - conclude properties', async (accounts) => {
 
   it('Test if agreement cannot be concluded status before Running status', async () => {
     assert.equal(
-      (await agreement.getStatus.call()),
+      (await agreementInterfaces[0].getStatus.call()),
       AgreementEnumerations.Status.New,
       "Status should be set to New"
     );

@@ -43,7 +43,7 @@ contract('Test agreement flow cross-interactions with remove', async (accounts) 
 
   it('Agreement 1.1 should set to Running', async () =>
   {
-      let RunningStatus = (await agreement.getStatus.call());
+      let RunningStatus = (await agreementInterfaces[1].getStatus.call());
       assert.equal(
         RunningStatus,
         AgreementEnumerations.Status.Running,

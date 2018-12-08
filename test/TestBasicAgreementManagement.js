@@ -1,5 +1,6 @@
 const {assertRevert} = require('./helpers/assertThrow');
 const {createManyAgreements} = require('./helpers/agreementFactory');
+const AddressCapture = artifacts.require('./helpers/AddressCapture.sol');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
@@ -247,15 +248,21 @@ contract('AgreementManager - check if agreements is registered', async(accounts)
   })
 
   it('Test if checkReg func returns false on alien agreement', async () =>{
+    let capture = await AddressCapture.new(agreementFactory.address);
     let number = await web3.toBigNumber('200000000000000000000001');
-    let alienAgreement = await agreementFactory.create(
+    await capture.create(
         accounts[0],
         ["0","0"],
         ["0","0","0","0","0","0","0","0"],
         100,
         number,
-        ""
+        '',
+        {from: accounts[0]}
     );
-    assert.isNotTrue(await testManager.checkReg.call(alienAgreement.address),'agreement should be unknow to Agreement 1.1 Manager');
+
+    assert.isNotTrue(
+      await testManager.checkReg.call((await capture.addressCaptured.call())),
+      'agreement should be unknow to Agreement 1.1 Manager'
+    );
   })
 })

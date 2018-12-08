@@ -4,7 +4,7 @@ const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
 const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
-var AgreementStates = [artifacts.require("EntryState"),artifacts.require("RunningState")];
+var AgreementStates = [artifacts.require("EntryState"),artifacts.require("RunningState"), artifacts.require("RemovingState")];
 
 contract('Agreement 1.1 - default path', async (accounts) => {
 
@@ -46,7 +46,7 @@ contract('Agreement 1.1 - default path', async (accounts) => {
 
   it('test if status is New', async () => {
     assert.equal(
-      (await agreement.getStatus.call()),
+      (await agreementInterfaces[0].getStatus.call()),
       AgreementEnumerations.Status.New,
       "Status should be set to New"
     );
@@ -112,7 +112,7 @@ contract('Agreement 1.1 - default path', async (accounts) => {
 
   it('test if status is Running', async () => {
     assert.equal(
-      (await agreement.getStatus.call()),
+      (await agreementInterfaces[1].getStatus.call()),
       AgreementEnumerations.Status.Running,
       "Status should be set to Running"
     );
@@ -124,12 +124,12 @@ contract('Agreement 1.1 - default path', async (accounts) => {
 
      await agreementInterfaces[1].conclude({from: buyer});
 
-     let afterBuyer= (await agreement.getStatus.call());
+     let afterBuyer= (await agreementInterfaces[1].getStatus.call());
      assert.equal(afterBuyer,Status.Running, "Status should be set to Running ");
 
      await agreementInterfaces[1].conclude({from: creator});
 
-     let afterCreator= (await agreement.getStatus.call());
+     let afterCreator= (await agreementInterfaces[2].getStatus.call());
      assert.equal(afterCreator,Status.Done, "Status should be set to Done ");
 
   })

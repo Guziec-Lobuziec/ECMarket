@@ -12,4 +12,8 @@ contract RemovingState is StateCommons {
       selfdestruct(msg.sender);
   }
 
+  function getStatus() public view returns(Status) {
+      return Status.Done;
+  }
+
 }

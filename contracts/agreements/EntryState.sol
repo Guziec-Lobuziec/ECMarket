@@ -55,4 +55,8 @@ contract EntryState is RemovingState {
       setMachineNextState(getMachineReachableStates()[0]);
   }
 
+  function getStatus() public view returns(Status) {
+      return Status.New;
+  }
+
 }
