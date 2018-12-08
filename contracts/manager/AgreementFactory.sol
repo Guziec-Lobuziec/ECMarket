@@ -1,7 +1,5 @@
 pragma solidity 0.4.24;
 
-import "bytes/BytesLib.sol";
-
 import "./IAgreementFactory.sol";
 import "../agreements/Agreement.sol";
 
