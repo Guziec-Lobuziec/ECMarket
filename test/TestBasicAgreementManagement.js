@@ -1,61 +1,103 @@
 const {assertRevert} = require('./helpers/assertThrow');
 const {createManyAgreements} = require('./helpers/agreementFactory');
+const AddressCapture = artifacts.require('./helpers/AddressCapture.sol');
 const AgreementManager = artifacts.require('AgreementManager');
-const Agreement1_1 = artifacts.require('Agreement1_1');
+const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
+const RemovingState = artifacts.require("RemovingState");
+const AgreementFactory = artifacts.require("AgreementFactory");
 
-contract('Agreement basic management - creation, removal', async (accounts) => {
+contract('Agreement basic management - creation', async (accounts) => {
 
   const creator = accounts[0];
+  const advancePayment = 250;
+  const timeToFallback = 50;
   var tests = [
-    {extra: {}, title: "A1.1 (no arguments)"},
-    {extra: {price: 1000}, title: "A1.1 (price)"},
-    {extra: {price: 1500, contractOut: {advancePayment: 250, timeToFallback: 50}}, title: "A1.2 (contractOut)"}
+    {extra: [], price: 0, title: "A1.1 (no arguments)"},
+    {extra: [], price: 1000, title: "A1.1 (price)"},
+    {
+      extra: [{name: "setAdvancePayment", args:[advancePayment,timeToFallback]}],
+      price: 1500,
+      title: "A1.2 (contractOut)"
+    }
   ];
 
-  tests.forEach(function(test) {
+  var testManager;
 
-    let testManager;
-    let createTransactions = [];
-    let agreementAddress = {};
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+  })
 
-    before(async () => {
-      testManager = await AgreementManager.deployed();
+  it('AgreementManager state before agreement creation' , async () => {
+    let before = await testManager.search.call();
+    assert.isTrue(before.every((e) => {return e == 0;}),'expected to be zeros before');
+  })
+
+  context('Agreement creation basic side-effects', () => {
+    tests.forEach((test, index) => {
+
+        let createTransactions = [];
+
+        it('Agreement creation events '+test.title, async () => {
+
+          createTransactions = await createManyAgreements(
+            testManager,
+            [{
+              address: creator,
+              count: 1,
+              name: ["0x0","0x0"],
+              description: ["0x0","0x0","0x0","0x0","0x0","0x0","0x0","0x0"],
+              price: test.price,
+              extra: test.extra
+            }]
+          );
+
+          assert.equal(createTransactions[0].logs.length, 1, 'one event generated');
+          assert.equal(createTransactions[0].logs[0].event, 'AgreementCreation', 'event name', 'event desciption');
+
+        })
+
+        it('Checking if contract exists under given address '+test.title, async () => {
+
+          let agreementAddress = createTransactions[0].logs[0].args.created;
+
+          assert.notEqual(agreementAddress, 0, 'should have valid address');
+
+          let codeOfAgreementBefore = await web3.eth.getCode(agreementAddress);
+          assert.notEqual(codeOfAgreementBefore, '0x0', 'should have some code');
+
+        })
+      })
     })
 
-    it('Agreement creation events '+test.title, async () => {
+})
 
-      let before = await testManager.search.call();
-      assert.isTrue(before.every((e) => {return e == 0;}),'expected to be zeros before');
+contract('Agreement basic management - search properties', async (accounts) => {
+  const creator = accounts[0];
+  const advancePayment = 250;
+  const timeToFallback = 50;
 
-      createTransactions = await createManyAgreements(
-        testManager,
-        [{
-          address: creator,
-          count: 1,
-          name: ["0","0"],
-          description: ["0","0","0","0","0","0","0","0"],
-          extra: test.extra
-        }]
-      );
 
-      assert.equal(createTransactions[0].logs.length, 1, 'one event generated');
-      assert.equal(createTransactions[0].logs[0].event, 'AgreementCreation', 'event name', 'event desciption');
+  var testManager;
+  var agreementAddress;
 
-    })
+  before(async () => {
+    testManager = await AgreementManager.deployed();
+    let createTransactions = await createManyAgreements(
+      testManager,
+      [{
+        address: creator,
+        count: 1,
+        name: ["0x0","0x0"],
+        description: ["0x0","0x0","0x0","0x0","0x0","0x0","0x0","0x0"],
+        price: 0,
+        extra: []
+      }]
+    );
+    agreementAddress = createTransactions[0].logs[0].args.created;
+  })
 
-    it('Checking if contract exists under given address '+test.title, async () => {
-
-      agreementAddress = createTransactions[0].logs[0].args.created;
-
-      assert.notEqual(agreementAddress, 0, 'should have valid address');
-
-      let codeOfAgreementBefore = await web3.eth.getCode(agreementAddress);
-      assert.notEqual(codeOfAgreementBefore, '0x0', 'should have some code');
-
-    })
-
-    it('Checking if search results match events logs '+test.title, async () => {
+    it('Checking if search results match events logs', async () => {
 
       let one = (await testManager.search.call()).filter((e) => {return e != 0;});
       assert.lengthOf(one, 1,'exactly one non zero');
@@ -63,8 +105,8 @@ contract('Agreement basic management - creation, removal', async (accounts) => {
 
     })
 
-    it('Test if agreement did selfdestruction '+test.title, async () => {
-      let agreement = await Agreement1_1.at(agreementAddress);
+    it('Test if agreement did selfdestruction', async () => {
+      let agreement = await RemovingState.at(agreementAddress);
       await agreement.remove({from: creator});
 
       let codeOfAgreementAfter = await web3.eth.getCode(agreementAddress);
@@ -74,8 +116,6 @@ contract('Agreement basic management - creation, removal', async (accounts) => {
       assert.isTrue(after.every((e) => {return e == 0;}),'expected to be zeros after');
 
     })
-  })
-
 })
 
 contract('Agreement basic management - remove selected', async (accounts) => {
@@ -125,7 +165,7 @@ contract('Agreement basic management - remove selected', async (accounts) => {
   it('Test if only selected agreement is removed', async () => {
 
     let createdAgreements = agreements.filter((e) => {return e != 0;});
-    let agreementToBeRemoved = await Agreement1_1.at(createdAgreements[0]);
+    let agreementToBeRemoved = await RemovingState.at(createdAgreements[0]);
     await agreementToBeRemoved.remove({from: accounts[0]});
 
     let after = await testManager.search.call();
@@ -137,7 +177,7 @@ contract('Agreement basic management - remove selected', async (accounts) => {
   })
 })
 
-contract('Agreement1_1 basic management - permissions to remove', async (accounts) => {
+contract('Agreement 1.1 basic management - permissions to remove', async (accounts) => {
 
   let testManager;
   let agreementsAddresses = [];
@@ -163,7 +203,7 @@ contract('Agreement1_1 basic management - permissions to remove', async (account
 
   it('Test if only creator can remove agreement', async () => {
 
-    let agreements = await Promise.all(agreementsAddresses.map((e) => {return Agreement1_1.at(e);}));
+    let agreements = await Promise.all(agreementsAddresses.map((e) => {return RemovingState.at(e);}));
 
     await assertRevert(agreements[2].remove({from: accounts[0]}),'3rd should revert');
     await assertRevert(agreements[0].remove({from: accounts[1]}),'1st should revert');
@@ -188,6 +228,7 @@ contract('AgreementManager - check if agreements is registered', async(accounts)
 {
 
   let testManager;
+  let agreementFactory;
   let createTransactions = [];
   let agreement;
   before(async () => {
@@ -198,24 +239,30 @@ contract('AgreementManager - check if agreements is registered', async(accounts)
       name: ["0","0"],
       description: ["0","0","0","0","0","0","0","0"]
     }]);
+    agreementFactory = await AgreementFactory.deployed();
   })
 
-  it('Test if agreements create by Agreement1_1 Manager are registered', async () =>{
+  it('Test if agreements create by Agreement 1.1 Manager are registered', async () =>{
         agreement = createTransactions[0].logs[0].args.created;
-        assert.isTrue(await testManager.checkReg.call(agreement),'agreement is register to Agreement1_1 Manager');
+        assert.isTrue(await testManager.checkReg.call(agreement),'agreement is register to Agreement 1.1 Manager');
   })
 
   it('Test if checkReg func returns false on alien agreement', async () =>{
+    let capture = await AddressCapture.new(agreementFactory.address);
     let number = await web3.toBigNumber('200000000000000000000001');
-    let alienAgreement = await Agreement1_1.new(
-      testManager.address,
-      accounts[1],
-      accounts[2],
-      number,
-      100,
-      ["0","0"],
-      ["0","0","0","0","0","0","0","0"]
+    await capture.create(
+        accounts[0],
+        ["0","0"],
+        ["0","0","0","0","0","0","0","0"],
+        100,
+        number,
+        '',
+        {from: accounts[0]}
     );
-    assert.isNotTrue(await testManager.checkReg.call(alienAgreement.address),'agreement should be unknow to Agreement1_1 Manager');
+
+    assert.isNotTrue(
+      await testManager.checkReg.call((await capture.addressCaptured.call())),
+      'agreement should be unknow to Agreement 1.1 Manager'
+    );
   })
 })

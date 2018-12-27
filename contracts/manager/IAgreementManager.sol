@@ -1,14 +1,15 @@
-pragma solidity 0.4.23;
+pragma solidity 0.4.24;
 
 contract IAgreementManager {
 
     event AgreementCreation(address created);
     function setAgreementFactory(address _factory) public;
     function create(
-      bytes32[2] name,
-      bytes32[8] description,
+      bytes32[] name,
+      bytes32[] description,
       uint blocksToExpiration,
-      bytes32[] extra
+      uint price,
+      bytes extra
     ) public returns (address);
     function remove() public;
     function search() public view returns (address[64]);

@@ -9,6 +9,8 @@
 
 # Solidity coverage
 /coverage
+/coverageEnv
+scTopics
 coverage.json
 
 # IDEs and editors

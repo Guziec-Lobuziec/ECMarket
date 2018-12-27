@@ -2,10 +2,11 @@ const {createManyAgreements} = require('./helpers/agreementFactory');
 const {assertRevert} = require('./helpers/assertThrow');
 const {AgreementEnumerations} = require('./helpers/Enumerations');
 const AgreementManager = artifacts.require('AgreementManager');
-const Agreement1_1 = artifacts.require('Agreement1_1');
+const Agreement = artifacts.require('Agreement');
 const StandardECMToken = artifacts.require("StandardECMToken");
+var AgreementStates = [artifacts.require("EntryState"), artifacts.require("RunningState")];
 
-contract('Agreement1_1 withdraw properties', async (accounts) => {
+contract('Agreement 1.1 withdraw properties', async (accounts) => {
 
   const creator = accounts[0];
   const buyer = accounts[1];
@@ -16,6 +17,7 @@ contract('Agreement1_1 withdraw properties', async (accounts) => {
   let testManager;
   let testWallet;
   let agreement;
+  let agreementInterfaces = [];
 
   before(async () => {
     testWallet = await StandardECMToken.deployed();
@@ -26,12 +28,16 @@ contract('Agreement1_1 withdraw properties', async (accounts) => {
         count: 1,
         name: ["0","0"],
         description: ["0","0","0","0","0","0","0","0"],
-        extra: {price: price}
+        price: price
       }]
     );
-    agreement = await Agreement1_1.at(createTransactions[0].logs[0].args.created);
+    agreement = await Agreement.at(createTransactions[0].logs[0].args.created);
     await testWallet.payIn({from: buyer, value: buyerBalance});
     await testWallet.payIn({from: suplicant1, value: suplicantBalance});
+
+    agreementInterfaces = await Promise.all(
+      AgreementStates.map(stateI => stateI.at(agreement.address))
+    );
   })
 
   beforeEach(async () => {
@@ -43,17 +49,17 @@ contract('Agreement1_1 withdraw properties', async (accounts) => {
   })
 
   it('withdraw should fail if user is not participant', async () => {
-    await assertRevert(agreement.withdraw({from: suplicant1}));
+    await assertRevert(agreementInterfaces[0].withdraw({from: suplicant1}));
   })
 
   it('withdraw should fail if user is seller', async () => {
-    await assertRevert(agreement.withdraw({from: creator}));
+    await assertRevert(agreementInterfaces[0].withdraw({from: creator}));
   })
 
   it('withdraw should allow transfer of tokens', async () => {
     await testWallet.approve(agreement.address, price, {from: suplicant1});
-    await agreement.join({from: suplicant1});
-    await agreement.withdraw({from: suplicant1});
+    await agreementInterfaces[0].join({from: suplicant1});
+    await agreementInterfaces[0].withdraw({from: suplicant1});
     assert.equal(
       (await testWallet.allowance.call(agreement.address,suplicant1)),
       price,
@@ -73,18 +79,18 @@ contract('Agreement1_1 withdraw properties', async (accounts) => {
   it('after becoming buyer, withdraw should fail', async () => {
 
     await testWallet.approve(agreement.address, price, {from: buyer});
-    await agreement.join({from: buyer});
+    await agreementInterfaces[0].join({from: buyer});
 
     await testWallet.approve(agreement.address, price, {from: suplicant1});
-    await agreement.join({from: suplicant1});
+    await agreementInterfaces[0].join({from: suplicant1});
 
-    await agreement.accept(buyer, {from: creator});
+    await agreementInterfaces[0].accept(buyer, {from: creator});
 
-    await assertRevert(agreement.withdraw({from: buyer}));
+    await assertRevert(agreementInterfaces[0].withdraw({from: buyer}));
   })
 
   it('Other suplicants will be able to withdraw tokens', async () => {
-    await agreement.withdraw({from: suplicant1});
+    await agreementInterfaces[0].withdraw({from: suplicant1});
     assert.equal(
       (await testWallet.allowance.call(agreement.address,suplicant1)),
       price,
