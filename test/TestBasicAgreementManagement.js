@@ -15,11 +15,11 @@ contract('Agreement basic management - creation', async (accounts) => {
   var tests = [
     {extra: [], price: 0, title: "A1.1 (no arguments)"},
     {extra: [], price: 1000, title: "A1.1 (price)"},
-    {
-      extra: [{name: "setAdvancePayment", args:[advancePayment,timeToFallback]}],
-      price: 1500,
-      title: "A1.2 (contractOut)"
-    }
+    // {
+    //   extra: [{name: "setAdvancePayment", args:[advancePayment,timeToFallback]}],
+    //   price: 1500,
+    //   title: "A1.2 (contractOut)"
+    // }
   ];
 
   var testManager;
